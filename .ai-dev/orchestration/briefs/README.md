@@ -35,19 +35,20 @@ M2-A … M2-E **RELEASED**（2026-06-13）
 | Gate | 目錄 | 狀態 | 說明 |
 |------|------|------|------|
 | **M4-A** | [M4-A/](M4-A/) | **RELEASED** | Classifier + Extractor + CT-G |
-| **M4-B** | [M4-B/](M4-B/) | **OPEN** | Aligner + Analyzer + Trust |
+| **M4-B** | [M4-B/](M4-B/) | **RELEASED** | Aligner + Analyzer + Trust |
+| **M4-C** | [M4-C/](M4-C/) | **OPEN** | Verdict + F01–F14 |
 | M4-C | [M4-C/](M4-C/) | BLOCKED | Verdict + F01–F14 |
 
 ---
 
 ## 派工入口
 
-**現在派 M4-B**：將 [M4-B/brief.md](M4-B/brief.md) 與 [M4-B/progress.md](M4-B/progress.md) 一併交給 Worker。
+**現在派 M4-C**：將 [M4-C/brief.md](M4-C/brief.md) 與 [M4-C/progress.md](M4-C/progress.md) 一併交給 Worker。
 
 交還 Orchestrator 時：
 
 ```markdown
-## Gate: M4-B
+## Gate: M4-C
 ## progress.md
 （附連結或 diff：progress 已勾選 §1、§2 已貼輸出）
 ## 備註

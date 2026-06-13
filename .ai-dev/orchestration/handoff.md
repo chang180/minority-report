@@ -1,7 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
 > **當前階段**：Milestone 4 — Consensus Engine（M3 ✅）。  
-> **下一步**：Gate **M4-B** — Aligner + Analyzer + Trust（見 [briefs/M4-B/](briefs/M4-B/)）。
+> **下一步**：Gate **M4-C** — Verdict + F01–F14 整合（見 [briefs/M4-C/](briefs/M4-C/)）。
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -94,9 +94,10 @@
 | Gate | 派工文件 |
 |------|----------|
 | **M4-A**（RELEASED） | [briefs/M4-A/](briefs/M4-A/) |
-| **M4-B**（OPEN） | [briefs/M4-B/](briefs/M4-B/) — Aligner + Analyzer + Trust |
+| **M4-B**（RELEASED） | [briefs/M4-B/](briefs/M4-B/) |
+| **M4-C**（OPEN） | [briefs/M4-C/](briefs/M4-C/) — Verdict + F01–F14 |
 
-M4-B 完成前 **MUST NOT** 實作 Verdict Reporter 或 F01–F14 全量整合（屬 M4-C）。
+M4-C 完成後 Milestone 4 即 **RELEASED**。
 
 ---
 
