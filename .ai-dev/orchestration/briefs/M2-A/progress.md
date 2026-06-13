@@ -57,8 +57,9 @@
 - [x] Boost skills：`laravel-best-practices`、`pest-testing`、`inertia-vue-development`、`tailwindcss-development`
 - [x] **Vue 3 + Inertia.js**（`inertiajs/inertia-laravel`、`HandleInertiaRequests`、`Welcome.vue`）
 - [x] **Pest** 取代 PHPUnit（`pestphp/pest` + `pest-plugin-laravel`；`tests/Pest.php`）
-- [x] **GitHub Actions** `.github/workflows/tests.yml`（composer + migrate + npm build + test）
+- [x] **GitHub Actions** `.github/workflows/tests.yml`（composer + migrate + npm typecheck/build + test）
 - [x] **TDD** 流程寫入 README Development
+- [x] **TypeScript** 前端預設（`app.ts`、`tsconfig.json`、`vue-tsc`；CI 跑 `npm run typecheck`）
 
 ---
 
@@ -148,7 +149,8 @@ Tests: 2 passed (11 assertions)   # Pest + assertInertia(Welcome)
 
 修改:
   README.md（Development 完整步驟）
-  routes/web.php, bootstrap/app.php, resources/js/app.js, vite.config.js, package.json
+  routes/web.php, bootstrap/app.php, resources/js/app.ts, vite.config.ts, package.json
+  tsconfig.json, tsconfig.node.json, resources/js/types/env.d.ts
   tests/Unit/ExampleTest.php, tests/Feature/ExampleTest.php（Pest 語法）
   composer.json / composer.lock（inertia, pest；移除 phpunit 直依）
 

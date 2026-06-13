@@ -44,7 +44,7 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | Framework | **Laravel 13** |
 | PHP | 8.4+ |
 | Database | SQLite（MVP）/ MySQL |
-| Frontend | **Vue 3** + **Inertia.js** + Tailwind CSS 4 |
+| Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 |
 | Testing | **Pest**（TDD；CI 於 push/PR 自動執行） |
 | AI 開發規範 | **Laravel Boost**（guidelines / skills / MCP） |
 | AI Infrastructure | Laravel AI SDK（介面層；domain 不綁 vendor） |
@@ -63,7 +63,7 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M5 Audit Trail | 待開始 |
 | M6 Minimal UI | 待開始 |
 
-目前 repo 已有 **Laravel 13 應用骨架**（SQLite、Vue + Inertia、Pest、GitHub Actions CI）。Consensus 業務邏輯尚未實作；所有行為仍以 spec 為準。
+目前 repo 已有 **Laravel 13 應用骨架**（SQLite、Vue + Inertia + TypeScript、Pest、GitHub Actions CI）。Consensus 業務邏輯尚未實作；所有行為仍以 spec 為準。
 
 ---
 
@@ -125,14 +125,26 @@ php artisan test --filter=welcome   # 單一測試
 ./vendor/bin/pest                   # 直接使用 Pest CLI
 ```
 
-CI：`.github/workflows/tests.yml` 於 `main` 的 push / PR 自動執行 `composer install` → migrate → `npm ci` → `npm run build` → `php artisan test`。
+CI：`.github/workflows/tests.yml` 於 `main` 的 push / PR 自動執行 `composer install` → migrate → `npm ci` → **`npm run typecheck`** → `npm run build` → `php artisan test`。
 
-### 前端（Vue + Inertia）
+### 前端（Vue + Inertia + TypeScript）
 
-- 頁面元件：`resources/js/Pages/`
+前端預設使用 **TypeScript**（`.ts` 入口、Vue SFC 使用 `<script setup lang="ts">`）。
+
+- 入口：`resources/js/app.ts`
+- 頁面元件：`resources/js/Pages/*.vue`
+- 型別宣告：`resources/js/types/env.d.ts`
+- 設定：`tsconfig.json`、`vite.config.ts`
 - 根模板：`resources/views/app.blade.php`
 - 路由回傳：`Inertia::render('PageName', [...])`（見 `routes/web.php`）
-- M6 UI 將在此堆疊上擴充
+
+```bash
+npm run typecheck   # vue-tsc 靜態型別檢查（CI 會跑）
+npm run dev         # Vite 開發伺服器
+npm run build       # 正式建置
+```
+
+M6 UI 將在此堆疊上擴充。
 
 ### Laravel Boost（AI 協作規範）
 
