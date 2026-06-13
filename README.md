@@ -97,4 +97,4 @@ php artisan key:generate
 
 ## License
 
-TBD
+[MIT License](LICENSE) — 可自由使用、修改與散布；軟體按「現狀」提供，不提供任何明示或默示擔保。
