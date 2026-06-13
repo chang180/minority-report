@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\AI\Providers\ConfiguredLlmProviderFactory;
 use App\Consensus\Contracts\ClaimAligner;
 use App\Consensus\Contracts\ConsensusAnalyzer;
 use App\Consensus\Contracts\FakeProviderRegistry;
@@ -14,7 +15,6 @@ use App\Consensus\Contracts\VerdictReporter;
 use App\Consensus\Fake\InMemoryFakeProviderRegistry;
 use App\Consensus\Stubs\NullClaimAligner;
 use App\Consensus\Stubs\NullConsensusAnalyzer;
-use App\Consensus\Stubs\NullLlmProvider;
 use App\Consensus\Stubs\NullQuestionClassifier;
 use App\Consensus\Stubs\NullResponseExtractor;
 use App\Consensus\Stubs\NullTrustLevelScorer;
@@ -26,7 +26,6 @@ class ConsensusServiceProvider extends ServiceProvider
 {
     public $bindings = [
         QuestionClassifier::class => NullQuestionClassifier::class,
-        LlmProvider::class => NullLlmProvider::class,
         ResponseExtractor::class => NullResponseExtractor::class,
         ClaimAligner::class => NullClaimAligner::class,
         ConsensusAnalyzer::class => NullConsensusAnalyzer::class,
@@ -39,7 +38,15 @@ class ConsensusServiceProvider extends ServiceProvider
         FakeProviderRegistry::class => InMemoryFakeProviderRegistry::class,
     ];
 
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->singleton(ConfiguredLlmProviderFactory::class);
+
+        $this->app->bind(
+            LlmProvider::class,
+            fn ($app) => $app->make(ConfiguredLlmProviderFactory::class)->default(),
+        );
+    }
 
     public function boot(): void {}
 }

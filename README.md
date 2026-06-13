@@ -58,8 +58,8 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 |-----------|------|
 | M1 Spec Documents | ✅ 完成 |
 | M2 Laravel Skeleton | ✅ 完成 |
-| M3 Provider Integration | 🚧 進行中（**M3-A** ✅ · **M3-B** 下一步） |
-| M4 Consensus Engine | 待開始 |
+| M3 Provider Integration | ✅ 完成 |
+| M4 Consensus Engine | 🚧 進行中（**M4-A** 下一步） |
 | M5 Audit Trail | 待開始 |
 | M6 Minimal UI | 待開始 |
 
@@ -155,7 +155,7 @@ M6 UI 將在此堆疊上擴充。
 
 ### Laravel AI SDK
 
-已安裝 `laravel/ai`（`config/ai.php`、agent conversation migrations）。**M3 前**僅完成套件與設定占位，不在 `app/Consensus/` 呼叫 SDK；Provider adapter 實作屬 M3。
+已安裝 `laravel/ai`（`config/ai.php`）。**M3 完成**：`app/AI/Providers/*` bridge SDK → domain `LlmProvider`；Consensus domain **MUST NOT** 直接呼叫 SDK facade。
 
 ```bash
 # 已執行（新 clone 時 setup 會 migrate）
@@ -178,7 +178,7 @@ php artisan boost:update
 
 ### LLM API Keys
 
-`.env.example` 已占位 `OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`GEMINI_API_KEY`（可空；**M3 前不呼叫**）。
+`.env.example` 已占位 `OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`GEMINI_API_KEY`（可空；缺 key 時 adapter 回傳 `provider_unavailable`）。
 
 ---
 

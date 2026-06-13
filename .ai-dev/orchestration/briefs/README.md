@@ -11,55 +11,43 @@
 
 ---
 
-## 流程
-
-```text
-讀 brief.md → 實作 → 更新 progress.md（勾選 + 貼驗收輸出）
-    → 使用者轉交 Orchestrator → 審核 progress.md + 程式碼 → RELEASED
-```
-
-**Orchestrator 只認 `progress.md` 的勾選與證據**，不以口頭摘要放行。
-
-**文件**：`docs/` 與根 `README.md` **僅 Orchestrator 可改**；Worker 若有回寫需求，寫在 progress **§4 建議 Orchestrator 文件更新**。
-
-### Laravel AI SDK（`laravel/ai`）政策
-
-| 時機 | 允許 | 禁止 |
-|------|------|------|
-| **M2-A**（Lead 選項 · 本 repo 已採用） | `composer require laravel/ai`、publish `config/ai.php`、migrate、Boost `ai-sdk-development` | 在 `app/Consensus/` 呼叫 SDK；Provider adapter 實作 |
-| **M2-B … M2-E** | interface / DTO / stub DI / audit schema | SDK **adapter**、真 LLM **呼叫** |
-| **M3-A** | fake `LlmProvider`、並行 raw answer 編排 | 真 API、SDK adapter |
-| **M3-B+** | `app/AI/Providers/*` bridge SDK → `LlmProvider` | domain 直接依賴 SDK facade |
-
----
-
 ## Milestone 2 — Laravel Skeleton ✅
 
-| Gate | 目錄 | 狀態 | 說明 |
-|------|------|------|------|
-| M2-A … M2-E | [M2-A/](M2-A/) … [M2-E/](M2-E/) | **RELEASED** | 2026-06-13 完成 |
+M2-A … M2-E **RELEASED**（2026-06-13）
 
 ---
 
-## Milestone 3 — Provider Integration（2 Gate）
+## Milestone 3 — Provider Integration ✅
 
-> 2026-06-13 自原 4 Gate 精簡：fake+編排合併為 A；三 backend adapter 合併為 B。
+| Gate | 目錄 | 狀態 |
+|------|------|------|
+| M3-A | [M3-A/](M3-A/) | **RELEASED** |
+| M3-B | [M3-B/](M3-B/) | **RELEASED** |
+
+**Milestone 3**：**RELEASED**（2026-06-13）
+
+---
+
+## Milestone 4 — Consensus Engine（3 Gate）
+
+> 2026-06-13 自原 6 Gate 精簡：A 輸入、B 核心、C 報告+fixtures。
 
 | Gate | 目錄 | 狀態 | 說明 |
 |------|------|------|------|
-| **M3-A** | [M3-A/](M3-A/) | **RELEASED** | fake provider + F01 + raw answer 編排 |
-| **M3-B** | [M3-B/](M3-B/) | **OPEN** | SDK adapter（OpenAI / Claude / Gemini） |
+| **M4-A** | [M4-A/](M4-A/) | **OPEN** | Classifier + Extractor + CT-G |
+| M4-B | [M4-B/](M4-B/) | BLOCKED | Aligner + Analyzer + Trust |
+| M4-C | [M4-C/](M4-C/) | BLOCKED | Verdict + F01–F14 |
 
 ---
 
 ## 派工入口
 
-**現在派 M3-B**：將 [M3-B/brief.md](M3-B/brief.md) 與 [M3-B/progress.md](M3-B/progress.md) 一併交給 Worker。
+**現在派 M4-A**：將 [M4-A/brief.md](M4-A/brief.md) 與 [M4-A/progress.md](M4-A/progress.md) 一併交給 Worker。
 
 交還 Orchestrator 時：
 
 ```markdown
-## Gate: M3-B
+## Gate: M4-A
 ## progress.md
 （附連結或 diff：progress 已勾選 §1、§2 已貼輸出）
 ## 備註
