@@ -2,7 +2,7 @@
 
 **Milestone 2 · Routes + 健康檢查 + M2 整體驗收**  
 **前置 Gate**：M2-A、M2-B、M2-C、M2-D 皆 **RELEASED**  
-**狀態**：OPEN
+**狀態**：**RELEASED**（2026-06-13）
 
 ---
 

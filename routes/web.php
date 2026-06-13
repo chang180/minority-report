@@ -9,3 +9,11 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'app' => 'minority-report',
+        'laravel' => app()->version(),
+    ]);
+});

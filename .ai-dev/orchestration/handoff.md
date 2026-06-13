@@ -1,7 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：Milestone 1 完成 — Spec Documents 已就緒。  
-> **下一步**：Milestone 2 — Laravel 13 Skeleton（見 [docs/07-milestones.md](../../docs/07-milestones.md)）。
+> **當前階段**：Milestone 3 — Provider Integration（M2 ✅）。  
+> **下一步**：Gate **M3-A** — fake provider + 並行 raw answer（見 [briefs/M3-A/](briefs/M3-A/)）。
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -72,9 +72,20 @@
 | **M2-B**（RELEASED） | [briefs/M2-B/](briefs/M2-B/) |
 | **M2-C**（RELEASED） | [briefs/M2-C/](briefs/M2-C/) |
 | **M2-D**（RELEASED） | [briefs/M2-D/](briefs/M2-D/) |
-| **M2-E**（OPEN） | [briefs/M2-E/](briefs/M2-E/) |
+| **M2-E**（RELEASED） | [briefs/M2-E/](briefs/M2-E/) |
 
-**M2 完成前 MUST NOT 實作 consensus 判定邏輯**（屬 M4）。
+**M2 已完成。** M2 完成前 MUST NOT 實作 consensus 判定邏輯（屬 M4）。
+
+---
+
+## Milestone 3（Gate 制 · 2 Gate）
+
+| Gate | 派工文件 |
+|------|----------|
+| **M3-A**（OPEN） | [briefs/M3-A/](briefs/M3-A/) — fake + F01 + 並行 raw answer |
+| M3-B | [briefs/M3-B/](briefs/M3-B/) — SDK adapter（OpenAI / Claude / Gemini） |
+
+M3-A 完成前 **MUST NOT** 接真 API 或寫 SDK adapter。
 
 ---
 

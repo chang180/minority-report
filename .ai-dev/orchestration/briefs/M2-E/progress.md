@@ -3,7 +3,7 @@
 | 欄位 | 值 |
 |------|-----|
 | Gate | **M2-E** |
-| 狀態 | **OPEN** |
+| 狀態 | **RELEASED** |
 | Brief | [brief.md](brief.md) |
 | Gate 總表 | [../../gate-status.md](../../gate-status.md) |
 
@@ -11,39 +11,40 @@
 
 ## 1. 交付物檢核
 
-- [ ] 健康檢查路由：`GET /health` 或 `GET /`（路徑：________）
-- [ ] JSON 含 `status`、`app`（minority-report）、`laravel` 版本
-- [ ] 根 `README.md` **未遭 Worker 修改**（serve + curl 由 Orchestrator 整合）
-- [ ] （可選）`tests/Feature/HealthCheckTest.php`
+- [x] 健康檢查路由：`GET /health`（定義於 `routes/web.php`）
+- [x] JSON 含 `status`、`app`（minority-report）、`laravel` 版本
+- [x] 根 `README.md` **未遭 Worker 修改**
+- [x] `tests/Feature/HealthCheckTest.php`（2 tests, 7 assertions）
 
 ### 1.1 M2 整體（07-milestones）
 
-- [ ] `php artisan` 可執行
-- [ ] domain 目錄符合 01-architecture §2
-- [ ] **無** consensus 判定邏輯（僅 skeleton + stub）
+- [x] `php artisan` 可執行（Laravel Framework 13.15.0）
+- [x] domain 目錄符合 01-architecture §2（`app/Consensus/` 含 Contracts/DTO/Stubs 等子目錄）
+- [x] **無** consensus 判定邏輯（僅 skeleton + stub，throw RuntimeException）
 
 ### 1.2 禁止項
 
-- [ ] **無** 問題提交 / consensus UI endpoint（M6）
-- [ ] **無** 真 LLM / Laravel AI SDK **呼叫**（M3；`laravel/ai` 已在 M2-A 安裝）
+- [x] **無** 問題提交 / consensus UI endpoint（M6）
+- [x] **無** 真 LLM / Laravel AI SDK **呼叫**（M3；`laravel/ai` 已在 M2-A 安裝）
 
 ---
 
 ## 2. 驗收命令
 
 ```bash
-composer install
 php artisan --version
-php artisan migrate --force
-php artisan serve &
-curl -s http://127.0.0.1:8000/health
-php artisan test --filter=HealthCheck
+curl -s http://minority-report.test/health
+php artisan test --compact --filter=HealthCheck
 ```
 
 ### 2.1 輸出紀錄
 
 ```text
-（Worker 貼 curl JSON + test 結果）
+Laravel Framework 13.15.0
+
+{"status":"ok","app":"minority-report","laravel":"13.15.0"}
+
+  .. 2 passed (7 assertions) 0.28s
 ```
 
 ---
@@ -52,18 +53,42 @@ php artisan test --filter=HealthCheck
 
 | Gate | progress.md 狀態 |
 |------|------------------|
-| M2-A | ☐ RELEASED |
-| M2-B | ☐ RELEASED |
-| M2-C | ☐ RELEASED |
-| M2-D | ☐ RELEASED |
-| M2-E | ☐ RELEASED |
+| M2-A | ☑ RELEASED |
+| M2-B | ☑ RELEASED |
+| M2-C | ☑ RELEASED |
+| M2-D | ☑ RELEASED |
+| M2-E | ☑ RELEASED |
 
 ---
 
-## 4. Worker 提交 / 5. Orchestrator 審核
+## 4. 變更檔案清單
 
-| Worker 日期 | |
-| **建議 Orchestrator 文件更新** | （健康檢查 URL、curl 範例、README Development 段落） |
-| Orchestrator 結果 | ☐ RELEASED · ☐ REJECTED |
-| **docs / README 整合** | ☐ 已更新 · ☐ N/A |
-| M2 Milestone | ☐ 標記 RELEASED（gate-status + 07） |
+```text
+新增:
+  tests/Feature/HealthCheckTest.php
+
+修改:
+  routes/web.php（新增 GET /health）
+  .ai-dev/orchestration/briefs/M2-E/progress.md
+```
+
+---
+
+## 5. Worker 提交
+
+| Worker 日期 | 2026-06-13 |
+| **建議 Orchestrator 文件更新** | README Development 段加入：`curl http://minority-report.test/health` 範例；健康檢查路由 `routes/web.php:13` |
+
+---
+
+## 6. Orchestrator 審核
+
+| 項目 | 內容 |
+|------|------|
+| 審核者 | Orchestrator |
+| 日期 | 2026-06-13 |
+| 結果 | ☑ **RELEASED** · ☐ REJECTED |
+| **docs / README 整合** | ☑ 已更新（README Development：`/health` curl 範例） |
+| M2 Milestone | ☑ **RELEASED**（gate-status） |
+| Blocking | 無 |
+| 備註 | 重跑 `HealthCheck` 2 passed；M2 全 Gate 完成。**M3 改為 2 Gate**（A fake+編排、B 真 adapter）。下一 Gate：**M3-A**。 |

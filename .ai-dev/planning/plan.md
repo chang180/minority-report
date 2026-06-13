@@ -105,11 +105,16 @@ Orchestrator 發 Brief → Worker 產出 → User 轉交 Orchestrator 審核
 | [orchestration/gate-status.md](../orchestration/gate-status.md) | 放行狀態 |
 | [orchestration/briefs/](../orchestration/briefs/) | Worker 派工 |
 
-**下一 Gate**：M2-A — [briefs/M2-A/](orchestration/briefs/M2-A/)
+M3–M6 詳見 orchestrator.md §5。M2 已完成；**M3 改 2 Gate**（A fake+編排、B adapter）。
 
-**AI 層決策**：Laravel AI SDK 作 infrastructure 介面化（`app/AI/` bridge → domain `LlmProvider`），非 SDK 選型 PoC。
+### M3 Gate 摘要（2026-06-13 精簡）
 
-### M2 Gate 摘要
+| Gate | 交付物 |
+|------|--------|
+| M3-A | fake `LlmProvider` + F01 + 並行 raw answer + 持久化 |
+| M3-B | `app/AI/Providers/*` + OpenAI / Claude / Gemini |
+
+### M2 Gate 摘要（已完成）
 
 | Gate | 交付物 |
 |------|--------|
@@ -118,8 +123,6 @@ Orchestrator 發 Brief → Worker 產出 → User 轉交 Orchestrator 審核
 | M2-C | `config/consensus.php` + DI |
 | M2-D | audit migrations + models |
 | M2-E | routes + M2 驗收 |
-
-M3–M6 詳見 orchestrator.md §5。M2 派工見 orchestration/briefs/。
 
 ---
 

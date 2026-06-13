@@ -28,46 +28,38 @@
 |------|------|------|
 | **M2-A**（Lead 選項 · 本 repo 已採用） | `composer require laravel/ai`、publish `config/ai.php`、migrate、Boost `ai-sdk-development` | 在 `app/Consensus/` 呼叫 SDK；Provider adapter 實作 |
 | **M2-B … M2-E** | interface / DTO / stub DI / audit schema | SDK **adapter**、真 LLM **呼叫** |
-| **M3+** | `app/AI/Providers/*` bridge SDK → `LlmProvider` | domain 直接依賴 SDK facade |
+| **M3-A** | fake `LlmProvider`、並行 raw answer 編排 | 真 API、SDK adapter |
+| **M3-B+** | `app/AI/Providers/*` bridge SDK → `LlmProvider` | domain 直接依賴 SDK facade |
 
 ---
 
-## Milestone 2 — Laravel Skeleton
+## Milestone 2 — Laravel Skeleton ✅
 
 | Gate | 目錄 | 狀態 | 說明 |
 |------|------|------|------|
-| **M2-A** | [M2-A/](M2-A/) | **RELEASED** | Laravel 13 + 可選 `laravel/ai` 安裝 |
-| **M2-B** | [M2-B/](M2-B/) | **RELEASED** | Consensus / AI interface + DTO 骨架 |
-| **M2-C** | [M2-C/](M2-C/) | **RELEASED** | config + DI stub |
-| **M2-D** | [M2-D/](M2-D/) | **RELEASED** | audit migrations + models |
-| **M2-E** | [M2-E/](M2-E/) | **OPEN** | health route + M2 總驗收 |
+| M2-A … M2-E | [M2-A/](M2-A/) … [M2-E/](M2-E/) | **RELEASED** | 2026-06-13 完成 |
 
-### 目錄慣例（M3+ 沿用）
+---
 
-```text
-briefs/
-├── README.md           ← 本文件
-├── M2-A/
-│   ├── brief.md
-│   └── progress.md
-├── M2-B/
-│   ├── brief.md
-│   └── progress.md
-└── …
-```
+## Milestone 3 — Provider Integration（2 Gate）
 
-M2 全部 **RELEASED** 後，Orchestrator 新增 `M3-A/` … 目錄（同結構）。
+> 2026-06-13 自原 4 Gate 精簡：fake+編排合併為 A；三 backend adapter 合併為 B。
+
+| Gate | 目錄 | 狀態 | 說明 |
+|------|------|------|------|
+| **M3-A** | [M3-A/](M3-A/) | **OPEN** | fake provider + F01 + 並行 raw answer |
+| M3-B | [M3-B/](M3-B/) | BLOCKED | SDK adapter（OpenAI / Claude / Gemini） |
 
 ---
 
 ## 派工入口
 
-**現在派 M2-E**：將 [M2-E/brief.md](M2-E/brief.md) 與 [M2-E/progress.md](M2-E/progress.md) 一併交給 Worker。
+**現在派 M3-A**：將 [M3-A/brief.md](M3-A/brief.md) 與 [M3-A/progress.md](M3-A/progress.md) 一併交給 Worker。
 
 交還 Orchestrator 時：
 
 ```markdown
-## Gate: M2-E
+## Gate: M3-A
 ## progress.md
 （附連結或 diff：progress 已勾選 §1、§2 已貼輸出）
 ## 備註
