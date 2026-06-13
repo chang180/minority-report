@@ -2,7 +2,7 @@
 
 **Milestone 2 · Consensus / AI 目錄與 Interface 骨架**  
 **前置 Gate**：M2-A **RELEASED**  
-**狀態**：OPEN
+**狀態**：**RELEASED**（2026-06-13）
 
 ---
 
@@ -91,7 +91,7 @@ app/AI/
 
 ```bash
 composer dump-autoload
-php -r "require 'vendor/autoload.php'; class_exists(App\\Consensus\\Contracts\\LlmProvider::class) || exit(1);"
+php -r "require 'vendor/autoload.php'; interface_exists(App\\Consensus\\Contracts\\LlmProvider::class) || exit(1); echo 'ok';"
 php artisan --version
 ```
 

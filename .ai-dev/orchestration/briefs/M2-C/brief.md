@@ -2,7 +2,7 @@
 
 **Milestone 2 · config + DI wiring**  
 **前置 Gate**：M2-B **RELEASED**  
-**狀態**：BLOCKED
+**狀態**：OPEN
 
 ---
 

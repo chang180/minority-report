@@ -37,8 +37,8 @@
 | Gate | 目錄 | 狀態 | 說明 |
 |------|------|------|------|
 | **M2-A** | [M2-A/](M2-A/) | **RELEASED** | Laravel 13 + 可選 `laravel/ai` 安裝 |
-| **M2-B** | [M2-B/](M2-B/) | **OPEN** | Consensus / AI interface 骨架 |
-| M2-C | [M2-C/](M2-C/) | BLOCKED | config + DI stub |
+| **M2-B** | [M2-B/](M2-B/) | **RELEASED** | Consensus / AI interface + DTO 骨架 |
+| **M2-C** | [M2-C/](M2-C/) | **OPEN** | config + DI stub |
 | M2-D | [M2-D/](M2-D/) | BLOCKED | audit migrations + models |
 | M2-E | [M2-E/](M2-E/) | BLOCKED | health route + M2 總驗收 |
 
@@ -62,12 +62,12 @@ M2 全部 **RELEASED** 後，Orchestrator 新增 `M3-A/` … 目錄（同結構�
 
 ## 派工入口
 
-**現在派 M2-B**：將 [M2-B/brief.md](M2-B/brief.md) 與 [M2-B/progress.md](M2-B/progress.md) 一併交給 Worker。
+**現在派 M2-C**：將 [M2-C/brief.md](M2-C/brief.md) 與 [M2-C/progress.md](M2-C/progress.md) 一併交給 Worker。
 
 交還 Orchestrator 時：
 
 ```markdown
-## Gate: M2-B
+## Gate: M2-C
 ## progress.md
 （附連結或 diff：progress 已勾選 §1、§2 已貼輸出）
 ## 備註

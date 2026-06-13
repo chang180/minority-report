@@ -69,8 +69,8 @@
 | Gate | 派工文件 |
 |------|----------|
 | **M2-A**（RELEASED） | [briefs/M2-A/](briefs/M2-A/)（brief + progress） |
-| **M2-B**（OPEN） | [briefs/M2-B/](briefs/M2-B/) |
-| M2-C | [briefs/M2-C/](briefs/M2-C/) |
+| **M2-B**（RELEASED） | [briefs/M2-B/](briefs/M2-B/) |
+| **M2-C**（OPEN） | [briefs/M2-C/](briefs/M2-C/) |
 | M2-D | [briefs/M2-D/](briefs/M2-D/) |
 | M2-E | [briefs/M2-E/](briefs/M2-E/) |
 
