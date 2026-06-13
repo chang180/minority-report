@@ -59,7 +59,7 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M1 Spec Documents | ✅ 完成 |
 | M2 Laravel Skeleton | ✅ 完成 |
 | M3 Provider Integration | ✅ 完成 |
-| M4 Consensus Engine | 🚧 進行中（**M4-A** 下一步） |
+| M4 Consensus Engine | 🚧 進行中（**M4-A** ✅ · **M4-B** 下一步） |
 | M5 Audit Trail | 待開始 |
 | M6 Minimal UI | 待開始 |
 

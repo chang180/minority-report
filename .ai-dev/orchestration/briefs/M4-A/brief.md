@@ -2,7 +2,7 @@
 
 **Milestone 4 · Question Classifier + Response Extractor**  
 **前置**：M3 全 Gate **RELEASED**  
-**狀態**：OPEN
+**狀態**：**RELEASED**（2026-06-13）
 
 > 合併原規劃 M4-A（Classifier）與 M4-B（Extractor）。Consensus 核心判定（Aligner / Analyzer / Trust）屬 **M4-B**。
 

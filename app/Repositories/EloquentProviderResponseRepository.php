@@ -24,4 +24,22 @@ class EloquentProviderResponseRepository implements ProviderResponseRepository
             'metadata' => $response->metadata ?: null,
         ]);
     }
+
+    public function updateExtraction(int $verificationRequestId, ProviderResponse $response): void
+    {
+        ProviderResponseModel::query()
+            ->where('verification_request_id', $verificationRequestId)
+            ->where('provider', $response->provider)
+            ->latest('id')
+            ->firstOrFail()
+            ->update([
+                'extraction_prompt' => $response->extractionPrompt ?: null,
+                'extractor_model' => $response->extractorModel ?: null,
+                'extraction_status' => $response->extractionStatus,
+                'normalized' => $response->normalized,
+                'usage' => $response->usage ?: null,
+                'error' => $response->error,
+                'metadata' => $response->metadata ?: null,
+            ]);
+    }
 }

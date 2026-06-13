@@ -2,7 +2,7 @@
 
 **Milestone 4 · Aligner + Analyzer + Trust Scorer**  
 **前置 Gate**：**M4-A RELEASED**  
-**狀態**：BLOCKED
+**狀態**：OPEN
 
 ---
 

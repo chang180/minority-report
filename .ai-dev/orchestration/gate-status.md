@@ -5,7 +5,7 @@
 > **M1 spec**：Claude 全文審查已整合（2026-06-13 patch：04 cap 雙列、CT-G fail-safe）。
 
 **當前 Milestone**：M4 — Consensus Engine  
-**當前可開工 Gate**：**M4-A**（M3 已 RELEASED）
+**當前可開工 Gate**：**M4-B**（M4-A 已 RELEASED）
 
 ---
 
@@ -44,8 +44,8 @@
 
 | Gate | 說明 | 狀態 |
 |------|------|------|
-| **M4-A** | Question Classifier + Response Extractor（含 CT-G1–G3） | **OPEN** |
-| M4-B | Claim Aligner + Consensus Analyzer + Trust Level Scorer | BLOCKED |
+| **M4-A** | Question Classifier + Response Extractor（含 CT-G1–G3） | **RELEASED** | 2026-06-13 · [M4-A/](briefs/M4-A/) |
+| **M4-B** | Claim Aligner + Consensus Analyzer + Trust Level Scorer | **OPEN** | [M4-B/](briefs/M4-B/) |
 | M4-C | Verdict Reporter + Fixture F01–F14 整合驗收 | BLOCKED |
 
 ---
@@ -74,3 +74,4 @@
 - 2026-06-13 | M3-A | RELEASED | fake provider + ProviderOrchestrator + persistence
 - 2026-06-13 | M3-B | RELEASED | `app/AI/Providers/*` SDK adapters + ConfiguredLlmProviderFactory
 - 2026-06-13 | — | PLAN | M4 Gate 自 6 個精簡為 3 個（A 輸入、B 核心、C 報告+fixtures）
+- 2026-06-13 | M4-A | RELEASED | FailSafeQuestionClassifier + JsonResponseExtractor + ResponseExtractionOrchestrator；CT-G1–G3

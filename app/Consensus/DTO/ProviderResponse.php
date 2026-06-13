@@ -22,5 +22,7 @@ final readonly class ProviderResponse
         public array $usage = [],
         public ?array $error = null,
         public array $metadata = [],
+        public string $extractionPrompt = '',
+        public string $extractorModel = '',
     ) {}
 }
