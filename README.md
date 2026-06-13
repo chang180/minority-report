@@ -18,14 +18,14 @@
 
 ## 這是什麼
 
-一套 **Multi-LLM Consensus Engine**（Laravel 13），完成：
+一套 **Multi-LLM Consensus Engine**（Laravel 13），流程如下：
 
 ```text
 Question → Classification → Multi-Provider Answers → Independent Extraction
     → Claim Alignment → Deterministic Consensus → Trust Level → Verdict Report
 ```
 
-核心能力（MVP 規格已完稿，實作進行中）：
+核心能力：
 
 | 能力 | 說明 |
 |------|------|
@@ -33,7 +33,9 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | **少數意見報告** | 2 vs 1 分歧時產出 Minority Report，不抹平異議 |
 | **信任等級** | `High / Medium / Low / Unknown`，base + caps 瀑布，拒絕假精確百分比 |
 | **棄權處理** | `unknown` 是棄權，不是反對票——不會產出「少數意見：我不知道」 |
-| **可稽核** | 完整 audit trail，可重播、可 regression test |
+| **可稽核** | audit trail 寫入 SQLite；replay 機制屬 M5 進行中 |
+
+端到端編排入口：`App\Consensus\ConsensusWorkflow`（Classifier → Verdict，結果持久化至 `verification_requests` / `provider_responses` / `consensus_results`）。
 
 ---
 
@@ -47,8 +49,8 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 |
 | Testing | **Pest**（TDD；CI 於 push/PR 自動執行） |
 | AI 開發規範 | **Laravel Boost**（guidelines / skills / MCP） |
-| AI Infrastructure | **Laravel AI SDK**（`laravel/ai` 已安裝；bridge 限 `app/AI/`） |
-| Providers | OpenAI · Anthropic · Gemini + **fake provider**（測試一等公民） |
+| AI Infrastructure | **Laravel AI SDK**（`laravel/ai`；adapter 限 `app/AI/`） |
+| Providers | OpenAI · Anthropic · Gemini + **fake provider**（fixture 測試） |
 
 ---
 
@@ -60,10 +62,42 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M2 Laravel Skeleton | ✅ 完成 |
 | M3 Provider Integration | ✅ 完成 |
 | M4 Consensus Engine | ✅ 完成 |
-| M5 Audit Trail | 🚧 進行中（**M5-A** 下一步） |
+| M5 Audit Trail | 🚧 進行中（**M5-A**：replay + §10 完整性） |
 | M6 Minimal UI | 待開始 |
 
-目前 repo 已有 **完整 Consensus 引擎**（Classifier → Provider → Extractor → Aligner → Analyzer → Trust → Verdict），F01–F14 fixture 回歸通過；Minimal UI 尚未實作。
+**已完成**：Consensus 引擎全鏈路、F01–F14 fixture 回歸（87 tests / 398 assertions）、SDK provider adapter、audit 三表持久化。  
+**尚未提供**：問題提交 UI、request replay API、真 LLM verdict narrative（目前 Verdict 為 deterministic structured fallback）。
+
+測試現況：`php artisan test` → 87 passed，1 skipped（opt-in live OpenAI）。
+
+---
+
+## 程式碼結構
+
+```text
+app/
+├── Consensus/              # domain（MUST NOT 直接依賴 Laravel AI SDK）
+│   ├── Classifier/         # FailSafeQuestionClassifier
+│   ├── Extractor/          # JsonResponseExtractor（逐 provider）
+│   ├── Aligner/            # StringClaimAligner
+│   ├── Analyzer/           # HybridConsensusAnalyzer（Cases 1–6）
+│   ├── Scorer/             # CascadeTrustLevelScorer
+│   ├── Verdict/            # StructuredVerdictReporter（non-binding）
+│   ├── Fake/               # fake LlmProvider + registry
+│   ├── Contracts/          # domain interfaces
+│   ├── DTO/
+│   └── ConsensusWorkflow.php
+├── AI/Providers/           # Laravel AI SDK → LlmProvider bridge
+├── Models/                 # VerificationRequest, ProviderResponse, ConsensusResult
+└── Repositories/           # Eloquent persistence adapters
+
+config/consensus.php        # provider keys、timeout、conflict threshold
+tests/
+├── Feature/Consensus/      # 整合（含 M4CFixtureRegressionTest F01–F14）
+└── Unit/Consensus/         # Classifier / Analyzer / Trust 單元測試
+```
+
+行為與術語以 `docs/02-contracts.md` 為 canonical；實作 MUST 對齊 spec。
 
 ---
 
@@ -81,7 +115,7 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | [docs/06-test-scenarios.md](docs/06-test-scenarios.md) | Fixture F01–F14、CT-G 測試 |
 | [docs/07-milestones.md](docs/07-milestones.md) | 開發里程碑 |
 
-開發者交接：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · M2 派工：[.ai-dev/orchestration/briefs/](.ai-dev/orchestration/briefs/)
+協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md) · 當前 brief：[M5-A](.ai-dev/orchestration/briefs/M5-A/)
 
 ---
 
@@ -127,9 +161,12 @@ curl -s http://127.0.0.1:8000/health
 本專案使用 **Pest**。新功能請先寫（或更新）測試，再實作程式碼；合併前須通過 `php artisan test`。
 
 ```bash
-php artisan test                    # 全 suite
-php artisan test --filter=welcome   # 單一測試
-./vendor/bin/pest                   # 直接使用 Pest CLI
+php artisan test                              # 全 suite
+php artisan test --filter=M4CFixtureRegressionTest   # F01–F14 回歸
+php artisan test --filter=FailSafeBias        # CT-G1–G3
+php artisan test --filter=TrustLevelDecisionTable
+php artisan test --filter=ConsensusAnalyzerCases
+./vendor/bin/pest
 ```
 
 CI：`.github/workflows/tests.yml` 於 `main` 的 push / PR 自動執行 `composer install` → migrate → `npm ci` → **`npm run typecheck`** → `npm run build` → `php artisan test`。
@@ -151,19 +188,20 @@ npm run dev         # Vite 開發伺服器
 npm run build       # 正式建置
 ```
 
-M6 UI 將在此堆疊上擴充。
+M6 UI 將在此堆疊上擴充（問題輸入 / 驗證結果頁）。
 
 ### Laravel AI SDK
 
-已安裝 `laravel/ai`（`config/ai.php`）。**M3 完成**：`app/AI/Providers/*` bridge SDK → domain `LlmProvider`；Consensus domain **MUST NOT** 直接呼叫 SDK facade。
+已安裝 `laravel/ai`（`config/ai.php`）。Provider adapter 位於 `app/AI/Providers/*`，bridge 至 domain `LlmProvider`；**`app/Consensus/` MUST NOT 直接呼叫 SDK facade**。
 
 ```bash
-# 已執行（新 clone 時 setup 會 migrate）
-php artisan vendor:publish --provider="Laravel\Ai\AiServiceProvider"
+# 新 clone 時 migrate 即可（套件已 require）
 php artisan migrate
 ```
 
-API keys 見 `.env.example`（`OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`GEMINI_API_KEY`）。
+API keys 見 `.env.example`（`OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`GEMINI_API_KEY`）。缺 key 時 adapter 回傳 `provider_unavailable`，不呼叫遠端 API。
+
+Opt-in  live adapter 測試：`M3_B_LIVE_OPENAI=1` + `OPENAI_API_KEY`。
 
 ### Laravel Boost（AI 協作規範）
 
@@ -175,10 +213,6 @@ php artisan boost:update
 ```
 
 產物含 `AGENTS.md`、`boost.json`、`.cursor/` 等，已納入版控，供 Cursor / Claude Code / Codex 等 agent 共用 Laravel 慣例。含 **`ai-sdk-development`** skill（隨 `laravel/ai` 自動同步）。
-
-### LLM API Keys
-
-`.env.example` 已占位 `OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`GEMINI_API_KEY`（可空；缺 key 時 adapter 回傳 `provider_unavailable`）。
 
 ---
 
