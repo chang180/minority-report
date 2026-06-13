@@ -13,7 +13,8 @@
 | Database | MySQL 或 SQLite | MVP 可先用 SQLite |
 | Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 | M6 Minimal UI；頁面於 `resources/js/Pages/` |
 | Testing | **Pest** | TDD；CI 於 push/PR 執行 |
-| AI 開發規範 | **Laravel Boost** | guidelines / skills / MCP；見根 README Development |
+| AI Infrastructure | **Laravel AI SDK**（`laravel/ai`） | 已安裝；MVP bridge 限 `app/AI/`；Consensus **MUST NOT** 直接依賴 SDK facade |
+| AI 開發規範 | **Laravel Boost** | guidelines / skills / MCP；含 `ai-sdk-development` |
 
 ---
 

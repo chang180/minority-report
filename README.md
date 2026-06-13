@@ -47,7 +47,7 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 |
 | Testing | **Pest**（TDD；CI 於 push/PR 自動執行） |
 | AI 開發規範 | **Laravel Boost**（guidelines / skills / MCP） |
-| AI Infrastructure | Laravel AI SDK（介面層；domain 不綁 vendor） |
+| AI Infrastructure | **Laravel AI SDK**（`laravel/ai` 已安裝；bridge 限 `app/AI/`） |
 | Providers | OpenAI · Anthropic · Gemini + **fake provider**（測試一等公民） |
 
 ---
@@ -146,6 +146,18 @@ npm run build       # 正式建置
 
 M6 UI 將在此堆疊上擴充。
 
+### Laravel AI SDK
+
+已安裝 `laravel/ai`（`config/ai.php`、agent conversation migrations）。**M3 前**僅完成套件與設定占位，不在 `app/Consensus/` 呼叫 SDK；Provider adapter 實作屬 M3。
+
+```bash
+# 已執行（新 clone 時 setup 會 migrate）
+php artisan vendor:publish --provider="Laravel\Ai\AiServiceProvider"
+php artisan migrate
+```
+
+API keys 見 `.env.example`（`OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`GEMINI_API_KEY`）。
+
 ### Laravel Boost（AI 協作規範）
 
 已安裝 `laravel/boost`。換機或升級主要套件後可更新 guidelines / skills：
@@ -155,7 +167,7 @@ php artisan boost:install --guidelines --skills --mcp --no-interaction
 php artisan boost:update
 ```
 
-產物含 `AGENTS.md`、`boost.json`、`.cursor/` 等，已納入版控，供 Cursor / Claude Code / Codex 等 agent 共用 Laravel 慣例。
+產物含 `AGENTS.md`、`boost.json`、`.cursor/` 等，已納入版控，供 Cursor / Claude Code / Codex 等 agent 共用 Laravel 慣例。含 **`ai-sdk-development`** skill（隨 `laravel/ai` 自動同步）。
 
 ### LLM API Keys
 
