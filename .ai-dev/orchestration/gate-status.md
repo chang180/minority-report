@@ -5,7 +5,7 @@
 > **M1 spec**：Claude 全文審查已整合（2026-06-13 patch：04 cap 雙列、CT-G fail-safe）。
 
 **當前 Milestone**：M3 — Provider Integration  
-**當前可開工 Gate**：**M3-A**（M2 已 RELEASED）
+**當前可開工 Gate**：**M3-B**（M3-A 已 RELEASED）
 
 ---
 
@@ -37,8 +37,8 @@
 
 | Gate | 說明 | 狀態 |
 |------|------|------|
-| **M3-A** | fake provider + F01 replay + 並行 raw answer 編排 | **OPEN** |
-| M3-B | Laravel AI SDK adapter（OpenAI + Claude + Gemini） | BLOCKED |
+| **M3-A** | fake provider + F01 replay + raw answer 編排 | **RELEASED** | 2026-06-13 · [M3-A/](briefs/M3-A/) |
+| **M3-B** | Laravel AI SDK adapter（OpenAI + Claude + Gemini） | **OPEN** | [M3-B/](briefs/M3-B/) |
 
 ---
 
@@ -87,3 +87,4 @@ YYYY-MM-DD | M2-A | RELEASED | Orchestrator 整合 Review #1,#3；對齊 01-arch
 - 2026-06-13 | M2-D | RELEASED | audit 三表 migration + models
 - 2026-06-13 | M2-E | RELEASED | `GET /health` + HealthCheckTest；M2 milestone 完成
 - 2026-06-13 | — | PLAN | M3 Gate 自 4 個精簡為 2 個（A fake+編排、B 真 adapter）
+- 2026-06-13 | M3-A | RELEASED | FakeLlmProvider + InMemoryFakeProviderRegistry + ProviderOrchestrator + Eloquent persistence；F01 replay

@@ -2,7 +2,7 @@
 
 **Milestone 3 · Laravel AI SDK Adapter（OpenAI + Claude + Gemini）**  
 **前置 Gate**：**M3-A RELEASED**  
-**狀態**：BLOCKED
+**狀態**：OPEN
 
 > 本 Gate 合併原規劃之 M3-C（OpenAI adapter）與 M3-D（Claude + Gemini）。三 backend 一次交付；未就緒 key 可仍以 fake 頂替（07 M3）。
 

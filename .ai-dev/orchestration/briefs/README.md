@@ -47,19 +47,19 @@
 
 | Gate | 目錄 | 狀態 | 說明 |
 |------|------|------|------|
-| **M3-A** | [M3-A/](M3-A/) | **OPEN** | fake provider + F01 + 並行 raw answer |
-| M3-B | [M3-B/](M3-B/) | BLOCKED | SDK adapter（OpenAI / Claude / Gemini） |
+| **M3-A** | [M3-A/](M3-A/) | **RELEASED** | fake provider + F01 + raw answer 編排 |
+| **M3-B** | [M3-B/](M3-B/) | **OPEN** | SDK adapter（OpenAI / Claude / Gemini） |
 
 ---
 
 ## 派工入口
 
-**現在派 M3-A**：將 [M3-A/brief.md](M3-A/brief.md) 與 [M3-A/progress.md](M3-A/progress.md) 一併交給 Worker。
+**現在派 M3-B**：將 [M3-B/brief.md](M3-B/brief.md) 與 [M3-B/progress.md](M3-B/progress.md) 一併交給 Worker。
 
 交還 Orchestrator 時：
 
 ```markdown
-## Gate: M3-A
+## Gate: M3-B
 ## progress.md
 （附連結或 diff：progress 已勾選 §1、§2 已貼輸出）
 ## 備註

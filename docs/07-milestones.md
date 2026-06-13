@@ -9,8 +9,8 @@
 | Milestone | 名稱 | 狀態 |
 |-----------|------|------|
 | M1 | Spec Documents | **完成**（本 repo `docs/00..07`） |
-| M2 | Laravel Skeleton | 待開始 |
-| M3 | Provider Integration | 待開始 |
+| M2 | Laravel Skeleton | **完成**（2026-06-13） |
+| M3 | Provider Integration | **進行中**（M3-A ✅；M3-B SDK adapter 下一步） |
 | M4 | Consensus Engine | 待開始 |
 | M5 | Audit Trail | 待開始 |
 | M6 | Minimal UI | 待開始 |

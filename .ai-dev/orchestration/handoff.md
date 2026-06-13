@@ -82,10 +82,10 @@
 
 | Gate | 派工文件 |
 |------|----------|
-| **M3-A**（OPEN） | [briefs/M3-A/](briefs/M3-A/) — fake + F01 + 並行 raw answer |
-| M3-B | [briefs/M3-B/](briefs/M3-B/) — SDK adapter（OpenAI / Claude / Gemini） |
+| **M3-A**（RELEASED） | [briefs/M3-A/](briefs/M3-A/) — fake + F01 + raw answer 編排 |
+| **M3-B**（OPEN） | [briefs/M3-B/](briefs/M3-B/) — SDK adapter（OpenAI / Claude / Gemini） |
 
-M3-A 完成前 **MUST NOT** 接真 API 或寫 SDK adapter。
+M3-B 完成前 **MUST NOT** 在 `app/Consensus/` 直接呼叫 Laravel AI SDK。
 
 ---
 

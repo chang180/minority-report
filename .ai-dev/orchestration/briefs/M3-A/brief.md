@@ -2,7 +2,7 @@
 
 **Milestone 3 · Fake Provider + 並行 Raw Answer 編排**  
 **前置**：M2 全 Gate **RELEASED**  
-**狀態**：OPEN
+**狀態**：**RELEASED**（2026-06-13）
 
 > 本 Gate 合併原規劃之 M3-A（fake + F01）與 M3-B（並行 raw answer），一次交付 fake 路徑與編排骨架。
 

@@ -3,7 +3,7 @@
 | 欄位 | 值 |
 |------|-----|
 | Gate | **M3-B** |
-| 狀態 | **BLOCKED**（待 M3-A RELEASED） |
+| 狀態 | **OPEN** |
 | Brief | [brief.md](brief.md) |
 
 ---
