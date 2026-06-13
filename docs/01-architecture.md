@@ -189,4 +189,4 @@ Job dispatch → Polling → Result page
 | §5 Latency | §17, T3-J |
 | §6 References | §20 |
 
-**技術決策覆寫**：Framework Laravel 13 見 [.ai-dev/plan.md](../.ai-dev/plan.md)。AI infrastructure 採 Laravel AI SDK 作介面層，非 SDK 選型競賽。
+**技術決策覆寫**：Framework Laravel 13 見 [.ai-dev/planning/plan.md](../.ai-dev/planning/plan.md)。AI infrastructure 採 Laravel AI SDK 作介面層，非 SDK 選型競賽。

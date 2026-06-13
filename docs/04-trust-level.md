@@ -191,7 +191,7 @@ TrustLevelResult **MUST** 包含：
 
 - **MUST** 以 decision table 單元測試覆蓋 §4 所有列（含 F13 的**有效表態==2**列，**不得**僅依可分析==2 推導）。
 - **MUST** 與 [06-test-scenarios.md](06-test-scenarios.md) Fixture F01–F14 期望一致。
-- 新增 cap 條件 **MUST** 同步更新 §2 cap 表、decision table 與 [description.md §15](../.ai-dev/description.md)。
+- 新增 cap 條件 **MUST** 同步更新 §2 cap 表、decision table 與 [description.md §15](../.ai-dev/decisions/description.md)。
 
 ---
 

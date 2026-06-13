@@ -23,7 +23,7 @@
 
 ### 進入條件
 
-- `.ai-dev/description.md` 決策文件存在
+- `.ai-dev/decisions/description.md` 決策文件存在
 
 ### 交付物
 
@@ -35,8 +35,8 @@
 - [x] `docs/05-failure-modes.md`
 - [x] `docs/06-test-scenarios.md`
 - [x] `docs/07-milestones.md`
-- [x] `.ai-dev/plan.md`
-- [x] `.ai-dev/handoff.md`
+- [x] `.ai-dev/planning/plan.md`
+- [x] `.ai-dev/orchestration/handoff.md`
 
 ### 驗收
 
@@ -51,7 +51,7 @@
 ### 進入條件
 
 - M1 完成
-- `.ai-dev/handoff.md` 已讀
+- `.ai-dev/orchestration/handoff.md` 已讀
 
 ### 交付物
 
@@ -202,4 +202,4 @@
 | Cross-Review | §23, Changelog T1–T3 |
 | Phase 3 延後 | §5, §14, §12.2 |
 
-**技術決策覆寫**：M2 使用 Laravel 13，見 [.ai-dev/plan.md](../.ai-dev/plan.md)。
+**技術決策覆寫**：M2 使用 Laravel 13，見 [.ai-dev/planning/plan.md](../.ai-dev/planning/plan.md)。

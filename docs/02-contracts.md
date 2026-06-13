@@ -394,4 +394,4 @@ interface FakeProviderRegistry
 | §9 Interfaces | §7 |
 | §10 Audit Trail | §18 |
 
-**技術決策覆寫**：Framework 見 [plan.md](../.ai-dev/plan.md)（Laravel 13）；description §6 寫 Laravel 12+ 以本專案 plan 為準。
+**技術決策覆寫**：Framework 見 [.ai-dev/planning/plan.md](../.ai-dev/planning/plan.md)（Laravel 13）；description §6 寫 Laravel 12+ 以本專案 plan 為準。

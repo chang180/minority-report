@@ -78,7 +78,7 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | [docs/06-test-scenarios.md](docs/06-test-scenarios.md) | Fixture F01–F14、CT-G 測試 |
 | [docs/07-milestones.md](docs/07-milestones.md) | 開發里程碑 |
 
-開發者交接：[.ai-dev/handoff.md](.ai-dev/handoff.md)
+開發者交接：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · M2 派工：[.ai-dev/orchestration/briefs/](.ai-dev/orchestration/briefs/)
 
 ---
 
@@ -91,7 +91,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-貢獻或協作前請先閱讀 `docs/02-contracts.md` 與 `.ai-dev/handoff.md` 中的 **Top 10 硬性規則**。
+貢獻或協作前請先閱讀 `docs/02-contracts.md` 與 `.ai-dev/orchestration/handoff.md` 中的 **Top 10 硬性規則**。
 
 ---
 

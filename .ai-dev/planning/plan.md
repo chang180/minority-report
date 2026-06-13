@@ -2,8 +2,7 @@
 
 ## 現況
 
-- 專案目前**僅有** [.ai-dev/description.md](description.md)（1074 行 handoff / 決策文件）
-- `docs/` 目錄與 `.ai-dev/handoff.md` 依本計畫建立
+- 決策與協作文件見 [.ai-dev/](../.ai-dev/README.md)（`decisions/`、`planning/`、`orchestration/`）
 - 依 §0、§21 Milestone 1：**必須先完成 spec，不得寫 Laravel application code**
 
 ## 技術決策更新（優先於 description.md §6）
@@ -29,14 +28,19 @@ docs/
 └── 07-milestones.md
 
 .ai-dev/
-├── description.md      ← 已存在，作為唯一來源決策（不修改語意）
-├── plan.md             ← 本計畫
-└── handoff.md          ← docs 完成後重建，指向 spec 並交接 Milestone 2
+├── README.md
+├── decisions/description.md
+├── planning/plan.md
+└── orchestration/
+    ├── handoff.md
+    ├── orchestrator.md
+    ├── gate-status.md
+    └── briefs/              ← Worker 派工（M2-A…E）
 ```
 
 ## 文件依賴與撰寫順序
 
-[`description.md` §23](description.md) 已拍板優先順序；以下加入**可並行**與**審核閘門**：
+[`decisions/description.md` §23](../decisions/description.md) 已拍板優先順序；以下加入**可並行**與**審核閘門**：
 
 1. `02-contracts.md`（基礎）
 2. `03-consensus-algorithm.md` + `05-failure-modes.md`（並行）
@@ -68,7 +72,7 @@ docs/
 
 ## Phase 5 — 里程碑整合、交叉審核、handoff 重建
 
-**文件**：`docs/07-milestones.md`、`.ai-dev/handoff.md`
+**文件**：`docs/07-milestones.md`、`.ai-dev/orchestration/handoff.md`
 
 ---
 
@@ -91,16 +95,17 @@ docs/
 M1 已完成。自 Milestone 2 起採 **Gate 制 + Orchestrator 整合**：
 
 ```text
-Orchestrator 發 Brief → Worker 產出 → External AI Review → User 轉交
-    → Orchestrator 整合 + 對齊 spec → 更新 gate-status → 下一 Gate
+Orchestrator 發 Brief → Worker 產出 → User 轉交 Orchestrator 審核
+    → 整合 + 對齊 spec → 更新 gate-status → 下一 Gate
 ```
 
 | 文件 | 用途 |
 |------|------|
-| [orchestrator.md](orchestrator.md) | Lead 手冊、Gate 切分、Brief/Review 模板 |
-| [gate-status.md](gate-status.md) | 當前可開工 Gate、放行紀錄 |
+| [orchestration/orchestrator.md](../orchestration/orchestrator.md) | Lead 手冊、Gate 切分 |
+| [orchestration/gate-status.md](../orchestration/gate-status.md) | 放行狀態 |
+| [orchestration/briefs/](../orchestration/briefs/) | Worker 派工 |
 
-**下一 Gate**：M2-A — 見 orchestrator.md §9
+**下一 Gate**：M2-A — [briefs/M2-A-laravel-init.md](../orchestration/briefs/M2-A-laravel-init.md)
 
 **AI 層決策**：Laravel AI SDK 作 infrastructure 介面化（`app/AI/` bridge → domain `LlmProvider`），非 SDK 選型 PoC。
 
@@ -114,7 +119,7 @@ Orchestrator 發 Brief → Worker 產出 → External AI Review → User 轉交
 | M2-D | audit migrations + models |
 | M2-E | routes + M2 驗收 |
 
-M3–M6 詳見 orchestrator.md §5。
+M3–M6 詳見 orchestrator.md §5。M2 派工見 orchestration/briefs/。
 
 ---
 

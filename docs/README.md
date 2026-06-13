@@ -1,6 +1,6 @@
 # 關鍵報告（Minority Report）— Spec 文件索引
 
-本目錄為 spec-driven 開發的**正式規格書**。決策來源為 [.ai-dev/description.md](../.ai-dev/description.md)；若 spec 與 description 在 Laravel 版本上不一致，以 [plan.md](../.ai-dev/plan.md) 的「技術決策更新」為準（**Laravel 13**）。
+本目錄為 spec-driven 開發的**正式規格書**。決策來源為 [.ai-dev/decisions/description.md](../.ai-dev/decisions/description.md)；若 spec 與 description 在 Laravel 版本上不一致，以 [plan.md](../.ai-dev/planning/plan.md) 的「技術決策更新」為準（**Laravel 13**）。
 
 ## 文件清單與依賴順序
 
