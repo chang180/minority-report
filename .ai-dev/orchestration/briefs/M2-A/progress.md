@@ -194,4 +194,4 @@ Tests: 2 passed (11 assertions)   # Pest + assertInertia(Welcome)
 | 結果 | ☑ **RELEASED** · ☐ REJECTED |
 | Blocking 項 | 無 |
 | **docs / README 整合** | ☑ 已更新（README Development · `docs/01-architecture.md` §1） |
-| 備註 | … **PATCH 2026-06-13**：`laravel/ai` 追溯納入 M2-A 交付（`4f4a3a1`）；briefs 政策：M2-A 可裝 SDK、M3 才 adapter/呼叫。下一 Gate：**M2-B**。 |
+| 備註 | 驗收：`artisan` 13.15.0、sqlite、`test` 2 passed、`typecheck` OK。**PATCH 2026-06-13**：`laravel/ai` 追溯納入 M2-A（`4f4a3a1`）；briefs 政策：M2-A 可裝 SDK、M3 才 adapter/呼叫。下一 Gate：**M2-B**。 |
