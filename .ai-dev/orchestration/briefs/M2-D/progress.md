@@ -3,7 +3,7 @@
 | 欄位 | 值 |
 |------|-----|
 | Gate | **M2-D** |
-| 狀態 | **BLOCKED**（待 M2-B RELEASED；可與 M2-C 並行） |
+| 狀態 | **OPEN** |
 | Brief | [brief.md](brief.md) |
 | Gate 總表 | [../../gate-status.md](../../gate-status.md) |
 

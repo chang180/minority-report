@@ -5,7 +5,7 @@
 > **M1 spec**：Claude 全文審查已整合（2026-06-13 patch：04 cap 雙列、CT-G fail-safe）。
 
 **當前 Milestone**：M2 — Laravel Skeleton  
-**當前可開工 Gate**：**M2-C**（M2-B 已 RELEASED）
+**當前可開工 Gate**：**M2-D**（M2-C 已 RELEASED；M2-E 前尚需 M2-D）
 
 ---
 
@@ -23,8 +23,8 @@
 |------|------|------|------|
 | M2-A | Laravel 13 專案初始化 | **RELEASED** | 2026-06-13 · 含 `laravel/ai` · [M2-A/](briefs/M2-A/) |
 | M2-B | Consensus 目錄 + interface/DTO 骨架 | **RELEASED** | 2026-06-13 · [M2-B/](briefs/M2-B/) |
-| M2-C | config/consensus.php + DI wiring | **OPEN** | [M2-C/](briefs/M2-C/) |
-| M2-D | migrations + model skeleton | BLOCKED | [M2-D/](briefs/M2-D/) |
+| M2-C | config/consensus.php + DI wiring | **RELEASED** | 2026-06-13 · [M2-C/](briefs/M2-C/) |
+| M2-D | migrations + model skeleton | **OPEN** | [M2-D/](briefs/M2-D/) |
 | M2-E | routes + M2 驗收 | BLOCKED | [M2-E/](briefs/M2-E/) |
 
 ---
@@ -81,3 +81,4 @@ YYYY-MM-DD | M2-A | RELEASED | Orchestrator 整合 Review #1,#3；對齊 01-arch
 - 2026-06-13 | M2-A | RELEASED | Laravel 13 + SQLite + Boost + Vue/Inertia/TS + Pest + CI；README Development；01 §1 前端堆疊回寫
 - 2026-06-13 | M2-A | PATCH | Lead：`laravel/ai` 納入 M2-A 交付；briefs 政策改為「M2-A 可裝 SDK、M3 才 adapter/呼叫」
 - 2026-06-13 | M2-B | RELEASED | `app/Consensus/*` Contracts+DTO 骨架、02 §9 簽名對齊；無 SDK 呼叫
+- 2026-06-13 | M2-C | RELEASED | `config/consensus.php` + ConsensusServiceProvider + Null stubs DI
