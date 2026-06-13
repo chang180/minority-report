@@ -2,7 +2,7 @@
 
 **Milestone 2 · Audit migrations + Model skeleton**  
 **前置 Gate**：M2-B **RELEASED**（可與 M2-C 並行，但 **M2-E 前必須 RELEASED**）  
-**狀態**：OPEN
+**狀態**：**RELEASED**（2026-06-13）
 
 ---
 
