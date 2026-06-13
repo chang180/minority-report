@@ -2,7 +2,7 @@
 
 **Milestone 2 · Consensus / AI 目錄與 Interface 骨架**  
 **前置 Gate**：M2-A **RELEASED**  
-**狀態**：BLOCKED
+**狀態**：OPEN
 
 ---
 

@@ -11,6 +11,9 @@
 | Framework | **Laravel 13** | 覆寫 description.md §6 的 Laravel 12+ |
 | PHP | 8.4+ | |
 | Database | MySQL 或 SQLite | MVP 可先用 SQLite |
+| Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 | M6 Minimal UI；頁面於 `resources/js/Pages/` |
+| Testing | **Pest** | TDD；CI 於 push/PR 執行 |
+| AI 開發規範 | **Laravel Boost** | guidelines / skills / MCP；見根 README Development |
 
 ---
 

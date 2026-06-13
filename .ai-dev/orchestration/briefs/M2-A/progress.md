@@ -3,7 +3,7 @@
 | 欄位 | 值 |
 |------|-----|
 | Gate | **M2-A** |
-| 狀態 | **OPEN**（Lead 追加需求已整合，待 RELEASED） |
+| 狀態 | **RELEASED** |
 | 前置 | M1 RELEASED |
 | Brief | [brief.md](brief.md) |
 | Gate 總表 | [../../gate-status.md](../../gate-status.md) |
@@ -42,7 +42,7 @@
 ### 1.4 Orchestrator / Lead 文件
 
 - [x] 根 `README.md` **Development** 含可執行步驟、Vue+Inertia、Pest/TDD、CI、Boost
-- [ ] （若需）`docs/` 與實作一致之回寫已完成（前端堆疊可留 M6 前再回寫 `01-architecture`）
+- [x] （若需）`docs/` 與實作一致之回寫已完成 — Orchestrator 已更新 `01-architecture.md` §1 Tech Stack
 
 ### 1.5 禁止項（必須為空或不存在）
 
@@ -169,7 +169,7 @@ Tests: 2 passed (11 assertions)   # Pest + assertInertia(Welcome)
 |------|------|
 | 提交者 | Worker Agent（Cursor）+ Lead 追加整合 |
 | 日期 | 2026-06-13 |
-| PR / commit | 見 git push `main` |
+| PR / commit | `b3d7110`、`ca18969` on `main` |
 | 留給 M2-B | `app/Consensus/` 目錄骨架 + 空 interface 占位；`app/AI/Providers/` 占位；Service provider wiring |
 | **Lead 決策（已實作）** | Boost 產物全 commit；Vue+Inertia；Pest；CI+TDD 寫入 README |
 | **建議 Orchestrator 文件更新** | README 已更新；`docs/01-architecture.md` §1 可補 Frontend: Vue+Inertia（非 blocking） |
@@ -181,8 +181,8 @@ Tests: 2 passed (11 assertions)   # Pest + assertInertia(Welcome)
 | 項目 | 內容 |
 |------|------|
 | 審核者 | Orchestrator |
-| 日期 | |
-| 結果 | ☐ RELEASED · ☐ REJECTED |
-| Blocking 項 | |
-| **docs / README 整合** | ☐ 已更新 · ☐ N/A |
-| 備註 | |
+| 日期 | 2026-06-13 |
+| 結果 | ☑ **RELEASED** · ☐ REJECTED |
+| Blocking 項 | 無 |
+| **docs / README 整合** | ☑ 已更新（README Development · `docs/01-architecture.md` §1） |
+| 備註 | 驗收重跑：`artisan --version` 13.15.0、`about` sqlite、`test` 2 passed、`npm run typecheck` OK。Lead 追加（Boost / Inertia / Pest / CI / TS）均在 M2-A 邊界內，未觸及 Consensus 業務。下一 Gate：**M2-B**。 |
