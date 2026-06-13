@@ -44,6 +44,9 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | Framework | **Laravel 13** |
 | PHP | 8.4+ |
 | Database | SQLite（MVP）/ MySQL |
+| Frontend | **Vue 3** + **Inertia.js** + Tailwind CSS 4 |
+| Testing | **Pest**（TDD；CI 於 push/PR 自動執行） |
+| AI 開發規範 | **Laravel Boost**（guidelines / skills / MCP） |
 | AI Infrastructure | Laravel AI SDK（介面層；domain 不綁 vendor） |
 | Providers | OpenAI · Anthropic · Gemini + **fake provider**（測試一等公民） |
 
@@ -54,13 +57,13 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | Milestone | 狀態 |
 |-----------|------|
 | M1 Spec Documents | ✅ 完成 |
-| M2 Laravel Skeleton | 🔜 下一步 |
+| M2 Laravel Skeleton | 🚧 進行中（M2-A 骨架 + Boost / Inertia / Pest / CI） |
 | M3 Provider Integration | 待開始 |
 | M4 Consensus Engine | 待開始 |
 | M5 Audit Trail | 待開始 |
 | M6 Minimal UI | 待開始 |
 
-目前 repo **尚無 application code**；所有行為以 spec 為準，進入 M2 後才開始撰寫 Laravel 程式碼。
+目前 repo 已有 **Laravel 13 應用骨架**（SQLite、Vue + Inertia、Pest、GitHub Actions CI）。Consensus 業務邏輯尚未實作；所有行為仍以 spec 為準。
 
 ---
 
@@ -84,12 +87,69 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 
 ## 開發
 
+### 需求
+
+- PHP **8.4+**、Composer 2.x
+- Node.js **22+**、npm（Vue + Inertia 前端）
+- SQLite（MVP 預設；本地需建立 `database/database.sqlite`）
+
+### 首次設定
+
 ```bash
-# M2 起（尚未初始化）
-composer create-project laravel/laravel . "^13.0"
+composer install
 cp .env.example .env
 php artisan key:generate
+touch database/database.sqlite
+php artisan migrate
+
+npm install
+npm run build          # 或開發時 npm run dev
 ```
+
+### 日常開發
+
+```bash
+composer dev           # artisan serve + queue + pail + vite（一鍵）
+# 或分開：
+php artisan serve
+npm run dev
+```
+
+### 測試（TDD）
+
+本專案使用 **Pest**。新功能請先寫（或更新）測試，再實作程式碼；合併前須通過 `php artisan test`。
+
+```bash
+php artisan test                    # 全 suite
+php artisan test --filter=welcome   # 單一測試
+./vendor/bin/pest                   # 直接使用 Pest CLI
+```
+
+CI：`.github/workflows/tests.yml` 於 `main` 的 push / PR 自動執行 `composer install` → migrate → `npm ci` → `npm run build` → `php artisan test`。
+
+### 前端（Vue + Inertia）
+
+- 頁面元件：`resources/js/Pages/`
+- 根模板：`resources/views/app.blade.php`
+- 路由回傳：`Inertia::render('PageName', [...])`（見 `routes/web.php`）
+- M6 UI 將在此堆疊上擴充
+
+### Laravel Boost（AI 協作規範）
+
+已安裝 `laravel/boost`。換機或升級主要套件後可更新 guidelines / skills：
+
+```bash
+php artisan boost:install --guidelines --skills --mcp --no-interaction
+php artisan boost:update
+```
+
+產物含 `AGENTS.md`、`boost.json`、`.cursor/` 等，已納入版控，供 Cursor / Claude Code / Codex 等 agent 共用 Laravel 慣例。
+
+### LLM API Keys
+
+`.env.example` 已占位 `OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`GEMINI_API_KEY`（可空；**M3 前不呼叫**）。
+
+---
 
 貢獻或協作前請先閱讀 `docs/02-contracts.md` 與 `.ai-dev/orchestration/handoff.md` 中的 **Top 10 硬性規則**。
 
