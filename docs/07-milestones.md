@@ -11,8 +11,8 @@
 | M1 | Spec Documents | **完成**（本 repo `docs/00..07`） |
 | M2 | Laravel Skeleton | **完成**（2026-06-13） |
 | M3 | Provider Integration | **完成**（2026-06-13） |
-| M4 | Consensus Engine | **進行中**（M4-A ✅ · M4-B ✅ · M4-C 下一步） |
-| M5 | Audit Trail | 待開始 |
+| M4 | Consensus Engine | **完成**（2026-06-13） |
+| M5 | Audit Trail | **進行中**（M5-A 下一步） |
 | M6 | Minimal UI | 待開始 |
 
 **M1 完成前 MUST NOT 撰寫 Laravel application code。** M2 起可開始實作。

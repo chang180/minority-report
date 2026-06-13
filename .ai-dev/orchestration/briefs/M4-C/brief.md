@@ -2,7 +2,7 @@
 
 **Milestone 4 · Verdict Reporter + Fixture 整合驗收**  
 **前置 Gate**：**M4-B RELEASED**  
-**狀態**：OPEN
+**狀態**：**RELEASED**（2026-06-13）
 
 ---
 

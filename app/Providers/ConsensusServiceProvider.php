@@ -18,7 +18,7 @@ use App\Consensus\Contracts\VerdictReporter;
 use App\Consensus\Extractor\JsonResponseExtractor;
 use App\Consensus\Fake\InMemoryFakeProviderRegistry;
 use App\Consensus\Scorer\CascadeTrustLevelScorer;
-use App\Consensus\Stubs\NullVerdictReporter;
+use App\Consensus\Verdict\StructuredVerdictReporter;
 use App\Repositories\EloquentProviderResponseRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -30,7 +30,7 @@ class ConsensusServiceProvider extends ServiceProvider
         ClaimAligner::class => StringClaimAligner::class,
         ConsensusAnalyzer::class => HybridConsensusAnalyzer::class,
         TrustLevelScorer::class => CascadeTrustLevelScorer::class,
-        VerdictReporter::class => NullVerdictReporter::class,
+        VerdictReporter::class => StructuredVerdictReporter::class,
         ProviderResponseRepository::class => EloquentProviderResponseRepository::class,
     ];
 

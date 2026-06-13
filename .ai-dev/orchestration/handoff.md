@@ -1,7 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：Milestone 4 — Consensus Engine（M3 ✅）。  
-> **下一步**：Gate **M4-C** — Verdict + F01–F14 整合（見 [briefs/M4-C/](briefs/M4-C/)）。
+> **當前階段**：Milestone 5 — Audit Trail（M4 ✅）。  
+> **下一步**：Gate **M5-A** — replay + audit 完整性（見 [briefs/M5-A/](briefs/M5-A/)）。
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -89,15 +89,17 @@
 
 ---
 
-## Milestone 4（Gate 制 · 3 Gate）
+## Milestone 4（Gate 制 · 3 Gate）✅
+
+M4-A … M4-C **RELEASED**（2026-06-13）。Consensus 核心流程（Classifier → Verdict）可跑，F01–F14 通過。
+
+---
+
+## Milestone 5（Gate 制 · 1 Gate）
 
 | Gate | 派工文件 |
 |------|----------|
-| **M4-A**（RELEASED） | [briefs/M4-A/](briefs/M4-A/) |
-| **M4-B**（RELEASED） | [briefs/M4-B/](briefs/M4-B/) |
-| **M4-C**（OPEN） | [briefs/M4-C/](briefs/M4-C/) — Verdict + F01–F14 |
-
-M4-C 完成後 Milestone 4 即 **RELEASED**。
+| **M5-A**（OPEN） | [briefs/M5-A/](briefs/M5-A/) — replay + §10 audit 完整性 |
 
 ---
 

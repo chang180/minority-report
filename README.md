@@ -59,11 +59,11 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M1 Spec Documents | ✅ 完成 |
 | M2 Laravel Skeleton | ✅ 完成 |
 | M3 Provider Integration | ✅ 完成 |
-| M4 Consensus Engine | 🚧 進行中（**M4-A** ✅ · **M4-B** ✅ · **M4-C** 下一步） |
-| M5 Audit Trail | 待開始 |
+| M4 Consensus Engine | ✅ 完成 |
+| M5 Audit Trail | 🚧 進行中（**M5-A** 下一步） |
 | M6 Minimal UI | 待開始 |
 
-目前 repo 已有 **Laravel 13 應用骨架**（SQLite、Vue + Inertia + TypeScript、Pest、GitHub Actions CI）。Consensus 業務邏輯尚未實作；所有行為仍以 spec 為準。
+目前 repo 已有 **完整 Consensus 引擎**（Classifier → Provider → Extractor → Aligner → Analyzer → Trust → Verdict），F01–F14 fixture 回歸通過；Minimal UI 尚未實作。
 
 ---
 
