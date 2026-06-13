@@ -79,9 +79,11 @@ app/AI/
 
 - 修改 `docs/`、根目錄 `README.md`（Orchestrator 專責；需求寫 progress §4）
 - 實作任何 consensus / trust / align 算法
-- 呼叫 LLM 或 Laravel AI SDK
-- 撰寫 migration（**M2-D**）
+- **呼叫** LLM 或 Laravel AI SDK（含在 `app/Consensus/` 或 `app/AI/Providers/` 寫 adapter 實作）
+- 撰寫 migration（**M2-D**；`laravel/ai` 的 agent conversation 表已在 **M2-A**）
 - 撰寫 `config/consensus.php` 業務綁定（**M2-C**）
+
+> **`laravel/ai` 已在 M2-A 安裝**；本 Gate 僅建立 interface / DTO 骨架，不碰 SDK。
 
 ---
 

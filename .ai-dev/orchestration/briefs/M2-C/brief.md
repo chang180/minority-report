@@ -47,7 +47,7 @@ return [
 
 - 新增 `App\Providers\ConsensusServiceProvider`（或擴展現有 AppServiceProvider，擇一並文件化）
 - 將 02 §9 各 interface 綁定到 **Null / Stub** 實作（例如 `NullQuestionClassifier` 回傳固定 DTO 或 throw `RuntimeException('Not implemented until M4')`）
-- **MUST NOT** 綁定真 LLM / Laravel AI SDK（M3）
+- **MUST NOT** 綁定 Laravel AI SDK **adapter 實作**或真 LLM backend（**M3**；`laravel/ai` 套件已在 M2-A 安裝，本 Gate 只用 stub）
 
 ### 註冊
 
@@ -59,8 +59,8 @@ return [
 
 - 修改 `docs/`、根目錄 `README.md`（Orchestrator 專責；需求寫 progress §4）
 - 實作 consensus 算法（M4）
-- 安裝 `laravel/ai` 或呼叫外部 API（M3）
-- 修改 migration（M2-D）
+- 綁定 Laravel AI SDK **adapter** 或呼叫外部 API（**M3**）
+- 修改 audit migration（M2-D；`laravel/ai` agent 表已在 M2-A）
 
 ---
 

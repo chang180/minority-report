@@ -48,13 +48,14 @@
 
 - [x] **無** `app/Consensus/` 業務實作（M2-B）
 - [x] **無** `config/consensus.php`（M2-C）
-- [x] **未**安裝 `laravel/ai` 或 consensus 相關套件（M3/M4）
-- [x] **無** consensus 算法 / Classifier / Extractor 實作
+- [x] **無** consensus 算法 / Classifier / Extractor 實作（M4）
+- [x] **無** 在 `app/Consensus/` 呼叫 SDK 或真 LLM API（M3）
 
 ### 1.6 額外（Lead 追加 · 2026-06-13）
 
 - [x] `laravel/boost` **^2.4** 已加入 `require-dev`；Boost 產物**已納入版控**
-- [x] Boost skills：`laravel-best-practices`、`pest-testing`、`inertia-vue-development`、`tailwindcss-development`
+- [x] Boost skills：`laravel-best-practices`、`pest-testing`、`inertia-vue-development`、`tailwindcss-development`、**`ai-sdk-development`**
+- [x] **`laravel/ai` ^0.8**（`config/ai.php`、agent conversations migration、stubs；**M3 前不呼叫**）
 - [x] **Vue 3 + Inertia.js**（`inertiajs/inertia-laravel`、`HandleInertiaRequests`、`Welcome.vue`）
 - [x] **Pest** 取代 PHPUnit（`pestphp/pest` + `pest-plugin-laravel`；`tests/Pest.php`）
 - [x] **GitHub Actions** `.github/workflows/tests.yml`（composer + migrate + npm typecheck/build + test）
@@ -154,6 +155,14 @@ Tests: 2 passed (11 assertions)   # Pest + assertInertia(Welcome)
   tests/Unit/ExampleTest.php, tests/Feature/ExampleTest.php（Pest 語法）
   composer.json / composer.lock（inertia, pest；移除 phpunit 直依）
 
+新增（Lead 追加 · Laravel AI SDK）:
+  laravel/ai, config/ai.php, database/migrations/*_create_agent_conversations_table.php
+  stubs/agent*.stub, stubs/tool.stub
+  .cursor/.claude/.agents/skills/ai-sdk-development/
+
+修改:
+  boost.json, AGENTS.md, CLAUDE.md, .env.example, docs/01-architecture.md §1
+
 删除:
   resources/views/welcome.blade.php（改 Inertia）
 
@@ -169,9 +178,9 @@ Tests: 2 passed (11 assertions)   # Pest + assertInertia(Welcome)
 |------|------|
 | 提交者 | Worker Agent（Cursor）+ Lead 追加整合 |
 | 日期 | 2026-06-13 |
-| PR / commit | `b3d7110`、`ca18969` on `main` |
-| 留給 M2-B | `app/Consensus/` 目錄骨架 + 空 interface 占位；`app/AI/Providers/` 占位；Service provider wiring |
-| **Lead 決策（已實作）** | Boost 產物全 commit；Vue+Inertia；Pest；CI+TDD 寫入 README |
+| PR / commit | `b3d7110`、`ca18969`、`674cc29`、`4f4a3a1` on `main` |
+| 留給 M2-B | `app/Consensus/` 目錄骨架 + 空 interface 占位；`app/AI/Providers/` 占位（**`laravel/ai` 已在 M2-A 安裝**） |
+| **Lead 決策（已實作）** | Boost 全 commit；Vue+Inertia+TS；Pest；CI+TDD；**`laravel/ai` 提前安裝（僅設定，M3 才 adapter/呼叫）** |
 | **建議 Orchestrator 文件更新** | README 已更新；`docs/01-architecture.md` §1 可補 Frontend: Vue+Inertia（非 blocking） |
 
 ---
@@ -185,4 +194,4 @@ Tests: 2 passed (11 assertions)   # Pest + assertInertia(Welcome)
 | 結果 | ☑ **RELEASED** · ☐ REJECTED |
 | Blocking 項 | 無 |
 | **docs / README 整合** | ☑ 已更新（README Development · `docs/01-architecture.md` §1） |
-| 備註 | 驗收重跑：`artisan --version` 13.15.0、`about` sqlite、`test` 2 passed、`npm run typecheck` OK。Lead 追加（Boost / Inertia / Pest / CI / TS）均在 M2-A 邊界內，未觸及 Consensus 業務。下一 Gate：**M2-B**。 |
+| 備註 | … **PATCH 2026-06-13**：`laravel/ai` 追溯納入 M2-A 交付（`4f4a3a1`）；briefs 政策：M2-A 可裝 SDK、M3 才 adapter/呼叫。下一 Gate：**M2-B**。 |

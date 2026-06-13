@@ -41,9 +41,10 @@
 
 ### 1.4 禁止項
 
-- [ ] **未**安裝 `laravel/ai`
+- [ ] **未** bind Laravel AI SDK adapter / 真 LLM backend（M3）
+- [ ] **無** 外部 API **呼叫**（M3）
 - [ ] **無** consensus 算法（M4）
-- [ ] **無** migration 變更（M2-D）
+- [ ] **無** audit migration 變更（M2-D）
 
 ---
 

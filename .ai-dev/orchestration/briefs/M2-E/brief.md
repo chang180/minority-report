@@ -52,7 +52,7 @@ php artisan test --filter=HealthCheck   # 若有
 
 - 修改 `docs/`、根目錄 `README.md`（Orchestrator 於 M2-E 放行時整合 serve/curl 說明）
 - Consensus workflow endpoint（M6）
-- 真 LLM 呼叫（M3）
+- 真 LLM / Laravel AI SDK **呼叫**（M3；`laravel/ai` 已在 M2-A 安裝）
 - Classifier 實作（M4）
 
 ---

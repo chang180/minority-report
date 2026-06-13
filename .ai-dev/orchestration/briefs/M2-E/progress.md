@@ -25,7 +25,7 @@
 ### 1.2 禁止項
 
 - [ ] **無** 問題提交 / consensus UI endpoint（M6）
-- [ ] **無** 真 LLM 呼叫（M3）
+- [ ] **無** 真 LLM / Laravel AI SDK **呼叫**（M3；`laravel/ai` 已在 M2-A 安裝）
 
 ---
 

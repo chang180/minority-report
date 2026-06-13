@@ -52,6 +52,7 @@ Eloquent 即可；**Consensus domain MUST NOT 直接依賴 Eloquent**（01 §2.2
 
 - 預設 SQLite 可跑：`php artisan migrate`
 - foreign key、index 合理即可
+- **不含** `laravel/ai` 的 `agent_conversations` 表（已在 **M2-A**）；本 Gate 只做 **audit** 三表
 
 ---
 

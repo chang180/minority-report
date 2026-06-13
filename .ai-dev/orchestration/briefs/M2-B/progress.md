@@ -53,8 +53,8 @@
 ### 1.5 禁止項
 
 - [ ] **無** consensus / trust / align 算法實作
-- [ ] **無** LLM / Laravel AI SDK 呼叫
-- [ ] **無** migration（M2-D）
+- [ ] **無** LLM / Laravel AI SDK **呼叫**（`laravel/ai` 已在 M2-A 安裝）
+- [ ] **無** migration（M2-D；agent conversation 表除外，屬 M2-A）
 - [ ] **無** `config/consensus.php`（M2-C）
 
 ---

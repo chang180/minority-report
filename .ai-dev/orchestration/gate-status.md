@@ -21,7 +21,7 @@
 
 | Gate | 說明 | 狀態 | 備註 |
 |------|------|------|------|
-| M2-A | Laravel 13 專案初始化 | **RELEASED** | 2026-06-13 · [M2-A/](briefs/M2-A/) |
+| M2-A | Laravel 13 專案初始化 | **RELEASED** | 2026-06-13 · 含 `laravel/ai` · [M2-A/](briefs/M2-A/) |
 | M2-B | Consensus 目錄 + interface/DTO 骨架 | **OPEN** | [M2-B/](briefs/M2-B/) |
 | M2-C | config/consensus.php + DI wiring | BLOCKED | [M2-C/](briefs/M2-C/) |
 | M2-D | migrations + model skeleton | BLOCKED | [M2-D/](briefs/M2-D/) |
@@ -79,3 +79,4 @@ YYYY-MM-DD | M2-A | RELEASED | Orchestrator 整合 Review #1,#3；對齊 01-arch
 - 2026-06-13 | — | REORG | briefs 改為每 Gate 目錄 + progress.md
 - 2026-06-13 | — | POLICY | M2+：`docs/`、根 README 僅 Orchestrator 可改；Worker 寫 progress §4 建議
 - 2026-06-13 | M2-A | RELEASED | Laravel 13 + SQLite + Boost + Vue/Inertia/TS + Pest + CI；README Development；01 §1 前端堆疊回寫
+- 2026-06-13 | M2-A | PATCH | Lead：`laravel/ai` 納入 M2-A 交付；briefs 政策改為「M2-A 可裝 SDK、M3 才 adapter/呼叫」
