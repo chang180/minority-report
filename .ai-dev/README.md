@@ -15,20 +15,20 @@
     ├── handoff.md            ← 給 Worker / Lead 的精簡交接
     ├── orchestrator.md       ← Lead 審核流程
     ├── gate-status.md        ← Gate 放行狀態（唯一真相）
-    └── briefs/               ← Worker 派工文件（按 Gate）
+    └── briefs/               ← 每 Gate 一目錄：brief.md + progress.md
         ├── README.md
-        └── M2-*.md
+        └── M2-A/ … M2-E/
 ```
 
 ## 快速入口
 
 | 你是… | 先讀 |
 |--------|------|
-| Worker Agent | [orchestration/briefs/](orchestration/briefs/) 對應 Gate → [handoff.md](orchestration/handoff.md) Top 10 |
-| Orchestrator（Lead） | [orchestration/orchestrator.md](orchestration/orchestrator.md) · [gate-status.md](orchestration/gate-status.md) |
+| Worker Agent | [briefs/](orchestration/briefs/) 對應 Gate + [handoff.md](orchestration/handoff.md) Top 10；**不**改 `docs/`、根 README |
+| Orchestrator（Lead） | [orchestrator.md](orchestration/orchestrator.md) · [gate-status.md](orchestration/gate-status.md) · **`docs/`、根 README 整合** |
 | 查決策為何如此 | [decisions/description.md](decisions/description.md) |
 | 查正式規格 | [docs/README.md](../docs/README.md) |
 
 ## 當前 Gate
 
-**M2-A** — 見 [orchestration/gate-status.md](orchestration/gate-status.md) · 派工 [orchestration/briefs/M2-A-laravel-init.md](orchestration/briefs/M2-A-laravel-init.md)
+**M2-A** — 見 [orchestration/gate-status.md](orchestration/gate-status.md) · 派工 [orchestration/briefs/M2-A/](orchestration/briefs/M2-A/)

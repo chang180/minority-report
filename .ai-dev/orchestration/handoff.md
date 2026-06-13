@@ -52,15 +52,27 @@
 
 ---
 
+## 文件編輯權（M2+）
+
+| 路徑 | Worker | Orchestrator |
+|------|--------|--------------|
+| `docs/`、`docs/README.md` | **MUST NOT** 修改（唯讀） | **唯一**可改動者 |
+| 根目錄 `README.md` | **MUST NOT** 修改 | **唯一**可改動者 |
+| progress §4 | **MUST** 列「建議 Orchestrator 文件更新」 | 放行前整合進 docs / README |
+
+實作與 spec 不一致、或需補 Development 步驟時，**由 Orchestrator 回寫**，不在 Worker diff 中出現上述路徑。
+
+---
+
 ## Milestone 2（Gate 制）
 
 | Gate | 派工文件 |
 |------|----------|
-| **M2-A**（OPEN） | [briefs/M2-A-laravel-init.md](briefs/M2-A-laravel-init.md) |
-| M2-B | [briefs/M2-B-consensus-skeleton.md](briefs/M2-B-consensus-skeleton.md) |
-| M2-C | [briefs/M2-C-config-di.md](briefs/M2-C-config-di.md) |
-| M2-D | [briefs/M2-D-migrations.md](briefs/M2-D-migrations.md) |
-| M2-E | [briefs/M2-E-routes-health.md](briefs/M2-E-routes-health.md) |
+| **M2-A**（OPEN） | [briefs/M2-A/](briefs/M2-A/)（brief + progress） |
+| M2-B | [briefs/M2-B/](briefs/M2-B/) |
+| M2-C | [briefs/M2-C/](briefs/M2-C/) |
+| M2-D | [briefs/M2-D/](briefs/M2-D/) |
+| M2-E | [briefs/M2-E/](briefs/M2-E/) |
 
 **M2 完成前 MUST NOT 實作 consensus 判定邏輯**（屬 M4）。
 
@@ -75,9 +87,9 @@
 
 ### 協作流程（M2+）
 
-1. 使用者依 [briefs/](briefs/) 派 Worker
-2. Worker 產出 → 使用者轉交 **Orchestrator** 審核
-3. Orchestrator 更新 [gate-status.md](gate-status.md) → 放行 → 下一 Gate
+1. 使用者依 [briefs/](briefs/) 派 Worker（**brief.md + progress.md**）
+2. Worker 實作 → **更新該 Gate 的 progress.md** → 使用者轉交 Orchestrator
+3. Orchestrator 審核 progress + 程式碼 → **必要時更新 docs/、根 README** → 更新 [gate-status.md](gate-status.md) → 放行 → 下一 Gate
 
 ---
 

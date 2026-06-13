@@ -21,11 +21,11 @@
 
 | Gate | 說明 | 狀態 | 備註 |
 |------|------|------|------|
-| M2-A | Laravel 13 專案初始化 | **OPEN** | [briefs/M2-A-laravel-init.md](briefs/M2-A-laravel-init.md) |
-| M2-B | Consensus 目錄 + interface/DTO 骨架 | BLOCKED | [M2-B-consensus-skeleton.md](briefs/M2-B-consensus-skeleton.md) |
-| M2-C | config/consensus.php + DI wiring | BLOCKED | [M2-C-config-di.md](briefs/M2-C-config-di.md) |
-| M2-D | migrations + model skeleton | BLOCKED | [M2-D-migrations.md](briefs/M2-D-migrations.md) |
-| M2-E | routes + M2 驗收 | BLOCKED | [M2-E-routes-health.md](briefs/M2-E-routes-health.md) |
+| M2-A | Laravel 13 專案初始化 | **OPEN** | [M2-A/](briefs/M2-A/) |
+| M2-B | Consensus 目錄 + interface/DTO 骨架 | BLOCKED | [M2-B/](briefs/M2-B/) |
+| M2-C | config/consensus.php + DI wiring | BLOCKED | [M2-C/](briefs/M2-C/) |
+| M2-D | migrations + model skeleton | BLOCKED | [M2-D/](briefs/M2-D/) |
+| M2-E | routes + M2 驗收 | BLOCKED | [M2-E/](briefs/M2-E/) |
 
 ---
 
@@ -76,4 +76,5 @@ YYYY-MM-DD | M2-A | RELEASED | Orchestrator 整合 Review #1,#3；對齊 01-arch
 
 - 2026-06-13 | M1 | RELEASED | Spec 建立；Cross-Review T1–T3 + T2-G
 - 2026-06-13 | M1 | PATCH | Claude 審查：04 §2 有效表態 cap 獨立列；06 CT-G1–G3；description §15 同步
-- 2026-06-13 | — | REORG | `.ai-dev/` 分為 decisions / planning / orchestration / briefs
+- 2026-06-13 | — | REORG | briefs 改為每 Gate 目錄 + progress.md
+- 2026-06-13 | — | POLICY | M2+：`docs/`、根 README 僅 Orchestrator 可改；Worker 寫 progress §4 建議

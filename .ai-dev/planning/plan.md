@@ -105,7 +105,7 @@ Orchestrator 發 Brief → Worker 產出 → User 轉交 Orchestrator 審核
 | [orchestration/gate-status.md](../orchestration/gate-status.md) | 放行狀態 |
 | [orchestration/briefs/](../orchestration/briefs/) | Worker 派工 |
 
-**下一 Gate**：M2-A — [briefs/M2-A-laravel-init.md](../orchestration/briefs/M2-A-laravel-init.md)
+**下一 Gate**：M2-A — [briefs/M2-A/](orchestration/briefs/M2-A/)
 
 **AI 層決策**：Laravel AI SDK 作 infrastructure 介面化（`app/AI/` bridge → domain `LlmProvider`），非 SDK 選型 PoC。
 
