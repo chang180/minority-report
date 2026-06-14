@@ -1,6 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：**M8 進行中** — M8-B **RELEASED**；**下一 Gate：M8-A**（verification 列表、async、Email verification）。
+> **當前階段**：**M8 進行中** — M8-B **RELEASED**；**M8-A 可開工**。  
+> **派工**：[M8-A/brief.md](briefs/M8-A/brief.md) · Spec：[10-product-ux-and-async.md](../../docs/10-product-ux-and-async.md)
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -125,7 +126,7 @@ M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結
 | Gate | 說明 | 狀態 |
 |------|------|------|
 | **M8-B** | [briefs/M8-B/](briefs/M8-B/) | **RELEASED** |
-| **M8-A** | （brief 待發布） | **下一 Gate** |
+| **M8-A** | [briefs/M8-A/](briefs/M8-A/) | **可開工** |
 | **M8-C** | （spec 待撰寫） | 規劃中 |
 
 詳見 [.ai-dev/planning/m8-roadmap.md](../planning/m8-roadmap.md)。

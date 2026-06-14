@@ -228,7 +228,7 @@
 | Gate | 名稱 | 狀態 |
 |------|------|------|
 | M8-B | Grounding v1 + trust cap + Admin 設定 | **RELEASED** |
-| M8-A | Verification 列表 + async + Email verification | **待 brief** |
+| M8-A | Verification 列表 + async + Email verification | **可開工** |
 | M8-C | Semantic claim alignment | 規劃中 |
 
 ### M8-B 進入條件
@@ -251,8 +251,26 @@
 
 ### M8-A / M8-C（概要）
 
-- **M8-A**（待 brief）：verification 列表、async Job、Email verification（本機自動通過 / 生產需驗證）
-- **M8-C**（待 spec）：semantic aligner；更新 03 / 06
+### M8-A 進入條件
+
+- M8-B **RELEASED**
+- [10-product-ux-and-async.md](10-product-ux-and-async.md) **已發布**（2026-06-14）
+
+### M8-A 交付物
+
+- `processing_status` + `RunAuthenticatedVerificationJob`
+- `GET /verifications` 列表；Show polling；`GET .../status`
+- Fortify Email verification（本機 auto-verify）
+- `POST .../replay` + UI
+- `M8A*` tests
+
+### M8-A 驗收
+
+- 詳見 [10-product-ux-and-async.md §10](10-product-ux-and-async.md)
+
+### M8-C（概要）
+
+- Semantic aligner；更新 03 / 06
 
 ---
 

@@ -10,12 +10,12 @@
 |------|-----------|-----------|------|
 | **MVP** | M1–M6 | `docs/00..07` **完成** | **RELEASED**（2026-06-14） |
 | **Post-MVP** | M7+ | `docs/08` + `07` §M7 | **RELEASED**（2026-06-14） |
-| **M8** | M8-B 進行中 | `docs/09` + `07` §M8 | M8-B **可開工** · M8-A 待 brief |
+| **M8** | M8-A 可開工 | `docs/09` + `10` + `07` §M8 | M8-B **RELEASED** · M8-A **可開工** |
 
 ### Spec-driven 規則（M2 起）
 
 1. **M1**：`docs/00..07` 完成前 **MUST NOT** 撰寫 Laravel application code。
-2. **M7+**：對應 spec 章節（如 [08-ui-auth-providers.md](08-ui-auth-providers.md)、[09-grounding-and-trust.md](09-grounding-and-trust.md)）與 [07-milestones.md](07-milestones.md) **MUST** 由 Orchestrator 寫入並對齊後，Worker **MAY** 開工該 Gate。
+2. **M7+**：對應 spec 章節（如 [08-ui-auth-providers.md](08-ui-auth-providers.md)、[09-grounding-and-trust.md](09-grounding-and-trust.md)、[10-product-ux-and-async.md](10-product-ux-and-async.md)）與 [07-milestones.md](07-milestones.md) **MUST** 由 Orchestrator 寫入並對齊後，Worker **MAY** 開工該 Gate。
 3. Worker **MUST NOT** 直接修改 `docs/`；需求變更寫 progress §4，由 Orchestrator 回寫 spec。
 4. 實作 **MUST** 對齊 spec；spec 與程式不一致時，先修 spec 或先修 code，**MUST NOT** 無 spec 漂移合併。
 
@@ -42,8 +42,11 @@
 |------|------|------|
 | [08-ui-auth-providers.md](08-ui-auth-providers.md) | Auth、UI 路由、per-user provider、Demo 管理 | 00, 01, 02, 07 |
 | [09-grounding-and-trust.md](09-grounding-and-trust.md) | Grounding v1、Admin 後端、Trust cap（M8-B） | 02, 04, 07, 08 |
+| [10-product-ux-and-async.md](10-product-ux-and-async.md) | 列表、async Job、Email verification、Replay（M8-A） | 07, 08, 09 |
 
-**M8-B Worker 必讀**：`09-grounding-and-trust.md` + `07-milestones.md` §M8-B + [M8-B brief](../.ai-dev/orchestration/briefs/M8-B/brief.md)。
+**M8-A Worker 必讀**：`10-product-ux-and-async.md` + [M8-A brief](../.ai-dev/orchestration/briefs/M8-A/brief.md)。
+
+**M8-B Worker 必讀**（已 RELEASED）：`09-grounding-and-trust.md` + [M8-B brief](../.ai-dev/orchestration/briefs/M8-B/brief.md)。
 
 ---
 

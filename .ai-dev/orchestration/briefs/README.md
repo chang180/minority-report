@@ -6,24 +6,27 @@
 
 ## 當前可開工
 
-**無** — **M8-A brief 待 Orchestrator 發布**（M8-B 已 RELEASED）。
+| Gate | Brief | 說明 |
+|------|-------|------|
+| **M8-A** | [M8-A/brief.md](M8-A/brief.md) | 列表、async Job、Email verification、Replay |
+
+Spec：[docs/10-product-ux-and-async.md](../../docs/10-product-ux-and-async.md)
 
 ---
 
-## M1–M7 + M8-B ✅
+## 已 RELEASED（M8）
 
 | Gate | 狀態 |
 |------|------|
-| M1–M7 | **RELEASED** |
 | M8-B | **RELEASED** |
 
 ---
 
-## Milestone 8（進行中）
+## Milestone 8
 
 | Gate | 狀態 |
 |------|------|
-| M8-A | **下一 Gate**（待 brief） |
+| M8-A | **可開工** |
 | M8-B | **RELEASED** |
 | M8-C | 規劃中 |
 

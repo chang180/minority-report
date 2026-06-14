@@ -71,10 +71,10 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | M7-A Auth + UI 基礎 | ✅ 完成（2026-06-14） |
 | M7-B Provider + Dashboard | ✅ 完成（2026-06-14） |
 | M8-B Grounding v1 | ✅ 完成（2026-06-14） |
-| M8-A UX + Email verification | 📋 **下一 Gate** |
+| M8-A UX + Email verification | 🔨 **可開工** |
 | M8-C Semantic alignment | 📋 規劃中 |
 
-**M1–M7 + M8-B 已完成**。**M8-A**（verification 列表、async、Email verification）為下一 Gate。
+**M1–M7 + M8-B 已完成**。**M8-A** 可開工：列表、async、Email verification — [brief](.ai-dev/orchestration/briefs/M8-A/brief.md)。
 
 ### Web 路由（摘要）
 
@@ -88,9 +88,12 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | `GET /dashboard` | auth | 儀表板（provider 就緒度、最近 verification） |
 | `GET /settings/profile`, `/settings/password` | auth | 帳號設定 |
 | `GET /settings/providers` | auth | BYOK Provider 設定（preset + 自訂 endpoint） |
-| `GET /verifications/create` | auth | 新建驗證（無 fixture） |
-| `POST /verifications` | auth | 提交登入 verification |
-| `GET /verifications/{id}` | auth | 登入 verification 結果（policy 限制本人） |
+| `GET /verifications/create` | auth, verified | 新建驗證（無 fixture） |
+| `POST /verifications` | auth, verified | 提交驗證（async Job · **M8-A**） |
+| `GET /verifications/{id}` | auth, verified | 登入 verification 結果（policy 限制本人） |
+| `GET /verifications` | auth, verified | 我的驗證列表（**M8-A**） |
+| `GET /verifications/{id}/status` | auth, verified | 處理狀態 JSON（polling · **M8-A**） |
+| `POST /verifications/{id}/replay` | auth, verified | 重播分析（**M8-A**） |
 | `GET /admin/demo` | admin | 訪客 Demo 模式管理 |
 | `PUT /admin/demo` | admin | 更新 demo 設定 |
 | `GET /admin/grounding` | admin | Grounding 後端設定（**M8-B**） |
