@@ -31,32 +31,32 @@ function submit(): void {
     <AuthLayout>
         <Card>
             <CardHeader>
-                <CardTitle>Choose a new password</CardTitle>
-                <CardDescription>Complete the password reset request.</CardDescription>
+                <CardTitle>設定新密碼</CardTitle>
+                <CardDescription>完成這次密碼重設申請。</CardDescription>
             </CardHeader>
             <CardContent>
                 <form class="grid gap-5" @submit.prevent="submit">
                     <div class="grid gap-2">
-                        <Label for="email">Email</Label>
+                        <Label for="email">電子郵件</Label>
                         <Input id="email" v-model="form.email" type="email" name="email" autocomplete="email" required />
                         <InputError :message="form.errors.email" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="password">Password</Label>
+                        <Label for="password">新密碼</Label>
                         <Input id="password" v-model="form.password" type="password" name="password" autocomplete="new-password" required autofocus />
                         <p v-if="passwordRules" class="text-xs text-neutral-500">{{ passwordRules }}</p>
                         <InputError :message="form.errors.password" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="password_confirmation">Confirm password</Label>
+                        <Label for="password_confirmation">確認密碼</Label>
                         <Input id="password_confirmation" v-model="form.password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" required />
                         <InputError :message="form.errors.password_confirmation" />
                     </div>
 
                     <Button type="submit" :disabled="form.processing">
-                        {{ form.processing ? 'Resetting...' : 'Reset password' }}
+                        {{ form.processing ? '重設中...' : '重設密碼' }}
                     </Button>
                 </form>
             </CardContent>

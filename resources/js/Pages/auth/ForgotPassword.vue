@@ -25,8 +25,8 @@ function submit(): void {
     <AuthLayout>
         <Card>
             <CardHeader>
-                <CardTitle>Reset password</CardTitle>
-                <CardDescription>Enter your email and Fortify will send a password reset link.</CardDescription>
+                <CardTitle>重設密碼</CardTitle>
+                <CardDescription>輸入電子郵件後，系統會寄出密碼重設連結。</CardDescription>
             </CardHeader>
             <CardContent>
                 <p v-if="status" class="mb-4 rounded-md bg-teal-50 px-3 py-2 text-sm text-teal-800 dark:bg-teal-950 dark:text-teal-200">
@@ -35,18 +35,18 @@ function submit(): void {
 
                 <form class="grid gap-5" @submit.prevent="submit">
                     <div class="grid gap-2">
-                        <Label for="email">Email</Label>
+                        <Label for="email">電子郵件</Label>
                         <Input id="email" v-model="form.email" type="email" name="email" autocomplete="email" required autofocus />
                         <InputError :message="form.errors.email" />
                     </div>
 
                     <Button type="submit" :disabled="form.processing">
-                        {{ form.processing ? 'Sending...' : 'Send reset link' }}
+                        {{ form.processing ? '寄送中...' : '寄出重設連結' }}
                     </Button>
                 </form>
 
                 <p class="mt-6 text-center text-sm">
-                    <TextLink href="/login">Back to login</TextLink>
+                    <TextLink href="/login">返回登入</TextLink>
                 </p>
             </CardContent>
         </Card>

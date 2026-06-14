@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
+import { ArrowLeft } from '@lucide/vue';
 import { computed } from 'vue';
 
 type FixtureOption = {
@@ -16,7 +17,7 @@ const props = defineProps<{
 }>();
 
 const form = useForm({
-    question: 'Did the product launch date pass consensus verification?',
+    question: '產品發布日期是否通過共識驗證？',
     fixture_id: props.defaultFixtureId,
 });
 
@@ -32,21 +33,25 @@ function submit(): void {
         <section class="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-5 py-8 sm:px-8 lg:px-10">
             <header class="flex flex-col gap-3 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
                 <div class="space-y-2">
-                    <p class="text-sm font-medium text-teal-300">Minority Report</p>
+                    <p class="text-sm font-medium text-teal-300">關鍵報告 · Minority Report</p>
                     <h1 class="text-3xl font-semibold tracking-normal text-white sm:text-4xl">
-                        Question Verification
+                        問題驗證
                     </h1>
                 </div>
-                <div class="grid grid-cols-2 gap-2 text-sm text-neutral-300">
-                    <span class="rounded bg-white/10 px-3 py-2">Fake providers</span>
-                    <span class="rounded bg-white/10 px-3 py-2">Audit persisted</span>
+                <div class="flex flex-wrap items-center gap-2 text-sm text-neutral-300 sm:justify-end">
+                    <Link href="/" class="inline-flex min-h-10 items-center gap-2 rounded border border-white/15 bg-white/10 px-3 font-medium text-white transition hover:bg-white/15">
+                        <ArrowLeft class="size-4" />
+                        回首頁
+                    </Link>
+                    <span class="rounded bg-white/10 px-3 py-2">模擬供應端</span>
+                    <span class="rounded bg-white/10 px-3 py-2">已保存稽核紀錄</span>
                 </div>
             </header>
 
             <form class="grid gap-6 lg:grid-cols-[1fr_18rem]" @submit.prevent="submit">
                 <section class="space-y-4">
                     <div class="space-y-2">
-                        <label for="question" class="text-sm font-medium text-neutral-200">Question</label>
+                        <label for="question" class="text-sm font-medium text-neutral-200">問題</label>
                         <textarea
                             id="question"
                             v-model="form.question"
@@ -65,14 +70,14 @@ function submit(): void {
                             class="inline-flex min-h-11 items-center justify-center rounded bg-teal-300 px-5 text-sm font-semibold text-neutral-950 transition hover:bg-teal-200 disabled:cursor-not-allowed disabled:bg-neutral-600 disabled:text-neutral-300"
                             :disabled="form.processing"
                         >
-                            {{ form.processing ? 'Running...' : 'Run verification' }}
+                            {{ form.processing ? '驗證中...' : '執行驗證' }}
                         </button>
                     </div>
                 </section>
 
                 <aside class="space-y-4 rounded border border-white/10 bg-white/5 p-4">
                     <div class="space-y-2">
-                        <label for="fixture_id" class="text-sm font-medium text-neutral-200">Demo fixture</label>
+                        <label for="fixture_id" class="text-sm font-medium text-neutral-200">示範範例</label>
                         <select
                             id="fixture_id"
                             v-model="form.fixture_id"
@@ -94,11 +99,11 @@ function submit(): void {
                         </p>
                         <div class="grid grid-cols-2 gap-2">
                             <div class="rounded border border-white/10 bg-neutral-900 p-3">
-                                <p class="text-xs uppercase text-neutral-500">Consensus</p>
+                                <p class="text-xs uppercase text-neutral-500">共識</p>
                                 <p class="mt-1 font-semibold text-white">{{ selectedFixture.expected_consensus }}</p>
                             </div>
                             <div class="rounded border border-white/10 bg-neutral-900 p-3">
-                                <p class="text-xs uppercase text-neutral-500">Trust</p>
+                                <p class="text-xs uppercase text-neutral-500">信任等級</p>
                                 <p class="mt-1 font-semibold text-white">{{ selectedFixture.expected_trust }}</p>
                             </div>
                         </div>

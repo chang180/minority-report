@@ -62,11 +62,11 @@ function stringValue(value: unknown): string | null {
 }
 
 function normalizedSummary(response: ProviderResponse): string {
-    return stringValue(response.normalized?.summary) ?? 'No extracted summary.';
+    return stringValue(response.normalized?.summary) ?? '沒有抽取到摘要。';
 }
 
 function directAnswer(response: ProviderResponse): string {
-    return stringValue(response.normalized?.direct_answer) ?? 'not available';
+    return stringValue(response.normalized?.direct_answer) ?? '無法取得';
 }
 
 function formatJson(value: unknown): string {
@@ -96,10 +96,10 @@ function badgeClass(value: string | null): string {
             <header class="flex flex-col gap-4 border-b border-white/10 pb-5 lg:flex-row lg:items-start lg:justify-between">
                 <div class="space-y-3">
                     <Link href="/demo" class="text-sm font-medium text-teal-300 hover:text-teal-200">
-                        New verification
+                        新增驗證
                     </Link>
                     <h1 class="text-2xl font-semibold tracking-normal text-white sm:text-3xl">
-                        Verification #{{ verification.id }}
+                        驗證 #{{ verification.id }}
                     </h1>
                     <p class="max-w-3xl text-base leading-7 text-neutral-300">
                         {{ verification.question }}
@@ -107,19 +107,19 @@ function badgeClass(value: string | null): string {
                 </div>
                 <div class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4 lg:min-w-xl">
                     <div class="rounded border border-white/10 bg-white/5 p-3">
-                        <p class="text-xs uppercase text-neutral-500">Type</p>
+                        <p class="text-xs uppercase text-neutral-500">類型</p>
                         <p class="mt-1 font-semibold text-white">{{ verification.classified_type }}</p>
                     </div>
                     <div class="rounded border border-white/10 bg-white/5 p-3">
-                        <p class="text-xs uppercase text-neutral-500">Shape</p>
+                        <p class="text-xs uppercase text-neutral-500">答案型態</p>
                         <p class="mt-1 font-semibold text-white">{{ verification.answer_shape }}</p>
                     </div>
                     <div class="rounded border border-white/10 bg-white/5 p-3">
-                        <p class="text-xs uppercase text-neutral-500">Consensus</p>
+                        <p class="text-xs uppercase text-neutral-500">共識</p>
                         <p class="mt-1 font-semibold text-white">{{ consensusStatus }}</p>
                     </div>
                     <div class="rounded border border-white/10 bg-white/5 p-3">
-                        <p class="text-xs uppercase text-neutral-500">Trust</p>
+                        <p class="text-xs uppercase text-neutral-500">信任等級</p>
                         <p class="mt-1 font-semibold text-white">{{ verification.final_trust }}</p>
                     </div>
                 </div>
@@ -135,11 +135,11 @@ function badgeClass(value: string | null): string {
                             {{ verification.final_trust }}
                         </span>
                         <span v-if="minorityProvider" class="rounded border border-rose-300/30 bg-rose-300/10 px-3 py-1 text-sm font-semibold text-rose-100">
-                            Minority: {{ minorityProvider }}
+                            少數意見：{{ minorityProvider }}
                         </span>
                     </div>
 
-                    <h2 class="mt-5 text-lg font-semibold text-white">Verdict</h2>
+                    <h2 class="mt-5 text-lg font-semibold text-white">判定結果</h2>
                     <p v-if="verdictSummary" class="mt-2 text-sm text-neutral-300">
                         {{ verdictSummary }}
                     </p>
@@ -148,25 +148,25 @@ function badgeClass(value: string | null): string {
                             {{ line }}
                         </p>
                         <p v-if="verdictLines.length === 0" class="rounded bg-neutral-900 px-3 py-2 text-neutral-400">
-                            No final verdict was produced.
+                            未產生最終判定。
                         </p>
                     </div>
                 </article>
 
                 <article class="rounded border border-white/10 bg-white/5 p-5">
-                    <h2 class="text-lg font-semibold text-white">Decision Basis</h2>
+                    <h2 class="text-lg font-semibold text-white">決策依據</h2>
                     <dl class="mt-4 grid gap-3 text-sm">
                         <div class="flex items-center justify-between gap-3 rounded bg-neutral-900 px-3 py-2">
-                            <dt class="text-neutral-400">Decision key</dt>
+                            <dt class="text-neutral-400">決策鍵</dt>
                             <dd class="font-medium text-white">{{ consensusResult?.decision_key }}</dd>
                         </div>
                         <div class="flex items-center justify-between gap-3 rounded bg-neutral-900 px-3 py-2">
-                            <dt class="text-neutral-400">Trust base</dt>
+                            <dt class="text-neutral-400">信任基準</dt>
                             <dd class="font-medium text-white">{{ consensusResult?.trust_base }}</dd>
                         </div>
                         <div class="flex items-center justify-between gap-3 rounded bg-neutral-900 px-3 py-2">
-                            <dt class="text-neutral-400">Minority report</dt>
-                            <dd class="font-medium text-white">{{ hasMinorityReport ? 'Present' : 'None' }}</dd>
+                            <dt class="text-neutral-400">少數意見報告</dt>
+                            <dd class="font-medium text-white">{{ hasMinorityReport ? '存在' : '無' }}</dd>
                         </div>
                     </dl>
                     <pre class="mt-4 max-h-56 overflow-auto rounded bg-neutral-900 p-3 text-xs leading-5 text-neutral-300">{{ formatJson(consensusResult?.decision_basis) }}</pre>
@@ -197,18 +197,18 @@ function badgeClass(value: string | null): string {
 
                     <div class="flex flex-1 flex-col gap-4 p-4">
                         <section>
-                            <h3 class="text-sm font-semibold text-neutral-200">Extracted</h3>
+                            <h3 class="text-sm font-semibold text-neutral-200">抽取結果</h3>
                             <p class="mt-2 text-sm leading-6 text-neutral-300">{{ normalizedSummary(response) }}</p>
                             <pre class="mt-3 max-h-36 overflow-auto rounded bg-neutral-900 p-3 text-xs leading-5 text-neutral-300">{{ formatJson(response.claims) }}</pre>
                         </section>
 
                         <section>
-                            <h3 class="text-sm font-semibold text-neutral-200">Raw</h3>
+                            <h3 class="text-sm font-semibold text-neutral-200">原始回應</h3>
                             <pre class="mt-2 max-h-52 overflow-auto rounded bg-neutral-900 p-3 text-xs leading-5 text-neutral-300">{{ response.raw_answer }}</pre>
                         </section>
 
                         <section v-if="response.error">
-                            <h3 class="text-sm font-semibold text-rose-200">Error</h3>
+                            <h3 class="text-sm font-semibold text-rose-200">錯誤</h3>
                             <pre class="mt-2 max-h-32 overflow-auto rounded bg-rose-950/60 p-3 text-xs leading-5 text-rose-100">{{ formatJson(response.error) }}</pre>
                         </section>
                     </div>

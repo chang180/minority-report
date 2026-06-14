@@ -30,44 +30,44 @@ function submit(): void {
     <AuthLayout>
         <Card>
             <CardHeader>
-                <CardTitle>Create account</CardTitle>
-                <CardDescription>Registration is open for M7-A.</CardDescription>
+                <CardTitle>建立帳號</CardTitle>
+                <CardDescription>M7-A 階段開放註冊。</CardDescription>
             </CardHeader>
             <CardContent>
                 <form class="grid gap-5" @submit.prevent="submit">
                     <div class="grid gap-2">
-                        <Label for="name">Name</Label>
+                        <Label for="name">姓名</Label>
                         <Input id="name" v-model="form.name" name="name" autocomplete="name" required autofocus />
                         <InputError :message="form.errors.name" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="email">Email</Label>
+                        <Label for="email">電子郵件</Label>
                         <Input id="email" v-model="form.email" type="email" name="email" autocomplete="email" required />
                         <InputError :message="form.errors.email" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="password">Password</Label>
+                        <Label for="password">密碼</Label>
                         <Input id="password" v-model="form.password" type="password" name="password" autocomplete="new-password" required />
                         <p v-if="passwordRules" class="text-xs text-neutral-500">{{ passwordRules }}</p>
                         <InputError :message="form.errors.password" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="password_confirmation">Confirm password</Label>
+                        <Label for="password_confirmation">確認密碼</Label>
                         <Input id="password_confirmation" v-model="form.password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" required />
                         <InputError :message="form.errors.password_confirmation" />
                     </div>
 
                     <Button type="submit" :disabled="form.processing">
-                        {{ form.processing ? 'Creating...' : 'Create account' }}
+                        {{ form.processing ? '建立中...' : '建立帳號' }}
                     </Button>
                 </form>
 
                 <p class="mt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
-                    Already registered?
-                    <TextLink href="/login">Log in</TextLink>
+                    已經有帳號？
+                    <TextLink href="/login">登入</TextLink>
                 </p>
             </CardContent>
         </Card>

@@ -19,11 +19,11 @@ const user = computed(() => (page.props.auth as Auth | undefined)?.user ?? null)
                     <nav class="flex items-center gap-1 text-sm">
                         <Link href="/demo" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
                             <TestTubeDiagonal class="size-4" />
-                            Demo
+                            訪客示範
                         </Link>
                         <Link href="/settings/profile" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
                             <Settings class="size-4" />
-                            Settings
+                            設定
                         </Link>
                     </nav>
                 </div>
@@ -32,7 +32,7 @@ const user = computed(() => (page.props.auth as Auth | undefined)?.user ?? null)
                     <span class="hidden text-neutral-600 dark:text-neutral-400 sm:inline">{{ user?.email }}</span>
                     <Link href="/logout" method="post" as="button" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
                         <LogOut class="size-4" />
-                        Logout
+                        登出
                     </Link>
                 </div>
             </div>

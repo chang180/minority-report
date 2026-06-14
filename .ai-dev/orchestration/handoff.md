@@ -1,7 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：**M7 進行中** — M7-A **REOPEN**（M7-A-R1 繁中 UI 修正）。  
-> **可開工**：[M7-A/brief.md](briefs/M7-A/brief.md) · **M7-B 暫停**。
+> **當前階段**：**M7 進行中** — M7-A **RELEASED**（含 M7-A-R1 繁中 UI）。  
+> **下一 Gate**：**M7-B**（Orchestrator 發布 brief 後可開工）。
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -114,8 +114,8 @@ M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結
 
 | Gate | 派工文件 | 狀態 |
 |------|----------|------|
-| **M7-A** | [briefs/M7-A/](briefs/M7-A/) | **REOPEN**（M7-A-R1） |
-| **M7-B** | （M7-A 重新 RELEASED 後發布） | **暫停** |
+| **M7-A** | [briefs/M7-A/](briefs/M7-A/) | **RELEASED**（M7-A-R1 繁中 UI） |
+| **M7-B** | （待 Orchestrator 發布 brief） | **待開** |
 
 **M7 目標**（產品基本 UI，非 M6 minimal）：
 

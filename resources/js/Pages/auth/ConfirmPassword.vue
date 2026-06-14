@@ -22,19 +22,19 @@ function submit(): void {
     <AuthLayout>
         <Card>
             <CardHeader>
-                <CardTitle>Confirm password</CardTitle>
-                <CardDescription>Enter your password to continue.</CardDescription>
+                <CardTitle>確認密碼</CardTitle>
+                <CardDescription>請輸入密碼以繼續操作。</CardDescription>
             </CardHeader>
             <CardContent>
                 <form class="grid gap-5" @submit.prevent="submit">
                     <div class="grid gap-2">
-                        <Label for="password">Password</Label>
+                        <Label for="password">密碼</Label>
                         <Input id="password" v-model="form.password" type="password" name="password" autocomplete="current-password" required autofocus />
                         <InputError :message="form.errors.password" />
                     </div>
 
                     <Button type="submit" :disabled="form.processing">
-                        {{ form.processing ? 'Confirming...' : 'Confirm' }}
+                        {{ form.processing ? '確認中...' : '確認' }}
                     </Button>
                 </form>
             </CardContent>

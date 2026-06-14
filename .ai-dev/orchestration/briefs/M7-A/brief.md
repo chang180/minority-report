@@ -2,9 +2,9 @@
 
 **Milestone 7 · Auth 基礎 + Vue Starter Kit 移植 + Welcome + Demo 路由**  
 **前置**：M6 **RELEASED**  
-**狀態**：**REOPEN**（2026-06-14 · 繁體中文 UI 修正）
+**狀態**：**RELEASED**（2026-06-14 · M7-A-R1 繁中 UI 修正完成）
 
-> 原 M7-A 已實作並 RELEASED，Orchestrator 審閱 UI 後 **退回修正**。修正完成後再交 Orchestrator 複審；**M7-B brief 待 M7-A 重新 RELEASED 後發布**。
+> M7-A-R1 已複審放行。**M7-B brief 可發布**。
 
 Post-MVP 第一 Gate。Auth 採 **Laravel Fortify**（L13 官方 starter kit 同款），**不用 Breeze**。前端 **選擇性移植** [laravel/vue-starter-kit](https://github.com/laravel/vue-starter-kit)（**MUST NOT** 整包安裝），見 [docs/08 §1.4](../../../../docs/08-ui-auth-providers.md)。
 
@@ -48,19 +48,19 @@ Worker Agent。**本輪只做 M7-A-R1：繁體中文 UI 修正**（在既有 For
 
 ### 必須中文化（至少）
 
-- [ ] `resources/js/layouts/*`（AppLayout、AuthLayout、GuestLayout）— nav、logout、settings 等
-- [ ] `resources/js/Pages/auth/*`（Login、Register、ForgotPassword、ResetPassword、ConfirmPassword）
-- [ ] `resources/js/Pages/settings/*`（Profile、Password）
-- [ ] `resources/js/Pages/Dashboard.vue`
-- [ ] `resources/js/Pages/Home/Welcome.vue`（若有英文段落）
-- [ ] `resources/js/Pages/Verification/Index.vue`、`Show.vue`（M6 英文標題/label 一併改繁中）
-- [ ] Fortify / Laravel 回傳之**使用者可見** flash、validation（`lang/zh_TW` 或自訂 messages）
-- [ ] `config/app.php` 或 `.env`：`APP_LOCALE=zh_TW`、`APP_FALLBACK_LOCALE=zh_TW`（本機 example 由 Orchestrator 整合；Worker 可於 progress §4 建議）
+- [x] `resources/js/layouts/*`（AppLayout、AuthLayout、GuestLayout）— nav、logout、settings 等
+- [x] `resources/js/Pages/auth/*`（Login、Register、ForgotPassword、ResetPassword、ConfirmPassword）
+- [x] `resources/js/Pages/settings/*`（Profile、Password）
+- [x] `resources/js/Pages/Dashboard.vue`
+- [x] `resources/js/Pages/Home/Welcome.vue`（若有英文段落）
+- [x] `resources/js/Pages/Verification/Index.vue`、`Show.vue`（M6 英文標題/label 一併改繁中）
+- [x] Fortify / Laravel 回傳之**使用者可見** flash、validation（`lang/zh_TW` 或自訂 messages）
+- [x] `config/app.php` 或 `.env`：`APP_LOCALE=zh_TW`、`APP_FALLBACK_LOCALE=zh_TW`（本機 example 由 Orchestrator 整合；Worker 可於 progress §4 建議）
 
 ### 測試
 
-- [ ] 更新 `M7AAuthTest` / `M6MinimalUiTest`：若 assert 英文 Inertia 文案，改為繁中或改 assert 結構（component/route）避免 brittle
-- [ ] `npm run typecheck`、全 suite 綠
+- [x] 更新 `M7AAuthTest` / `M6MinimalUiTest`：若 assert 英文 Inertia 文案，改為繁中或改 assert 結構（component/route）避免 brittle
+- [x] `npm run typecheck`、全 suite 綠
 
 ### 本輪 MUST NOT
 

@@ -25,40 +25,40 @@ function submit(): void {
     <AppLayout>
         <div class="grid gap-6 lg:grid-cols-[14rem_1fr]">
             <nav class="flex gap-2 lg:flex-col">
-                <Link href="/settings/profile" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-neutral-900">Profile</Link>
-                <Link href="/settings/password" class="rounded-md bg-neutral-200 px-3 py-2 text-sm font-medium dark:bg-neutral-800">Password</Link>
+                <Link href="/settings/profile" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-neutral-900">個人資料</Link>
+                <Link href="/settings/password" class="rounded-md bg-neutral-200 px-3 py-2 text-sm font-medium dark:bg-neutral-800">密碼</Link>
             </nav>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Password</CardTitle>
-                    <CardDescription>Change your account password.</CardDescription>
+                    <CardTitle>密碼</CardTitle>
+                    <CardDescription>更新帳號登入密碼。</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form class="grid max-w-xl gap-5" @submit.prevent="submit">
                         <div class="grid gap-2">
-                            <Label for="current_password">Current password</Label>
+                            <Label for="current_password">目前密碼</Label>
                             <Input id="current_password" v-model="form.current_password" type="password" name="current_password" autocomplete="current-password" required />
                             <InputError :message="form.errors.current_password" />
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="password">New password</Label>
+                            <Label for="password">新密碼</Label>
                             <Input id="password" v-model="form.password" type="password" name="password" autocomplete="new-password" required />
                             <InputError :message="form.errors.password" />
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="password_confirmation">Confirm password</Label>
+                            <Label for="password_confirmation">確認密碼</Label>
                             <Input id="password_confirmation" v-model="form.password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" required />
                             <InputError :message="form.errors.password_confirmation" />
                         </div>
 
                         <div class="flex items-center gap-3">
                             <Button type="submit" :disabled="form.processing">
-                                {{ form.processing ? 'Saving...' : 'Save password' }}
+                                {{ form.processing ? '儲存中...' : '儲存密碼' }}
                             </Button>
-                            <p v-if="form.recentlySuccessful" class="text-sm text-teal-700 dark:text-teal-300">Saved.</p>
+                            <p v-if="form.recentlySuccessful" class="text-sm text-teal-700 dark:text-teal-300">已儲存。</p>
                         </div>
                     </form>
                 </CardContent>

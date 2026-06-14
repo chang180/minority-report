@@ -8,7 +8,7 @@
 
 | Gate | Brief | 說明 |
 |------|-------|------|
-| **M7-A-R1** | [M7-A/brief.md](M7-A/brief.md) | 繁體中文 UI 修正（原 M7-A REOPEN） |
+| **M7-B** | （待 Orchestrator 發布） | Provider 設定、Admin demo、Dashboard、真 verification |
 
 ---
 
@@ -22,8 +22,8 @@
 
 | Gate | 狀態 |
 |------|------|
-| M7-A | **REOPEN**（M7-A-R1） |
-| M7-B | 暫停（待 M7-A 重新 RELEASED） |
+| M7-A | **RELEASED**（含 M7-A-R1 繁中 UI） |
+| M7-B | **待開**（brief 待發布） |
 
 ---
 

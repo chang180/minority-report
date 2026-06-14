@@ -28,34 +28,34 @@ function submit(): void {
     <AppLayout>
         <div class="grid gap-6 lg:grid-cols-[14rem_1fr]">
             <nav class="flex gap-2 lg:flex-col">
-                <Link href="/settings/profile" class="rounded-md bg-neutral-200 px-3 py-2 text-sm font-medium dark:bg-neutral-800">Profile</Link>
-                <Link href="/settings/password" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-neutral-900">Password</Link>
+                <Link href="/settings/profile" class="rounded-md bg-neutral-200 px-3 py-2 text-sm font-medium dark:bg-neutral-800">個人資料</Link>
+                <Link href="/settings/password" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-neutral-900">密碼</Link>
             </nav>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Profile</CardTitle>
-                    <CardDescription>Update your account name and email.</CardDescription>
+                    <CardTitle>個人資料</CardTitle>
+                    <CardDescription>更新帳號姓名與電子郵件。</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form class="grid max-w-xl gap-5" @submit.prevent="submit">
                         <div class="grid gap-2">
-                            <Label for="name">Name</Label>
+                            <Label for="name">姓名</Label>
                             <Input id="name" v-model="form.name" name="name" autocomplete="name" required />
                             <InputError :message="form.errors.name" />
                         </div>
 
                         <div class="grid gap-2">
-                            <Label for="email">Email</Label>
+                            <Label for="email">電子郵件</Label>
                             <Input id="email" v-model="form.email" type="email" name="email" autocomplete="email" required />
                             <InputError :message="form.errors.email" />
                         </div>
 
                         <div class="flex items-center gap-3">
                             <Button type="submit" :disabled="form.processing">
-                                {{ form.processing ? 'Saving...' : 'Save' }}
+                                {{ form.processing ? '儲存中...' : '儲存' }}
                             </Button>
-                            <p v-if="form.recentlySuccessful" class="text-sm text-teal-700 dark:text-teal-300">Saved.</p>
+                            <p v-if="form.recentlySuccessful" class="text-sm text-teal-700 dark:text-teal-300">已儲存。</p>
                         </div>
                     </form>
                 </CardContent>

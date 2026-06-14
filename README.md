@@ -48,6 +48,7 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | Database | SQLite（MVP）/ MySQL |
 | Auth | **Laravel Fortify**（session） |
 | Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 + shadcn-vue（M7-A 起） |
+| UI 語言 | **繁體中文**（產品唯一顯示語言；API/domain 參數保留英文，見 [docs/08 §3.4](docs/08-ui-auth-providers.md)） |
 | Testing | **Pest**（TDD；CI 於 push/PR 自動執行） |
 | AI 開發規範 | **Laravel Boost**（guidelines / skills / MCP） |
 | AI Infrastructure | **Laravel AI SDK**（`laravel/ai`；adapter 限 `app/AI/`） |
@@ -68,7 +69,7 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M7-A Auth + UI 基礎 | ✅ 完成（2026-06-14） |
 | M7-B Provider + Dashboard | 🔜 待開 |
 
-**M1–M6 MVP 已完成**（2026-06-14）。**M7-A** 已交付 Fortify auth 與 Welcome/Demo 路由。
+**M1–M6 MVP 已完成**（2026-06-14）。**M7-A** 已交付 Fortify auth、Welcome/Demo 路由，以及繁體中文 UI（`APP_LOCALE=zh_TW`）。
 
 ### Web 路由（摘要）
 
@@ -233,7 +234,7 @@ npm run dev         # Vite 開發伺服器
 npm run build       # 正式建置
 ```
 
-M7 UI 已就緒（Welcome、`/demo` Verification、Fortify auth、settings）。
+M7 UI 已就緒（繁體中文 Welcome、`/demo` Verification、Fortify auth、settings）。
 
 ### Laravel AI SDK
 

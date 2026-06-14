@@ -87,9 +87,23 @@ test('password reset link can be requested', function () {
 
     $this->post('/forgot-password', [
         'email' => 'reset@example.com',
-    ])->assertRedirect();
+    ])
+        ->assertRedirect()
+        ->assertSessionHas('status', '密碼重設連結已寄出。');
 
     Notification::assertSentTo($user, ResetPassword::class);
+});
+
+test('auth validation messages are shown in traditional chinese', function () {
+    $this->from('/login')
+        ->post('/login', [
+            'email' => 'missing@example.com',
+            'password' => 'wrong-password',
+        ])
+        ->assertRedirect('/login')
+        ->assertSessionHasErrors([
+            'email' => '這些登入資訊與我們的紀錄不符。',
+        ]);
 });
 
 test('auth pages render through inertia', function () {
@@ -104,6 +118,6 @@ test('auth pages render through inertia', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('auth/Register')
-            ->has('passwordRules')
+            ->where('passwordRules', '密碼至少需要 8 個字元。')
         );
 });

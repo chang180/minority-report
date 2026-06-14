@@ -93,5 +93,8 @@ test('M6-A validates question submission', function () {
             'fixture_id' => 'missing-fixture',
         ])
         ->assertRedirect('/demo')
-        ->assertSessionHasErrors(['question', 'fixture_id']);
+        ->assertSessionHasErrors([
+            'question' => '問題必須至少 8 個字元。',
+            'fixture_id' => '選取的示範範例無效。',
+        ]);
 });
