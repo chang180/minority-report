@@ -3,7 +3,7 @@
 > Orchestrator 維護。每個 Gate 只有 Orchestrator 審核整合後可標為 **RELEASED**。
 
 **當前 Milestone**：**M7 — 產品 UI + Auth**（Post-MVP）  
-**當前可開工 Gate**：**M7-A** · [briefs/M7-A/](briefs/M7-A/)
+**當前可開工 Gate**：**M7-B**（待 brief 發布）
 
 ---
 
@@ -17,8 +17,8 @@ M1–M6 全 **RELEASED**（2026-06-14）
 
 | Gate | 說明 | 狀態 | 備註 |
 |------|------|------|------|
-| M7-A | Fortify + Vue kit auth/layout + Welcome + Demo 路由 | **OPEN** | [M7-A/](briefs/M7-A/) |
-| M7-B | Provider 設定 + Admin demo + Dashboard + 真 verification | 未開 | 待 M7-A RELEASED |
+| M7-A | Fortify + Vue kit auth/layout + Welcome + Demo 路由 | **RELEASED** | 2026-06-14 · [M7-A/](briefs/M7-A/) |
+| M7-B | Provider 設定 + Admin demo + Dashboard + 真 verification | 未開 | 待 Orchestrator 發 brief |
 
 **Milestone 7**：進行中
 
@@ -26,5 +26,6 @@ M1–M6 全 **RELEASED**（2026-06-14）
 
 ## 放行紀錄
 
+- 2026-06-14 | M7-A | RELEASED | Fortify + Welcome + /demo + M7AAuthTest
 - 2026-06-14 | M6-A | RELEASED | VerificationController + demo fixtures + Inertia UI
 - 2026-06-14 | M6 | RELEASED | **MVP 完成**

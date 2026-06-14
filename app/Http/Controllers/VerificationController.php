@@ -40,7 +40,7 @@ class VerificationController extends Controller
             providers: $this->fixtures->providersFor($fixtureId),
         );
 
-        return redirect()->route('verification.show', $verification);
+        return redirect()->route('demo.verifications.show', $verification);
     }
 
     public function show(VerificationRequest $verification): Response

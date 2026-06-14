@@ -46,7 +46,8 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | Framework | **Laravel 13** |
 | PHP | 8.4+ |
 | Database | SQLite（MVP）/ MySQL |
-| Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 |
+| Auth | **Laravel Fortify**（session） |
+| Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 + shadcn-vue（M7-A 起） |
 | Testing | **Pest**（TDD；CI 於 push/PR 自動執行） |
 | AI 開發規範 | **Laravel Boost**（guidelines / skills / MCP） |
 | AI Infrastructure | **Laravel AI SDK**（`laravel/ai`；adapter 限 `app/AI/`） |
@@ -64,14 +65,27 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M4 Consensus Engine | ✅ 完成 |
 | M5 Audit Trail | ✅ 完成 |
 | M6 Minimal UI | ✅ 完成 |
+| M7-A Auth + UI 基礎 | ✅ 完成（2026-06-14） |
+| M7-B Provider + Dashboard | 🔜 待開 |
 
-**M1–M6 MVP 已完成**（2026-06-14）。
+**M1–M6 MVP 已完成**（2026-06-14）。**M7-A** 已交付 Fortify auth 與 Welcome/Demo 路由。
 
-**UI 入口**：`/` — 選 demo fixture 提交問題 → `/verifications/{id}` 查看 consensus / trust / minority report / provider 比對。**不需 API key**（fake fixture）。
+### Web 路由（摘要）
 
-**後續迭代（非 MVP）**：真 provider UI 路徑、HTTP replay API、LLM verdict narrative。
+| 路由 | 存取 | 說明 |
+|------|------|------|
+| `GET /` | 公開 | Welcome |
+| `GET /demo` | 公開 | Fake fixture demo（不需 API key） |
+| `POST /demo/verifications` | 公開 | 提交 demo 驗證 |
+| `GET /demo/verifications/{id}` | 公開 | Demo 結果 |
+| `GET /login`, `/register` | guest | Fortify auth |
+| `GET /dashboard` | auth | 登入後首頁（M7-B 換產品內容） |
+| `GET /settings/profile`, `/settings/password` | auth | 帳號設定 |
+| `GET /health` | 公開 | JSON health check |
 
-測試現況：`php artisan test` → 94 passed，1 skipped。
+**後續（M7-B）**：Provider 設定、Admin demo 管理、登入使用者真 provider 驗證。
+
+測試現況：`php artisan test` → **101 passed**，1 skipped。
 
 ---
 
@@ -92,18 +106,26 @@ app/
 │   ├── Contracts/
 │   ├── DTO/
 │   └── ConsensusWorkflow.php
-├── Http/Controllers/       # VerificationController
+├── Http/Controllers/       # VerificationController（demo + 未來 auth 驗證）
+├── Actions/Fortify/        # Fortify user lifecycle（M7-A）
 ├── AI/Providers/
 ├── Models/                 # VerificationRequest, ProviderResponse, ConsensusResult
 └── Repositories/           # Eloquent persistence adapters
 
 config/consensus.php        # provider keys、timeout、conflict threshold
 tests/
+├── Feature/M7AAuthTest.php
 ├── Feature/M6MinimalUiTest.php
 ├── Feature/Consensus/      # F01–F14、M5 replay
 └── Unit/Consensus/
 
-resources/js/Pages/Verification/  # Index.vue、Show.vue
+resources/js/
+├── Pages/Home/Welcome.vue
+├── Pages/auth/             # Login、Register…
+├── Pages/settings/         # Profile、Password
+├── Pages/Verification/     # Demo Index、Show
+├── layouts/
+└── components/ui/
 ```
 
 行為與術語以 `docs/02-contracts.md` 為 canonical；實作 MUST 對齊 spec。
@@ -123,8 +145,9 @@ resources/js/Pages/Verification/  # Index.vue、Show.vue
 | [docs/05-failure-modes.md](docs/05-failure-modes.md) | 失敗模式狀態機 |
 | [docs/06-test-scenarios.md](docs/06-test-scenarios.md) | Fixture F01–F14、CT-G 測試 |
 | [docs/07-milestones.md](docs/07-milestones.md) | 開發里程碑 |
+| [docs/08-ui-auth-providers.md](docs/08-ui-auth-providers.md) | M7 Auth、UI、Provider 規格 |
 
-協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M1–M6 MVP ✅**）
+協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M7-A ✅ · M7-B 待開**）
 
 ---
 
@@ -144,9 +167,17 @@ cp .env.example .env
 php artisan key:generate
 touch database/database.sqlite
 php artisan migrate
+php artisan db:seed          # 含 AdminUserSeeder（見 ADMIN_*）
 
 npm install
 npm run build          # 或開發時 npm run dev
+```
+
+`.env` 可選設定初始 admin（`config/auth.php` → `AdminUserSeeder`）：
+
+```bash
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your-secure-password
 ```
 
 ### 日常開發
@@ -158,7 +189,7 @@ php artisan serve
 npm run dev
 ```
 
-開啟 [http://127.0.0.1:8000/](http://127.0.0.1:8000/) 使用 **Minimal UI**（fake fixture demo，不需 API key）。
+開啟 [http://127.0.0.1:8000/](http://127.0.0.1:8000/) 為 **Welcome**；訪客 demo 在 [/demo](http://127.0.0.1:8000/demo)（fake fixture，不需 API key）。
 
 健康檢查：
 
@@ -173,7 +204,8 @@ curl -s http://127.0.0.1:8000/health
 
 ```bash
 php artisan test                              # 全 suite
-php artisan test --filter=M6MinimalUiTest        # UI 流程
+php artisan test --filter=M7AAuthTest           # Fortify auth
+php artisan test --filter=M6MinimalUiTest        # Demo UI 流程
 php artisan test --filter=M5AReplayAuditTest     # replay + audit trail
 php artisan test --filter=M4CFixtureRegressionTest   # F01–F14 回歸
 php artisan test --filter=FailSafeBias        # CT-G1–G3
@@ -201,7 +233,7 @@ npm run dev         # Vite 開發伺服器
 npm run build       # 正式建置
 ```
 
-M6 UI 已就緒（`resources/js/Pages/Verification/`）。
+M7 UI 已就緒（Welcome、`/demo` Verification、Fortify auth、settings）。
 
 ### Laravel AI SDK
 

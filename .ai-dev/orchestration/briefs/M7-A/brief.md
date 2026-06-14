@@ -2,7 +2,7 @@
 
 **Milestone 7 · Auth 基礎 + Vue Starter Kit 移植 + Welcome + Demo 路由**  
 **前置**：M6 **RELEASED**  
-**狀態**：**OPEN**
+**狀態**：**RELEASED**（2026-06-14）
 
 > Post-MVP 第一 Gate。Auth 採 **Laravel Fortify**（L13 官方 starter kit 同款），**不用 Breeze**。前端 **選擇性移植** [laravel/vue-starter-kit](https://github.com/laravel/vue-starter-kit)（**MUST NOT** 整包安裝或 `laravel new --vue`），見 [docs/08 §1.4](../../../../docs/08-ui-auth-providers.md)。
 

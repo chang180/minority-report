@@ -8,7 +8,7 @@
 
 | Gate | Brief | 說明 |
 |------|-------|------|
-| **M7-A** | [M7-A/brief.md](M7-A/brief.md) | Fortify + Vue Starter Kit 移植、Welcome、Demo 路由 |
+| **M7-B** | （待發布） | Provider 設定 + Admin demo + 產品 Dashboard |
 
 ---
 
@@ -30,8 +30,8 @@
 
 | Gate | 狀態 |
 |------|------|
-| M7-A | **OPEN** |
-| M7-B | 待 M7-A RELEASED |
+| M7-A | **RELEASED**（2026-06-14） |
+| M7-B | 待 brief |
 
 ---
 

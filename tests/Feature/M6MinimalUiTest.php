@@ -8,7 +8,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 uses(RefreshDatabase::class);
 
 test('M6-A renders the question input page with demo fixtures', function () {
-    $this->get('/')
+    $this->get('/demo')
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Verification/Index')
@@ -20,14 +20,14 @@ test('M6-A renders the question input page with demo fixtures', function () {
 });
 
 test('M6-A submits a question through the fake workflow and renders results', function () {
-    $response = $this->post('/verifications', [
+    $response = $this->post('/demo/verifications', [
         'question' => 'Did the product launch date pass consensus verification?',
         'fixture_id' => 'M6-F02',
     ]);
 
     $verification = VerificationRequest::query()->latest('id')->firstOrFail();
 
-    $response->assertRedirect(route('verification.show', $verification));
+    $response->assertRedirect(route('demo.verifications.show', $verification));
 
     expect($verification->question)->toBe('Did the product launch date pass consensus verification?')
         ->and($verification->metadata['fixture_id'])->toBe('M6-F02')
@@ -38,7 +38,7 @@ test('M6-A submits a question through the fake workflow and renders results', fu
         ->and($verification->final_trust)->toBe('Medium')
         ->and($verification->final_verdict)->toContain('Minority Opinion');
 
-    $this->get(route('verification.show', $verification))
+    $this->get(route('demo.verifications.show', $verification))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Verification/Show')
@@ -54,7 +54,7 @@ test('M6-A submits a question through the fake workflow and renders results', fu
 });
 
 test('M6-A result page exposes provider failure and extracted summary comparison', function () {
-    $this->post('/verifications', [
+    $this->post('/demo/verifications', [
         'question' => 'Can the system surface insufficient provider evidence?',
         'fixture_id' => 'M6-F10',
     ])->assertRedirect();
@@ -74,7 +74,7 @@ test('M6-A result page exposes provider failure and extracted summary comparison
         ->and($anthropic->extraction_status)->toBe('invalid_json')
         ->and($gemini->provider_status)->toBe('failed_timeout');
 
-    $this->get(route('verification.show', $verification))
+    $this->get(route('demo.verifications.show', $verification))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Verification/Show')
@@ -87,11 +87,11 @@ test('M6-A result page exposes provider failure and extracted summary comparison
 });
 
 test('M6-A validates question submission', function () {
-    $this->from('/')
-        ->post('/verifications', [
+    $this->from('/demo')
+        ->post('/demo/verifications', [
             'question' => 'short',
             'fixture_id' => 'missing-fixture',
         ])
-        ->assertRedirect('/')
+        ->assertRedirect('/demo')
         ->assertSessionHasErrors(['question', 'fixture_id']);
 });

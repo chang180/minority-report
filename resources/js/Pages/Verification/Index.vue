@@ -23,7 +23,7 @@ const form = useForm({
 const selectedFixture = computed(() => props.fixtures.find((fixture) => fixture.id === form.fixture_id));
 
 function submit(): void {
-    form.post('/verifications');
+    form.post('/demo/verifications');
 }
 </script>
 

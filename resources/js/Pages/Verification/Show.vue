@@ -95,7 +95,7 @@ function badgeClass(value: string | null): string {
         <section class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-8 sm:px-8 lg:px-10">
             <header class="flex flex-col gap-4 border-b border-white/10 pb-5 lg:flex-row lg:items-start lg:justify-between">
                 <div class="space-y-3">
-                    <Link href="/" class="text-sm font-medium text-teal-300 hover:text-teal-200">
+                    <Link href="/demo" class="text-sm font-medium text-teal-300 hover:text-teal-200">
                         New verification
                     </Link>
                     <h1 class="text-2xl font-semibold tracking-normal text-white sm:text-3xl">

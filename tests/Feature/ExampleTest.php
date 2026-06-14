@@ -1,11 +1,9 @@
 <?php
 
-test('home page renders the verification input page', function () {
+test('home page renders the product welcome page', function () {
     $this->get('/')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('Verification/Index')
-            ->has('fixtures')
-            ->has('defaultFixtureId')
+            ->component('Home/Welcome')
         );
 });

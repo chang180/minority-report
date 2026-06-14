@@ -1,8 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：**M7 進行中** — Post-MVP 產品 UI + Auth。  
-> **可開工 Gate**：[M7-A](briefs/M7-A/)（Fortify + Vue Starter Kit 移植）。  
-> MVP UI：`/demo`（M7-A 完成後；目前 M6 仍為 `/`）。Health：`GET /health`。
+> **當前階段**：**M7 進行中** — M7-A **RELEASED**；下一 Gate **M7-B**（待 brief）。  
+> **UI 入口**：`/` Welcome · `/demo` fake fixture · `/dashboard`（auth）。Health：`GET /health`。
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -115,7 +114,7 @@ M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結
 
 | Gate | 派工文件 | 狀態 |
 |------|----------|------|
-| **M7-A** | [briefs/M7-A/](briefs/M7-A/) | **OPEN** |
+| **M7-A** | [briefs/M7-A/](briefs/M7-A/) | **RELEASED** |
 | **M7-B** | （M7-A RELEASED 後發布） | 未開 |
 
 **M7 目標**（產品基本 UI，非 M6 minimal）：

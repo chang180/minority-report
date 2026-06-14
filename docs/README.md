@@ -9,7 +9,7 @@
 | 階段 | Milestone | Spec 狀態 | 實作 |
 |------|-----------|-----------|------|
 | **MVP** | M1–M6 | `docs/00..07` **完成** | **RELEASED**（2026-06-14） |
-| **Post-MVP** | M7+ | `docs/08` + `07` §M7 **已寫** | M7-A **OPEN**（見 [gate-status](../.ai-dev/orchestration/gate-status.md)） |
+| **Post-MVP** | M7+ | `docs/08` + `07` §M7 **已寫** | M7-A **RELEASED** · M7-B 未開 |
 
 ### Spec-driven 規則（M2 起）
 
