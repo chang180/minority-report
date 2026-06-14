@@ -70,11 +70,11 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | M6 Minimal UI | ✅ 完成 |
 | M7-A Auth + UI 基礎 | ✅ 完成（2026-06-14） |
 | M7-B Provider + Dashboard | ✅ 完成（2026-06-14） |
-| M8-B Grounding v1 | 🔨 **可開工** |
-| M8-A UX + Email verification | 📋 規劃中 |
+| M8-B Grounding v1 | ✅ 完成（2026-06-14） |
+| M8-A UX + Email verification | 📋 **下一 Gate** |
 | M8-C Semantic alignment | 📋 規劃中 |
 
-**M1–M7 已完成**（2026-06-14）。**M8-B** 規格見 [docs/09-grounding-and-trust.md](docs/09-grounding-and-trust.md)；Worker brief：[M8-B/brief.md](.ai-dev/orchestration/briefs/M8-B/brief.md)。
+**M1–M7 + M8-B 已完成**。**M8-A**（verification 列表、async、Email verification）為下一 Gate。
 
 ### Web 路由（摘要）
 
@@ -97,7 +97,7 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | `PUT /admin/grounding` | admin | 更新 grounding 設定 |
 | `GET /health` | public | JSON health check |
 
-測試現況：`php artisan test` → **131 passed**，1 skipped。
+測試現況：`php artisan test` → **146 passed**，1 skipped。
 
 ---
 
@@ -166,7 +166,7 @@ resources/js/
 | [docs/08-ui-auth-providers.md](docs/08-ui-auth-providers.md) | M7 Auth、UI、Provider 規格 |
 | [docs/09-grounding-and-trust.md](docs/09-grounding-and-trust.md) | M8-B Grounding、Admin 後端、Trust cap |
 
-協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M8-B 可開工**）
+協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M8-B ✅ · M8-A 下一 Gate**）
 
 ---
 
@@ -252,7 +252,7 @@ npm run dev         # Vite 開發伺服器
 npm run build       # 正式建置
 ```
 
-M7 產品 UI 已就緒。**M8-B Grounding** 進行中：Admin 可設定 grounding 後端（本機 LLM `web_search` / Search API），見 [docs/09](docs/09-grounding-and-trust.md)。
+M7 產品 UI 已就緒。**M8-B Grounding** 已交付：Admin `/admin/grounding`、三 mode 後端、Type C Trust 放寬路徑。詳見 [docs/09](docs/09-grounding-and-trust.md)。
 
 ### Grounding（M8-B）
 

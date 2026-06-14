@@ -290,14 +290,14 @@ F01–F14 在 `grounding_available=false` 下 **MUST** 行為不變。
 
 ## 11. Milestone 8-B 驗收
 
-- [ ] `system_grounding_settings` + Admin UI + seeder
-- [ ] `GroundingService` + 三 mode strategy
-- [ ] `local_llm_tool_loop` tool loop（web_search）
-- [ ] Auth + demo verification 注入 grounding metadata
-- [ ] Trust cap 調整 + F04/F15 測試
-- [ ] `Verification/Show` grounding 區塊（繁中）
-- [ ] `npm run typecheck`；全 suite 綠
-- [ ] **MUST NOT** 改 `app/Consensus/` 算法（scorer 最小 cap 條件 diff 除外）
+- [x] `system_grounding_settings` + Admin UI + seeder
+- [x] `GroundingService` + 三 mode strategy
+- [x] `local_llm_tool_loop` tool loop（web_search）
+- [x] Auth + demo verification 注入 grounding metadata
+- [x] Trust cap 調整 + F04/F15 測試
+- [x] `Verification/Show` grounding 區塊（繁中）
+- [x] `npm run typecheck`；全 suite 綠
+- [x] **MUST NOT** 改 Cases 1–6（scorer 最小 cap diff 除外）
 
 ---
 

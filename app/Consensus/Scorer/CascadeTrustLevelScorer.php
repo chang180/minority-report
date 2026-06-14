@@ -64,8 +64,10 @@ class CascadeTrustLevelScorer implements TrustLevelScorer
     ): array {
         $caps = [];
 
-        // Type C + no grounding
-        if ($classification->type === 'C' && ! $context->groundingAvailable) {
+        // Type C + no grounding (skip cap when grounding succeeded per M8-B §9.1)
+        $groundingSucceeded = $context->groundingAvailable
+            && ($context->metadata['grounding_status'] ?? '') === 'success';
+        if ($classification->type === 'C' && ! $groundingSucceeded) {
             $caps[] = ['condition' => 'type_c_no_grounding', 'cap' => 'Low'];
         }
 

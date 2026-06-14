@@ -40,6 +40,7 @@ class ConsensusWorkflow
     {
         $classification = $this->classifier->classify($question);
         $groundingAvailable = (bool) ($question->metadata['grounding_available'] ?? false);
+        $groundingStatus = (string) ($question->metadata['grounding']['status'] ?? '');
 
         $verificationRequest = VerificationRequest::create([
             'question' => $question->text,
@@ -59,7 +60,7 @@ class ConsensusWorkflow
             $classification,
         );
 
-        return $this->completeFromResponses($verificationRequest, $classification, $providerResponses, $groundingAvailable);
+        return $this->completeFromResponses($verificationRequest, $classification, $providerResponses, $groundingAvailable, $groundingStatus);
     }
 
     public function replayFromPersisted(VerificationRequest $verificationRequest): VerificationRequest
@@ -73,6 +74,7 @@ class ConsensusWorkflow
                 ->map(fn (ProviderResponseModel $response): ProviderResponse => $this->providerResponseFromModel($response))
                 ->all(),
             groundingAvailable: $verificationRequest->grounding_available,
+            groundingStatus: (string) ($verificationRequest->metadata['grounding']['status'] ?? ''),
         );
     }
 
@@ -84,11 +86,12 @@ class ConsensusWorkflow
         ClassificationResult $classification,
         array $providerResponses,
         bool $groundingAvailable,
+        string $groundingStatus = '',
     ): VerificationRequest {
         $analyzableResponses = $this->analyzableResponses($providerResponses);
         $alignment = $this->aligner->align($analyzableResponses);
         $consensus = $this->analyzer->analyze($classification, $analyzableResponses, $alignment);
-        $context = $this->analysisContext($classification, $providerResponses, $analyzableResponses, $groundingAvailable);
+        $context = $this->analysisContext($classification, $providerResponses, $analyzableResponses, $groundingAvailable, $groundingStatus);
         $trustLevel = $this->trustLevelScorer->score($classification, $consensus, $context);
         $verdictReport = $this->verdictReporter->report(new VerdictInput(
             classification: $classification,
@@ -171,6 +174,7 @@ class ConsensusWorkflow
         array $providerResponses,
         array $analyzableResponses,
         bool $groundingAvailable,
+        string $groundingStatus = '',
     ): AnalysisContext {
         return new AnalysisContext(
             groundingAvailable: $groundingAvailable,
@@ -180,6 +184,7 @@ class ConsensusWorkflow
                 ? $this->effectiveVoteCount($analyzableResponses)
                 : -1,
             metadata: [
+                'grounding_status' => $groundingStatus,
                 'provider_statuses' => array_map(
                     fn (ProviderResponse $response): array => [
                         'provider' => $response->provider,

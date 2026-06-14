@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AI\Providers\ConfiguredLlmProviderFactory;
 use App\Consensus\ConsensusWorkflow;
 use App\Consensus\DTO\Question;
+use App\Grounding\GroundingService;
 use App\Models\ProviderResponse;
 use App\Models\VerificationRequest;
 use Illuminate\Http\RedirectResponse;
@@ -17,6 +18,7 @@ class AuthVerificationController extends Controller
     public function __construct(
         private readonly ConsensusWorkflow $workflow,
         private readonly ConfiguredLlmProviderFactory $factory,
+        private readonly GroundingService $groundingService,
     ) {}
 
     public function create(): Response
@@ -32,16 +34,51 @@ class AuthVerificationController extends Controller
 
         $user = $request->user();
         $providers = $this->factory->forUser($user);
+        $questionText = trim($validated['question']);
+
+        // Classify early to know requiresGrounding — we pass an empty metadata
+        // so the workflow will classify; here we do a lightweight pre-check.
+        // The workflow re-classifies internally, so we use a best-effort flag.
+        // Per spec §6: grounding MUST run before ConsensusWorkflow::run().
+        // We use a temporary Question to detect requiresGrounding via the grounding service.
+        $preMetadata = ['source' => 'authenticated'];
+
+        // Fetch grounding — GroundingService skips when requiresGrounding=false.
+        // Since we don't have classification yet, we always attempt grounding;
+        // the workflow's classifier will set requiresGrounding on the record.
+        // For M8-B we conservatively attempt grounding and let the workflow persist
+        // grounding_available from the metadata we pass.
+        $grounding = $this->groundingService->fetch($questionText, true);
+
+        $metadata = array_merge($preMetadata, [
+            'grounding_available' => $grounding->groundingAvailable,
+            'grounding' => $grounding->toMetadataArray(),
+        ]);
+
+        $providerPrompt = null;
+        if ($grounding->groundingAvailable && $grounding->summary !== '') {
+            $sourceLines = array_map(
+                fn (array $s) => "- {$s['title']}: {$s['url']}",
+                $grounding->toMetadataArray()['sources'],
+            );
+            $providerPrompt = implode("\n", [
+                'External grounding summary (non-authoritative, for reference):',
+                $grounding->summary,
+                '',
+                'Sources:',
+                implode("\n", $sourceLines),
+            ]);
+        }
 
         $verification = $this->workflow->run(
             question: new Question(
-                text: trim($validated['question']),
-                metadata: ['source' => 'authenticated'],
+                text: $questionText,
+                metadata: $metadata,
             ),
             providers: $providers,
+            providerPrompt: $providerPrompt,
         );
 
-        // Attach user and audit metadata without touching app/Consensus/.
         $verification->update([
             'user_id' => $user->id,
             'metadata' => array_merge($verification->metadata ?? [], [
@@ -52,7 +89,7 @@ class AuthVerificationController extends Controller
         return redirect()->route('verifications.show', $verification);
     }
 
-    public function show(Request $request, VerificationRequest $verification): Response
+    public function show(VerificationRequest $verification): Response
     {
         $this->authorize('view', $verification);
 

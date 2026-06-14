@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Auth } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { Database, LogOut, ServerCog, Settings, ShieldCheck, TestTubeDiagonal } from '@lucide/vue';
+import { Database, Globe, LogOut, ServerCog, Settings, ShieldCheck, TestTubeDiagonal } from '@lucide/vue';
 import { computed } from 'vue';
 
 const page = usePage();
@@ -33,6 +33,10 @@ const isAdmin = computed(() => user.value?.role === 'admin');
                         <Link v-if="isAdmin" href="/admin/demo" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950">
                             <Database class="size-4" />
                             Demo 管理
+                        </Link>
+                        <Link v-if="isAdmin" href="/admin/grounding" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950">
+                            <Globe class="size-4" />
+                            Grounding 設定
                         </Link>
                         <Link href="/settings/profile" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
                             <Settings class="size-4" />

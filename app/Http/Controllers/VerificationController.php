@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Consensus\ConsensusWorkflow;
 use App\Consensus\Demo\ConsensusDemoFixtureCatalog;
 use App\Consensus\DTO\Question;
+use App\Grounding\GroundingService;
 use App\Http\Requests\StoreVerificationRequest;
 use App\Models\ProviderResponse;
 use App\Models\SystemDemoSettings;
@@ -18,6 +19,7 @@ class VerificationController extends Controller
     public function __construct(
         private readonly ConsensusWorkflow $workflow,
         private readonly ConsensusDemoFixtureCatalog $fixtures,
+        private readonly GroundingService $groundingService,
     ) {}
 
     public function index(): Response
@@ -50,13 +52,38 @@ class VerificationController extends Controller
 
         $validated = $request->validated();
         $fixtureId = $validated['fixture_id'];
+        $questionText = $validated['question'];
+        $fixtureMetadata = $this->fixtures->metadataFor($fixtureId);
+
+        $grounding = $this->groundingService->fetch($questionText, true);
+
+        $groundingMetadata = [
+            'grounding_available' => $grounding->groundingAvailable,
+            'grounding' => $grounding->toMetadataArray(),
+        ];
+
+        $providerPrompt = null;
+        if ($grounding->groundingAvailable && $grounding->summary !== '') {
+            $sourceLines = array_map(
+                fn (array $s) => "- {$s['title']}: {$s['url']}",
+                $grounding->toMetadataArray()['sources'],
+            );
+            $providerPrompt = implode("\n", [
+                'External grounding summary (non-authoritative, for reference):',
+                $grounding->summary,
+                '',
+                'Sources:',
+                implode("\n", $sourceLines),
+            ]);
+        }
 
         $verification = $this->workflow->run(
             question: new Question(
-                text: $validated['question'],
-                metadata: $this->fixtures->metadataFor($fixtureId),
+                text: $questionText,
+                metadata: array_merge($fixtureMetadata, $groundingMetadata),
             ),
             providers: $this->fixtures->providersFor($fixtureId),
+            providerPrompt: $providerPrompt,
         );
 
         $verification->update([

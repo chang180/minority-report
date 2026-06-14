@@ -2,6 +2,20 @@
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
+type GroundingSource = {
+    title: string;
+    url: string;
+    snippet: string;
+};
+
+type GroundingMeta = {
+    status: string;
+    provider_mode: string;
+    query: string;
+    summary: string;
+    sources: GroundingSource[];
+};
+
 type Verification = {
     id: number;
     question: string;
@@ -49,6 +63,10 @@ const props = defineProps<{
     providerResponses: ProviderResponse[];
     consensusResult: ConsensusResult | null;
 }>();
+
+const groundingMeta = computed(() => props.verification.metadata?.grounding as GroundingMeta | undefined);
+const groundingSources = computed(() => groundingMeta.value?.sources ?? []);
+const groundingSummary = computed(() => groundingMeta.value?.summary ?? '');
 
 const consensusStatus = computed(() => stringValue(props.consensusResult?.consensus?.status) ?? 'Unknown');
 const minorityProvider = computed(() => stringValue(props.consensusResult?.consensus?.minority_provider));
@@ -171,6 +189,39 @@ function badgeClass(value: string | null): string {
                     </dl>
                     <pre class="mt-4 max-h-56 overflow-auto rounded bg-neutral-900 p-3 text-xs leading-5 text-neutral-300">{{ formatJson(consensusResult?.decision_basis) }}</pre>
                 </article>
+            </section>
+
+            <section v-if="verification.requires_grounding" class="rounded border border-white/10 bg-white/5 p-5">
+                <div class="flex flex-wrap items-center gap-3">
+                    <h2 class="text-lg font-semibold text-white">外部查證（Grounding）</h2>
+                    <span class="rounded border px-2 py-0.5 text-xs" :class="verification.grounding_available ? 'border-emerald-300/30 bg-emerald-300/10 text-emerald-200' : 'border-neutral-300/20 bg-white/10 text-neutral-300'">
+                        {{ verification.grounding_available ? '已取得' : '未取得' }}
+                    </span>
+                    <span v-if="groundingMeta?.provider_mode" class="rounded bg-white/10 px-2 py-0.5 text-xs text-neutral-300">
+                        {{ groundingMeta.provider_mode }}
+                    </span>
+                </div>
+
+                <div v-if="groundingSummary" class="mt-3">
+                    <p class="text-xs uppercase text-neutral-500">摘要</p>
+                    <p class="mt-1 text-sm leading-6 text-neutral-300">{{ groundingSummary }}</p>
+                </div>
+
+                <div v-if="groundingSources.length > 0" class="mt-4">
+                    <p class="text-xs uppercase text-neutral-500">來源</p>
+                    <ul class="mt-2 space-y-2">
+                        <li v-for="source in groundingSources" :key="source.url" class="rounded bg-neutral-900 px-3 py-2 text-sm">
+                            <a :href="source.url" target="_blank" rel="noopener noreferrer" class="font-medium text-teal-300 hover:text-teal-200">
+                                {{ source.title || source.url }}
+                            </a>
+                            <p v-if="source.snippet" class="mt-0.5 text-xs text-neutral-400">{{ source.snippet }}</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <p v-else-if="!groundingSummary" class="mt-3 text-sm text-neutral-500">
+                    {{ verification.grounding_available ? '無來源資訊。' : '此次查證未取得外部來源。' }}
+                </p>
             </section>
 
             <section class="grid gap-4 lg:grid-cols-3">

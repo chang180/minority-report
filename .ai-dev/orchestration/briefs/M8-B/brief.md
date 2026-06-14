@@ -2,7 +2,7 @@
 
 **Milestone 8 · Grounding v1 + Trust cap + Admin 設定**  
 **前置**：M7 **RELEASED**  
-**狀態**：**可開工**（2026-06-14）
+**狀態**：**RELEASED**（2026-06-14）
 
 > User 優先：**Grounding** 為 M8 核心。Admin 可設定後端（本機 LLM `web_search` tool loop / Search API / 關閉）。Domain consensus Cases **MUST NOT** 改動。
 

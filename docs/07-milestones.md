@@ -227,8 +227,8 @@
 
 | Gate | 名稱 | 狀態 |
 |------|------|------|
-| M8-B | Grounding v1 + trust cap + Admin 設定 | **可開工** |
-| M8-A | Verification 列表 + async + Email verification | 規劃中 |
+| M8-B | Grounding v1 + trust cap + Admin 設定 | **RELEASED** |
+| M8-A | Verification 列表 + async + Email verification | **待 brief** |
 | M8-C | Semantic claim alignment | 規劃中 |
 
 ### M8-B 進入條件

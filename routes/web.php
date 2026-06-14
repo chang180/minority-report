@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDemoController;
+use App\Http\Controllers\AdminGroundingController;
 use App\Http\Controllers\AuthVerificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProviderSettingsController;
@@ -37,6 +38,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/', fn () => redirect()->route('dashboard'))->name('index');
     Route::get('/demo', [AdminDemoController::class, 'show'])->name('demo.show');
     Route::put('/demo', [AdminDemoController::class, 'update'])->name('demo.update');
+    Route::get('/grounding', [AdminGroundingController::class, 'show'])->name('grounding.show');
+    Route::put('/grounding', [AdminGroundingController::class, 'update'])->name('grounding.update');
 });
 
 Route::get('/health', function () {

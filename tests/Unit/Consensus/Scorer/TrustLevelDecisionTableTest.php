@@ -211,6 +211,54 @@ test('F14: N=3 + major claim conflict → Low', function () {
     expect($result->trustLevel)->toBe('Low');
 });
 
+// ── M8-B §9.1: Type C with grounding success ─────────────────────────────
+
+test('F15: Type C, Full 3/3, grounding success → High (no type_c_no_grounding cap)', function () {
+    $ctx = new AnalysisContext(
+        groundingAvailable: true,
+        analyzableCount: 3,
+        effectiveVoteCount: 3,
+        metadata: ['grounding_status' => 'success'],
+    );
+
+    $result = (new CascadeTrustLevelScorer)->score(
+        typeC(), consensus('Full'), $ctx
+    );
+
+    expect($result->trustLevel)->toBe('High')
+        ->and($result->base)->toBe('High');
+
+    $conditions = array_column($result->caps, 'condition');
+    expect($conditions)->not->toContain('type_c_no_grounding');
+});
+
+test('F15-partial: Type C, Full 3/3, grounding partial → Low (cap still applies)', function () {
+    $ctx = new AnalysisContext(
+        groundingAvailable: false,
+        analyzableCount: 3,
+        effectiveVoteCount: 3,
+        metadata: ['grounding_status' => 'partial'],
+    );
+
+    $result = (new CascadeTrustLevelScorer)->score(
+        typeC(), consensus('Full'), $ctx
+    );
+
+    expect($result->trustLevel)->toBe('Low');
+    $conditions = array_column($result->caps, 'condition');
+    expect($conditions)->toContain('type_c_no_grounding');
+});
+
+test('F4 regression: Type C no grounding → Low even with analysisCtx default metadata', function () {
+    $result = (new CascadeTrustLevelScorer)->score(
+        typeC(), consensus('Full'), analysisCtx(3, 3)
+    );
+
+    expect($result->trustLevel)->toBe('Low');
+    $conditions = array_column($result->caps, 'condition');
+    expect($conditions)->toContain('type_c_no_grounding');
+});
+
 // ── audit trail ───────────────────────────────────────────────────────────
 
 test('TrustLevelResult preserves base, both counts and applied_caps for audit trail', function () {
