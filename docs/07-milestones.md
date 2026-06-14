@@ -13,7 +13,7 @@
 | M3 | Provider Integration | **完成**（2026-06-13） |
 | M4 | Consensus Engine | **完成**（2026-06-13） |
 | M5 | Audit Trail | **完成**（2026-06-14） |
-| M6 | Minimal UI | **進行中**（M6-A 下一步） |
+| M6 | Minimal UI | **完成**（2026-06-14） |
 
 **M1 完成前 MUST NOT 撰寫 Laravel application code。** M2 起可開始實作。
 

@@ -1,7 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：Milestone 6 — Minimal UI（M5 ✅）。  
-> **下一步**：Gate **M6-A** — 問題輸入 + 驗證結果 UI（見 [briefs/M6-A/](briefs/M6-A/)）。
+> **當前階段**：**M1–M6 MVP 已完成**（2026-06-14）。  
+> UI 入口：`/`（fake fixture demo）。Health：`GET /health`。
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -101,11 +101,11 @@ M5-A **RELEASED**（2026-06-14）：`ConsensusReplayService` replay + `auditTrai
 
 ---
 
-## Milestone 6（Gate 制 · 1 Gate）
+## Milestone 6（Gate 制 · 1 Gate）✅
 
-| Gate | 派工文件 |
-|------|----------|
-| **M6-A**（OPEN） | [briefs/M6-A/](briefs/M6-A/) — 問題輸入 + 驗證結果 UI |
+M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結果頁；`ConsensusDemoFixtureCatalog` fake demo。
+
+**M1–M6 MVP 完成。**
 
 ---
 

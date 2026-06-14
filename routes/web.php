@@ -1,14 +1,11 @@
 <?php
 
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'laravelVersion' => app()->version(),
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::get('/', [VerificationController::class, 'index'])->name('verification.index');
+Route::post('/verifications', [VerificationController::class, 'store'])->name('verification.store');
+Route::get('/verifications/{verification}', [VerificationController::class, 'show'])->name('verification.show');
 
 Route::get('/health', function () {
     return response()->json([

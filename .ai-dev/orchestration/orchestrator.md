@@ -219,8 +219,6 @@ M5-A/B、M6-A/B 不變。
 
 ## 9. 當前 Gate
 
-**M6-A** — 派工：[briefs/M6-A/](briefs/M6-A/) · 狀態：[gate-status.md](gate-status.md)
-
-M5 已完成；M6 表：[briefs/README.md](briefs/README.md)
+**MVP 完成** — 狀態：[gate-status.md](gate-status.md) · 表：[briefs/README.md](briefs/README.md)
 
 M3 已完成；M4 表：[briefs/README.md](briefs/README.md)

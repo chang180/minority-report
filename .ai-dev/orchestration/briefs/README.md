@@ -4,26 +4,20 @@
 
 ---
 
-## Milestone 1–5 ✅
+## MVP 狀態 ✅
 
-M1–M5 全 **RELEASED**（M5：2026-06-14）
+**M1–M6 全 RELEASED**（2026-06-14）。無待開 Gate；後續功能另開 brief。
+
+| Milestone | 最後 Gate |
+|-----------|-----------|
+| M2 Skeleton | M2-E |
+| M3 Providers | M3-B |
+| M4 Consensus | M4-C |
+| M5 Audit | M5-A |
+| M6 UI | M6-A |
 
 ---
 
-## Milestone 6 — Minimal UI（1 Gate）
+## 目錄
 
-| Gate | 目錄 | 狀態 | 說明 |
-|------|------|------|------|
-| **M6-A** | [M6-A/](M6-A/) | **OPEN** | 問題輸入 + 驗證結果 UI |
-
----
-
-## 派工入口
-
-**現在派 M6-A**：將 [M6-A/brief.md](M6-A/brief.md) 與 [M6-A/progress.md](M6-A/progress.md) 一併交給 Worker。
-
-```markdown
-## Gate: M6-A
-## progress.md
-（附連結或 diff）
-```
+各 Gate 的 `brief.md` + `progress.md` 保留於 `M2-A/` … `M6-A/` 供稽核與回顧。

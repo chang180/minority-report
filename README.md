@@ -33,7 +33,7 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | **少數意見報告** | 2 vs 1 分歧時產出 Minority Report，不抹平異議 |
 | **信任等級** | `High / Medium / Low / Unknown`，base + caps 瀑布，拒絕假精確百分比 |
 | **棄權處理** | `unknown` 是棄權，不是反對票——不會產出「少數意見：我不知道」 |
-| **可稽核** | audit trail 寫入 SQLite；replay 機制屬 M5 進行中 |
+| **可稽核** | audit trail + `ConsensusReplayService` replay；UI 可跑 fake demo |
 
 端到端編排入口：`App\Consensus\ConsensusWorkflow`（Classifier → Verdict，結果持久化至 `verification_requests` / `provider_responses` / `consensus_results`）。
 
@@ -63,12 +63,15 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M3 Provider Integration | ✅ 完成 |
 | M4 Consensus Engine | ✅ 完成 |
 | M5 Audit Trail | ✅ 完成 |
-| M6 Minimal UI | 🚧 進行中（**M6-A** 下一步） |
+| M6 Minimal UI | ✅ 完成 |
 
-**已完成**：Consensus 全鏈路、F01–F14 回歸、`ConsensusReplayService`（request / fixture_id replay + audit 還原）。  
-**尚未提供**：問題提交 UI、HTTP replay API、真 LLM verdict narrative。
+**M1–M6 MVP 已完成**（2026-06-14）。
 
-測試現況：`php artisan test` → 90 passed，1 skipped（opt-in live OpenAI）。
+**UI 入口**：`/` — 選 demo fixture 提交問題 → `/verifications/{id}` 查看 consensus / trust / minority report / provider 比對。**不需 API key**（fake fixture）。
+
+**後續迭代（非 MVP）**：真 provider UI 路徑、HTTP replay API、LLM verdict narrative。
+
+測試現況：`php artisan test` → 94 passed，1 skipped。
 
 ---
 
@@ -84,18 +87,23 @@ app/
 │   ├── Scorer/             # CascadeTrustLevelScorer
 │   ├── Verdict/            # StructuredVerdictReporter（non-binding）
 │   ├── Fake/               # fake LlmProvider + registry
-│   ├── Replay/             # ConsensusReplayService（request / fixture replay）
-│   ├── Contracts/          # domain interfaces
+│   ├── Replay/             # ConsensusReplayService
+│   ├── Demo/               # ConsensusDemoFixtureCatalog（UI demo）
+│   ├── Contracts/
 │   ├── DTO/
 │   └── ConsensusWorkflow.php
-├── AI/Providers/           # Laravel AI SDK → LlmProvider bridge
+├── Http/Controllers/       # VerificationController
+├── AI/Providers/
 ├── Models/                 # VerificationRequest, ProviderResponse, ConsensusResult
 └── Repositories/           # Eloquent persistence adapters
 
 config/consensus.php        # provider keys、timeout、conflict threshold
 tests/
-├── Feature/Consensus/      # 整合（含 M4CFixtureRegressionTest F01–F14）
-└── Unit/Consensus/         # Classifier / Analyzer / Trust 單元測試
+├── Feature/M6MinimalUiTest.php
+├── Feature/Consensus/      # F01–F14、M5 replay
+└── Unit/Consensus/
+
+resources/js/Pages/Verification/  # Index.vue、Show.vue
 ```
 
 行為與術語以 `docs/02-contracts.md` 為 canonical；實作 MUST 對齊 spec。
@@ -116,7 +124,7 @@ tests/
 | [docs/06-test-scenarios.md](docs/06-test-scenarios.md) | Fixture F01–F14、CT-G 測試 |
 | [docs/07-milestones.md](docs/07-milestones.md) | 開發里程碑 |
 
-協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md) · 當前 brief：[M6-A](.ai-dev/orchestration/briefs/M6-A/)
+協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M1–M6 MVP ✅**）
 
 ---
 
@@ -150,7 +158,9 @@ php artisan serve
 npm run dev
 ```
 
-健康檢查（`routes/web.php`）：
+開啟 [http://127.0.0.1:8000/](http://127.0.0.1:8000/) 使用 **Minimal UI**（fake fixture demo，不需 API key）。
+
+健康檢查：
 
 ```bash
 curl -s http://127.0.0.1:8000/health
@@ -163,6 +173,7 @@ curl -s http://127.0.0.1:8000/health
 
 ```bash
 php artisan test                              # 全 suite
+php artisan test --filter=M6MinimalUiTest        # UI 流程
 php artisan test --filter=M5AReplayAuditTest     # replay + audit trail
 php artisan test --filter=M4CFixtureRegressionTest   # F01–F14 回歸
 php artisan test --filter=FailSafeBias        # CT-G1–G3
@@ -190,7 +201,7 @@ npm run dev         # Vite 開發伺服器
 npm run build       # 正式建置
 ```
 
-M6 UI 將在此堆疊上擴充（問題輸入 / 驗證結果頁）。
+M6 UI 已就緒（`resources/js/Pages/Verification/`）。
 
 ### Laravel AI SDK
 

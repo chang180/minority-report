@@ -2,7 +2,7 @@
 
 **Milestone 6 · Minimal UI（問題輸入 + 驗證結果）**  
 **前置**：M5 全 Gate **RELEASED**  
-**狀態**：OPEN
+**狀態**：**RELEASED**（2026-06-14）
 
 > 合併原規劃 M6-A/B：問題提交頁 + 結果頁（consensus、trust、minority report、provider 比對）一次交付。
 

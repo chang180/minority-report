@@ -1,11 +1,11 @@
 <?php
 
-test('welcome page renders inertia', function () {
+test('home page renders the verification input page', function () {
     $this->get('/')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('Welcome')
-            ->has('laravelVersion')
-            ->has('phpVersion')
+            ->component('Verification/Index')
+            ->has('fixtures')
+            ->has('defaultFixtureId')
         );
 });
