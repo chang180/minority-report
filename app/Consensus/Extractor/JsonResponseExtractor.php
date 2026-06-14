@@ -78,26 +78,63 @@ class JsonResponseExtractor implements ResponseExtractor
     {
         $candidate = trim($rawAnswer);
 
-        if (preg_match('/^```(?:json)?\s*(.*?)\s*```$/su', $candidate, $matches) === 1) {
+        if ($candidate === '' || $candidate === '[]') {
+            return null;
+        }
+
+        if (preg_match('/```(?:json)?\s*(.*?)\s*```/su', $candidate, $matches) === 1) {
             $candidate = trim($matches[1]);
         }
 
         $decoded = json_decode($candidate, true);
 
-        if (is_array($decoded)) {
+        if (is_array($decoded) && ! array_is_list($decoded)) {
             return $decoded;
         }
 
-        $objectStart = mb_strpos($candidate, '{');
-        $objectEnd = mb_strrpos($candidate, '}');
+        if (preg_match('/\{[\s\S]*\}/u', $candidate, $matches) === 1) {
+            $decoded = json_decode($matches[0], true);
 
-        if ($objectStart === false || $objectEnd === false || $objectEnd <= $objectStart) {
-            return null;
+            if (is_array($decoded) && ! array_is_list($decoded)) {
+                return $decoded;
+            }
         }
 
-        $decoded = json_decode(mb_substr($candidate, $objectStart, $objectEnd - $objectStart + 1), true);
+        return null;
+    }
 
-        return is_array($decoded) ? $decoded : null;
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>|null
+     */
+    private function unwrapPayload(array $payload): ?array
+    {
+        if (isset($payload['normalized']) && is_array($payload['normalized'])) {
+            return $payload['normalized'];
+        }
+
+        foreach (['response', 'result', 'data', 'output'] as $wrapper) {
+            if (isset($payload[$wrapper]) && is_array($payload[$wrapper]) && ! array_is_list($payload[$wrapper])) {
+                return $payload[$wrapper];
+            }
+        }
+
+        if (isset($payload['verifications']) && is_array($payload['verifications'])) {
+            $first = $payload['verifications'][0] ?? null;
+
+            if (is_array($first)) {
+                if (isset($first['claim']) && is_array($first['claim'])) {
+                    return [
+                        ...array_diff_key($first, ['claim' => true]),
+                        'claims' => [$first['claim']],
+                    ];
+                }
+
+                return $first;
+            }
+        }
+
+        return $payload;
     }
 
     /**
@@ -106,7 +143,7 @@ class JsonResponseExtractor implements ResponseExtractor
      */
     private function normalizePayload(array $payload, ClassificationResult $classification): ?array
     {
-        $normalized = $payload['normalized'] ?? $payload;
+        $normalized = $this->unwrapPayload($payload);
 
         if (! is_array($normalized)) {
             return null;
@@ -114,10 +151,14 @@ class JsonResponseExtractor implements ResponseExtractor
 
         $answerShape = $classification->answerShape;
         $directAnswer = $this->normalizeDirectAnswer($normalized['direct_answer'] ?? null, $answerShape);
-        $summary = $normalized['summary'] ?? null;
+        $summary = $this->resolveSummary($normalized, $directAnswer);
 
-        if (! is_string($summary)) {
+        if ($summary === null) {
             return null;
+        }
+
+        if ($answerShape === 'discrete' && $directAnswer === 'unknown') {
+            $directAnswer = $this->inferDirectAnswerFromSummary($summary);
         }
 
         return [
@@ -129,15 +170,98 @@ class JsonResponseExtractor implements ResponseExtractor
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $normalized
+     */
+    private function resolveSummary(array $normalized, string $directAnswer): ?string
+    {
+        $summary = $normalized['summary'] ?? null;
+
+        if (is_string($summary) && trim($summary) !== '') {
+            return $summary;
+        }
+
+        if (is_string($normalized['answer'] ?? null) && trim($normalized['answer']) !== '') {
+            return trim($normalized['answer']);
+        }
+
+        $claims = $normalized['claims'] ?? [];
+        if (is_array($claims)) {
+            foreach ($claims as $claim) {
+                if (! is_array($claim)) {
+                    continue;
+                }
+
+                foreach (['assertion', 'statement', 'value', 'text'] as $key) {
+                    if (is_string($claim[$key] ?? null) && trim($claim[$key]) !== '') {
+                        return trim($claim[$key]);
+                    }
+                }
+            }
+        }
+
+        return match ($directAnswer) {
+            'yes' => 'Affirmative answer.',
+            'no' => 'Negative answer.',
+            'unknown' => 'Unable to determine.',
+            default => null,
+        };
+    }
+
     private function normalizeDirectAnswer(mixed $directAnswer, string $answerShape): string
     {
         if ($answerShape === 'open') {
             return 'not_applicable';
         }
 
-        return in_array($directAnswer, ['yes', 'no', 'unknown'], true)
-            ? $directAnswer
-            : 'unknown';
+        if ($directAnswer === true) {
+            return 'yes';
+        }
+
+        if ($directAnswer === false) {
+            return 'no';
+        }
+
+        if (is_string($directAnswer)) {
+            $value = mb_strtolower(trim($directAnswer));
+
+            if (in_array($value, ['yes', 'true', 'y', '是', '對', '对', '正确', '正確', 'correct', 'affirmative'], true)) {
+                return 'yes';
+            }
+
+            if (in_array($value, ['no', 'false', 'n', '否', '不對', '不对', '错误', '錯誤', 'incorrect', 'negative'], true)) {
+                return 'no';
+            }
+
+            if (in_array($value, ['unknown', 'uncertain', '不知道', '无法确定', '無法確定', 'unsure'], true)) {
+                return 'unknown';
+            }
+
+            if ($value === 'not_applicable') {
+                return 'unknown';
+            }
+        }
+
+        return 'unknown';
+    }
+
+    private function inferDirectAnswerFromSummary(string $summary): string
+    {
+        $lower = mb_strtolower(trim($summary));
+
+        if ($lower === 'yes' || $lower === 'no') {
+            return $lower;
+        }
+
+        if (preg_match('/\b(yes|true|correct|affirmative|是|對|对|正確|正确)\b/u', $lower) === 1) {
+            return 'yes';
+        }
+
+        if (preg_match('/\b(no|false|incorrect|negative|否|不對|不对|錯誤|错误)\b/u', $lower) === 1) {
+            return 'no';
+        }
+
+        return 'unknown';
     }
 
     /**
@@ -153,14 +277,29 @@ class JsonResponseExtractor implements ResponseExtractor
             fn (array $claim): array => [
                 'type' => $this->normalizeClaimType($claim['type'] ?? null),
                 'canonical_key' => $this->canonicalKey($claim),
-                'subject' => is_string($claim['subject'] ?? null) ? $claim['subject'] : '',
-                'predicate' => is_string($claim['predicate'] ?? null) ? $claim['predicate'] : '',
-                'value' => is_scalar($claim['value'] ?? null) ? (string) $claim['value'] : '',
+                'subject' => $this->claimField($claim, ['subject', 'entity', 'topic']),
+                'predicate' => $this->claimField($claim, ['predicate', 'property', 'relation']),
+                'value' => $this->claimField($claim, ['value', 'assertion', 'statement', 'text', 'description']),
                 'unit' => is_scalar($claim['unit'] ?? null) ? (string) $claim['unit'] : null,
                 'source' => is_scalar($claim['source'] ?? null) ? (string) $claim['source'] : null,
             ],
             array_filter($claims, 'is_array'),
         ));
+    }
+
+    /**
+     * @param  array<string, mixed>  $claim
+     * @param  array<int, string>  $keys
+     */
+    private function claimField(array $claim, array $keys): string
+    {
+        foreach ($keys as $key) {
+            if (is_scalar($claim[$key] ?? null) && (string) $claim[$key] !== '') {
+                return (string) $claim[$key];
+            }
+        }
+
+        return '';
     }
 
     private function normalizeClaimType(mixed $type): string

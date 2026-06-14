@@ -18,20 +18,49 @@ class RunAuthenticatedVerificationJob implements ShouldQueue
 
     public int $tries = 2;
 
-    public int $timeout = 120;
-
     public function __construct(
         public readonly int $verificationRequestId,
         public readonly int $userId,
-    ) {}
+    ) {
+        $this->timeout = (int) config('consensus.timeouts.job_seconds', 330);
+    }
 
     public function handle(
         ConsensusWorkflow $workflow,
         ConfiguredLlmProviderFactory $factory,
         GroundingService $groundingService,
     ): void {
-        $verification = VerificationRequest::findOrFail($this->verificationRequestId);
+        $seconds = (int) config('consensus.timeouts.request_seconds', 300);
+        $previousLimit = ini_get('max_execution_time');
+        if ($seconds > 0) {
+            set_time_limit($seconds);
+        }
+
+        try {
+            $this->runVerification($workflow, $factory, $groundingService, $seconds);
+        } finally {
+            if ($previousLimit !== false && $previousLimit !== '') {
+                set_time_limit((int) $previousLimit);
+            }
+        }
+    }
+
+    private function runVerification(
+        ConsensusWorkflow $workflow,
+        ConfiguredLlmProviderFactory $factory,
+        GroundingService $groundingService,
+        int $seconds,
+    ): void {
+        if ($seconds > 0) {
+            set_time_limit($seconds);
+        }
+
+        $verification = VerificationRequest::find($this->verificationRequestId);
         $user = User::findOrFail($this->userId);
+
+        if ($verification === null) {
+            return;
+        }
 
         $verification->update(['processing_status' => 'running']);
 

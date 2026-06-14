@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'label', 'api_url', 'api_key', 'model', 'enabled'])]
+#[Fillable(['user_id', 'label', 'api_url', 'api_key', 'model', 'provider_options', 'enabled'])]
 class UserCustomProvider extends Model
 {
     public function user(): BelongsTo
@@ -19,6 +19,7 @@ class UserCustomProvider extends Model
         return [
             'api_key' => 'encrypted',
             'enabled' => 'boolean',
+            'provider_options' => 'array',
         ];
     }
 }

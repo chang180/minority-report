@@ -116,6 +116,18 @@ class FailSafeQuestionClassifier implements QuestionClassifier
 
     private function looksDiscrete(string $text): bool
     {
-        return preg_match('/\b(is|are|was|were|do|does|did|can|will|has|have|when|who|which|what version|how many|how much)\b/u', $text) === 1;
+        if (preg_match('/\b(is|are|was|were|do|does|did|can|will|has|have|when|who|which|what version|how many|how much)\b/u', $text) === 1) {
+            return true;
+        }
+
+        if (preg_match('/(是對的嗎|是错的吗|是錯的嗎|對嗎|对吗|是否|是不是|正確嗎|正确吗)/u', $text) === 1) {
+            return true;
+        }
+
+        if (preg_match('/嗎[？?]?\s*$/u', $text) === 1) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -17,7 +17,9 @@ return [
         ],
     ],
     'timeouts' => [
-        'provider_seconds' => 60,
-        'extractor_seconds' => 30,
+        'request_seconds' => (int) env('CONSENSUS_REQUEST_TIMEOUT_SECONDS', 300),
+        'job_seconds' => (int) env('CONSENSUS_JOB_TIMEOUT_SECONDS', 330),
+        'provider_seconds' => (int) env('CONSENSUS_PROVIDER_TIMEOUT_SECONDS', 90),
+        'extractor_seconds' => (int) env('CONSENSUS_EXTRACTOR_TIMEOUT_SECONDS', 30),
     ],
 ];

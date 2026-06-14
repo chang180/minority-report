@@ -10,8 +10,8 @@ class OpenAiLlmProvider extends LaravelAiLlmProvider
         bool $enabled = true,
         ?string $model = null,
         int $timeout = 60,
-        RawAnswerAgent $agent = new RawAnswerAgent,
+        array $providerOptions = [],
     ) {
-        parent::__construct('openai', Lab::OpenAI, $enabled, $model, $timeout, $agent);
+        parent::__construct('openai', Lab::OpenAI, $enabled, $model, $timeout, $providerOptions);
     }
 }

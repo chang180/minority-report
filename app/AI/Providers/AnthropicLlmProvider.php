@@ -10,8 +10,8 @@ class AnthropicLlmProvider extends LaravelAiLlmProvider
         bool $enabled = true,
         ?string $model = null,
         int $timeout = 60,
-        RawAnswerAgent $agent = new RawAnswerAgent,
+        array $providerOptions = [],
     ) {
-        parent::__construct('anthropic', Lab::Anthropic, $enabled, $model, $timeout, $agent);
+        parent::__construct('anthropic', Lab::Anthropic, $enabled, $model, $timeout, $providerOptions);
     }
 }

@@ -31,4 +31,14 @@ class VerificationRequestPolicy
         return $verificationRequest->user_id !== null
             && $verificationRequest->user_id === $user->id;
     }
+
+    public function delete(User $user, VerificationRequest $verificationRequest): bool
+    {
+        return $this->view($user, $verificationRequest);
+    }
+
+    public function deleteAny(User $user): bool
+    {
+        return true;
+    }
 }

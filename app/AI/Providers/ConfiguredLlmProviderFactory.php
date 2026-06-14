@@ -139,11 +139,15 @@ class ConfiguredLlmProviderFactory
         }
 
         $aiKey = self::PRESET_AI_KEY[$providerKey] ?? $providerKey;
-        $inner = $this->buildPresetInner($providerKey, $setting->model, $this->providerTimeout());
+        $options = ProviderGenerationOptions::sanitize($setting->provider_options);
+        $inner = $this->buildPresetInner($providerKey, $setting->model, $this->providerTimeout(), $options);
 
         $overrides = ['ai.providers.'.$aiKey.'.key' => ConsensusSlotReadiness::localApiKey($setting->api_key)];
         if ($setting->api_url !== null) {
-            $overrides["ai.providers.{$aiKey}.url"] = $setting->api_url;
+            $url = ConsensusSlotReadiness::normalizeOpenAiCompatibleBaseUrl($setting->api_url);
+            // Ollama preset uses OpenAI-compatible driver (Lab::OpenAI).
+            $urlKey = $providerKey === 'ollama' ? 'openai' : $aiKey;
+            $overrides["ai.providers.{$urlKey}.url"] = $url;
         }
 
         return new ScopedConfigLlmProvider($logicalName, $inner, $overrides, $this->config);
@@ -159,15 +163,17 @@ class ConfiguredLlmProviderFactory
         }
 
         // Custom providers use the OpenAI-compatible driver.
+        $options = ProviderGenerationOptions::sanitize($custom->provider_options);
         $inner = new OpenAiLlmProvider(
             enabled: true,
             model: $custom->model,
             timeout: $this->providerTimeout(),
+            providerOptions: $options,
         );
 
         return new ScopedConfigLlmProvider($logicalName, $inner, [
             'ai.providers.openai.key' => ConsensusSlotReadiness::localApiKey($custom->api_key),
-            'ai.providers.openai.url' => $custom->api_url,
+            'ai.providers.openai.url' => ConsensusSlotReadiness::normalizeOpenAiCompatibleBaseUrl($custom->api_url),
         ], $this->config);
     }
 
@@ -188,12 +194,12 @@ class ConfiguredLlmProviderFactory
         );
     }
 
-    private function buildPresetInner(string $providerKey, ?string $model, int $timeout): LaravelAiLlmProvider
+    private function buildPresetInner(string $providerKey, ?string $model, int $timeout, array $providerOptions = []): LaravelAiLlmProvider
     {
         return match ($providerKey) {
-            'anthropic' => new AnthropicLlmProvider(enabled: true, model: $model, timeout: $timeout),
-            'gemini' => new GeminiLlmProvider(enabled: true, model: $model, timeout: $timeout),
-            default => new OpenAiLlmProvider(enabled: true, model: $model, timeout: $timeout),
+            'anthropic' => new AnthropicLlmProvider(enabled: true, model: $model, timeout: $timeout, providerOptions: $providerOptions),
+            'gemini' => new GeminiLlmProvider(enabled: true, model: $model, timeout: $timeout, providerOptions: $providerOptions),
+            default => new OpenAiLlmProvider(enabled: true, model: $model, timeout: $timeout, providerOptions: $providerOptions),
         };
     }
 

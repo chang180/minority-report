@@ -35,6 +35,7 @@ test('user can save a preset provider key', function () {
             'api_key' => 'sk-test-1234',
             'api_url' => null,
             'model' => 'gpt-4o',
+            'provider_options_json' => '',
             'enabled' => true,
         ])
         ->assertRedirect();
@@ -57,6 +58,7 @@ test('preset api_key is stored encrypted', function () {
         'api_key' => 'sk-ant-secret',
         'api_url' => null,
         'model' => null,
+        'provider_options_json' => '',
         'enabled' => true,
     ]);
 
@@ -101,6 +103,7 @@ test('empty api_key in preset update does not wipe stored key', function () {
         'api_key' => '',
         'api_url' => null,
         'model' => 'gpt-4o-mini',
+        'provider_options_json' => '',
         'enabled' => false,
     ]);
 
@@ -122,12 +125,14 @@ test('user can add a custom provider', function () {
             'api_url' => 'http://localhost:11434/v1',
             'api_key' => '',
             'model' => 'llama3',
+            'provider_options_json' => '{"max_tokens": 4096}',
             'enabled' => true,
         ])
         ->assertRedirect();
 
     expect($user->customProviders()->count())->toBe(1)
-        ->and($user->customProviders()->first()->label)->toBe('My Ollama');
+        ->and($user->customProviders()->first()->label)->toBe('My Ollama')
+        ->and($user->customProviders()->first()->provider_options)->toMatchArray(['max_tokens' => 4096]);
 });
 
 test('user can delete their own custom provider', function () {
@@ -177,4 +182,61 @@ test('user can save consensus slots', function () {
         ->assertRedirect();
 
     expect($user->fresh()->consensus_slots)->toMatchArray($slots);
+});
+
+test('user can save preset provider options json', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->put('/settings/providers/preset', [
+            'provider_key' => 'ollama',
+            'api_key' => '',
+            'api_url' => 'http://127.0.0.1:8080/v1',
+            'model' => 'gemma',
+            'provider_options_json' => '{"max_tokens": 2048, "temperature": 0.2}',
+            'enabled' => true,
+        ])
+        ->assertRedirect();
+
+    $setting = UserProviderSettings::where('user_id', $user->id)
+        ->where('provider_key', 'ollama')
+        ->first();
+
+    expect($setting->provider_options)->toMatchArray([
+        'max_tokens' => 2048,
+        'temperature' => 0.2,
+    ]);
+});
+
+test('invalid provider options json returns validation error', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->put('/settings/providers/preset', [
+            'provider_key' => 'openai',
+            'api_key' => 'sk-test',
+            'api_url' => null,
+            'model' => null,
+            'provider_options_json' => 'not-json',
+            'enabled' => true,
+        ])
+        ->assertSessionHasErrors('provider_options_json');
+});
+
+test('provider settings page exposes provider options json', function () {
+    $user = User::factory()->create();
+    UserProviderSettings::create([
+        'user_id' => $user->id,
+        'provider_key' => 'openai',
+        'api_key' => 'sk-test',
+        'provider_options' => ['max_tokens' => 1024],
+        'enabled' => true,
+    ]);
+
+    $this->actingAs($user)
+        ->get('/settings/providers')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('presets.0.provider_options_json', fn (string $json) => str_contains($json, '1024'))
+        );
 });

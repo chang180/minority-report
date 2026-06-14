@@ -159,7 +159,15 @@ M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結
 | Email auto-verify | `APP_ENV=local` 或 `AUTH_AUTO_VERIFY_EMAIL=true`：舊帳號 middleware 自動 verified |
 | Demo Show | 同步 demo 設 `processing_status=completed`；Show 不對訪客 poll auth status |
 | 本機 Provider | Ollama／自訂 endpoint 僅需 URL 即可就緒（`ConsensusSlotReadiness`） |
-| Queue | 登入 verification 需 `php artisan queue:work` 或 `composer dev` |
+| Queue | `database` + `queue:listen`；Show 三欄漸進顯示；sync 僅簡單本機、無漸進 UI |
+| **provider_options** | `/settings/providers` JSON textarea → `provider_options`（如 `max_tokens`）；`ProviderGenerationOptions` 消毒 |
+| **Structured output** | `ConfiguredRawAnswerAgent` 實作 Laravel AI `HasStructuredOutput`；`LaravelAiLlmProvider` 結構化失敗時 fallback 至 `text` |
+| **JSON 抽取容錯** | `JsonResponseExtractor`：markdown 區塊、中文 direct_answer、`summary` 推斷、巢狀 payload 解包 |
+| **中文 discrete** | `FailSafeQuestionClassifier`：句尾「嗎？」與「是對的嗎」等句式 |
+| **API URL** | `ConsensusSlotReadiness::normalizeOpenAiCompatibleBaseUrl()` 剝 `/chat/completions` 後綴；base **SHOULD** 為 `…/v1` |
+| **驗證刪除** | 列表單筆／全部刪除；`RunAuthenticatedVerificationJob` 略過已刪除列 |
+| **Job 逾時** | `set_time_limit` 於 job 結束 `finally` 還原，避免 worker 空等 crash |
+| **本機驗證基線** | 簡短是非題（如「1加1等於2嗎？」「水的沸點…100度嗎？」）→ 抽取 3/3、Full、Trust High（#20–#21） |
 
 ### 已知缺口（待 spec）
 

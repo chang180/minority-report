@@ -9,6 +9,7 @@ use App\Models\VerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -100,6 +101,10 @@ class AuthVerificationController extends Controller
     {
         $this->authorize('view', $verification);
 
+        $verification->load([
+            'providerResponses' => fn ($query) => $query->oldest('id'),
+        ]);
+
         return response()->json([
             'id' => $verification->id,
             'processing_status' => $verification->processing_status,
@@ -107,6 +112,10 @@ class AuthVerificationController extends Controller
             'final_trust' => $verification->final_trust,
             'final_verdict' => $verification->final_verdict,
             'updated_at' => $verification->updated_at?->toISOString(),
+            'provider_responses' => $verification->providerResponses
+                ->map(fn (ProviderResponse $response): array => $this->providerPayload($response))
+                ->values()
+                ->all(),
         ]);
     }
 
@@ -125,6 +134,45 @@ class AuthVerificationController extends Controller
         ]);
 
         return redirect()->route('verifications.show', $newVerification);
+    }
+
+    public function destroy(VerificationRequest $verification): RedirectResponse
+    {
+        $this->authorize('delete', $verification);
+
+        $this->cancelQueuedJobsForVerification($verification->id);
+        $verification->delete();
+
+        return redirect()->route('verifications.index')->with('status', 'verification-deleted');
+    }
+
+    public function destroyAll(Request $request): RedirectResponse
+    {
+        $this->authorize('deleteAny', VerificationRequest::class);
+
+        $user = $request->user();
+        $query = $user->isAdmin()
+            ? VerificationRequest::query()
+            : VerificationRequest::where('user_id', $user->id);
+
+        $ids = $query->pluck('id');
+
+        foreach ($ids as $id) {
+            $this->cancelQueuedJobsForVerification($id);
+        }
+
+        $query->delete();
+
+        return redirect()->route('verifications.index')->with('status', 'verifications-cleared');
+    }
+
+    private function cancelQueuedJobsForVerification(int $verificationRequestId): void
+    {
+        DB::table('jobs')
+            ->where('payload', 'like', '%RunAuthenticatedVerificationJob%')
+            ->where('payload', 'like', '%verificationRequestId%')
+            ->where('payload', 'like', '%i:'.$verificationRequestId.';%')
+            ->delete();
     }
 
     /**

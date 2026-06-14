@@ -253,13 +253,17 @@ ADMIN_PASSWORD=your-secure-password
 
 ### 日常開發
 
+**Queue（登入 verification）**：預設 `QUEUE_CONNECTION=database`。提交後先進入 pending／分析中，Show 頁**三欄逐格顯示**各 provider 的 API 回應（polling + 打字機效果）。**必須**常駐 queue worker：
+
 ```bash
 composer dev           # artisan serve + queue + pail + vite（一鍵）
 # 或分開：
 php artisan serve
-php artisan queue:work   # M8-A：登入 verification 需 worker 處理 Job
+php artisan queue:listen --timeout=0
 npm run dev
 ```
+
+本機 Llama 等慢模型請保留 `.env` 的 `CONSENSUS_*_TIMEOUT_SECONDS`（預設整體 5 分鐘、每 provider 90 秒）。若改 `QUEUE_CONNECTION=sync` 則不需 worker，但 POST 會阻塞且無三欄漸進 UI。
 
 開啟 [http://127.0.0.1:8000/](http://127.0.0.1:8000/) 為 **Welcome**；訪客 demo 在 [/demo](http://127.0.0.1:8000/demo)（fake fixture，不需 API key）。
 
@@ -310,7 +314,7 @@ npm run build       # 正式建置
 
 M7–M8 產品 UI 已就緒。Post-MVP 重點：
 
-- **M8-A**：`POST /verifications` 為 async；本機需 `queue:work`（或 `composer dev`）
+- **M8-A**：async Job + Show 三欄 provider 漸進顯示；需 `database` queue + worker；逾時見 `CONSENSUS_*_TIMEOUT_SECONDS`
 - **M8-B**：Admin `/admin/grounding` — `disabled` | `local_llm_tool_loop` | `search_api`
 - **M8-C**：Admin `/admin/aligner` — `string`（預設）| `semantic_llm`
 
@@ -324,10 +328,22 @@ M7–M8 產品 UI 已就緒。Post-MVP 重點：
 本機 llama.cpp 範例（`.env`）：
 
 ```bash
-LOCAL_AI_API_URL=http://localhost:8080
+LOCAL_AI_API_URL=http://127.0.0.1:8080/v1
 OPENAI_API_KEY=local
 OPENAI_MODEL=gemma-4-E2B_q4_0-it.gguf
 ```
+
+**注意**：`LOCAL_AI_API_URL` 與 preset／自訂供應端 URL **MUST** 為 OpenAI-compatible **base**（例如 `http://host:8080/v1`），**MUST NOT** 含 `/chat/completions`（runtime 會自動剝除後綴）。Laravel AI OpenAI driver 使用 `/v1/responses` + `json_schema` 結構化輸出。
+
+### Provider 額外參數（Post-M8）
+
+登入使用者在 `/settings/providers` 可為 preset／自訂端點填寫 **JSON textarea**（`provider_options`），例如：
+
+```json
+{"max_tokens": 2048}
+```
+
+後端 `ProviderGenerationOptions` 消毒已知 key；其餘純量 key 保留供 OpenAI-compatible body 轉發。
 
 Opt-in live grounding test：`M8_B_LIVE_GROUNDING=1`（CI 預設 skip）。
 
@@ -344,12 +360,14 @@ Opt-in live semantic test：`M8_C_LIVE_SEMANTIC=1`（CI 預設 skip）。
 
 已安裝 `laravel/ai`（`config/ai.php`）。Provider adapter 位於 `app/AI/Providers/*`，bridge 至 domain `LlmProvider`；**`app/Consensus/` MUST NOT 直接呼叫 SDK facade**。
 
+登入驗證的 provider 呼叫使用 `ConfiguredRawAnswerAgent`（`HasStructuredOutput` + `HasProviderOptions`）：SDK 依 schema 要求 JSON；`JsonResponseExtractor` 再正規化為 domain `normalized` DTO。本機模型若結構化解析為空，adapter **SHOULD** fallback 至 raw text 供 lenient 抽取（見 [docs/05](docs/05-failure-modes.md) §4）。
+
 ```bash
 # 新 clone 時 migrate 即可（套件已 require）
 php artisan migrate
 ```
 
-登入使用者 **SHOULD** 在 `/settings/providers` 設定自己的 API key（BYOK）；全域 `.env` key 可作 fallback / CI。缺 key 時 adapter 回傳 `provider_unavailable`，不呼叫遠端 API。
+登入使用者 **SHOULD** 在 `/settings/providers` 設定自己的 API key（BYOK）與可選 `provider_options` JSON；全域 `.env` key 可作 fallback / CI。缺 key 時 adapter 回傳 `provider_unavailable`，不呼叫遠端 API。
 
 Opt-in  live adapter 測試：`M3_B_LIVE_OPENAI=1` + `OPENAI_API_KEY`。
 

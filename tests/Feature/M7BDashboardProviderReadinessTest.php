@@ -1,10 +1,16 @@
 <?php
 
+use App\AI\Providers\ConsensusSlotReadiness;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
+
+test('normalizeOpenAiCompatibleBaseUrl strips chat completions suffix', function () {
+    expect(ConsensusSlotReadiness::normalizeOpenAiCompatibleBaseUrl('http://127.0.0.1:8080/v1/chat/completions'))
+        ->toBe('http://127.0.0.1:8080/v1');
+});
 
 test('dashboard marks local ollama preset ready with api url only', function () {
     $user = User::factory()->create([

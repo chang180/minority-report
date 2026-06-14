@@ -8,19 +8,27 @@ use App\Consensus\DTO\Question;
 use App\Consensus\Exceptions\ProviderException;
 use App\Consensus\Exceptions\ProviderTimeoutException;
 use Illuminate\Http\Client\ConnectionException;
+use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Enums\Lab;
+use Laravel\Ai\Responses\AgentResponse;
+use Laravel\Ai\Responses\StructuredAgentResponse;
 use Throwable;
 
 abstract class LaravelAiLlmProvider implements LlmProvider
 {
+    private readonly Agent $agent;
+
     public function __construct(
         private readonly string $providerName,
         private readonly Lab $lab,
         private readonly bool $enabled,
         private readonly ?string $model = null,
         private readonly int $timeout = 60,
-        private readonly RawAnswerAgent $agent = new RawAnswerAgent,
-    ) {}
+        array $providerOptions = [],
+        ?Agent $agent = null,
+    ) {
+        $this->agent = $agent ?? new ConfiguredRawAnswerAgent($providerOptions);
+    }
 
     public function name(): string
     {
@@ -59,7 +67,7 @@ abstract class LaravelAiLlmProvider implements LlmProvider
             model: $response->meta->model ?: ($this->model ?: ''),
             providerStatus: 'success',
             extractionStatus: 'not_started',
-            rawAnswer: $response->text,
+            rawAnswer: $this->resolveRawAnswer($response),
             usage: [
                 'provider_input_tokens' => $response->usage->promptTokens,
                 'provider_output_tokens' => $response->usage->completionTokens,
@@ -72,8 +80,24 @@ abstract class LaravelAiLlmProvider implements LlmProvider
                 'ai_provider' => $response->meta->provider,
                 'invocation_id' => $response->invocationId,
                 'citations' => $response->meta->citations->all(),
+                'structured_output' => $response instanceof StructuredAgentResponse,
             ],
         );
+    }
+
+    private function resolveRawAnswer(AgentResponse $response): string
+    {
+        if ($response instanceof StructuredAgentResponse) {
+            $structured = $response->structured ?? [];
+
+            if ($structured !== [] && ! array_is_list($structured)) {
+                return $response->toJson(JSON_UNESCAPED_UNICODE);
+            }
+
+            return $response->text !== '' ? $response->text : '[]';
+        }
+
+        return $response->text;
     }
 
     private function isTimeoutException(Throwable $exception): bool

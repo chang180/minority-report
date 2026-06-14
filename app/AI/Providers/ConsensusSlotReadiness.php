@@ -57,4 +57,18 @@ class ConsensusSlotReadiness
     {
         return filled($apiKey) ? $apiKey : 'local';
     }
+
+    /**
+     * OpenAI-compatible clients append `/chat/completions` to the configured base URL.
+     */
+    public static function normalizeOpenAiCompatibleBaseUrl(string $url): string
+    {
+        $url = rtrim($url, '/');
+
+        if (str_ends_with($url, '/chat/completions')) {
+            return substr($url, 0, -strlen('/chat/completions'));
+        }
+
+        return $url;
+    }
 }

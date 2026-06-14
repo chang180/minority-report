@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
+import { Trash2 } from '@lucide/vue';
+import { computed, ref } from 'vue';
 
 type Verification = {
     id: number;
@@ -24,6 +27,44 @@ type PaginatedVerifications = {
 defineProps<{
     verifications: PaginatedVerifications;
 }>();
+
+const page = usePage();
+const flashStatus = computed(() => page.props.status as string | undefined);
+const clearingAll = ref(false);
+
+function deleteOne(id: number, question: string): void {
+    if (! window.confirm(`確定要刪除這筆驗證嗎？\n\n${question}`)) {
+        return;
+    }
+
+    router.delete(`/verifications/${id}`, { preserveScroll: true });
+}
+
+function clearAll(total: number): void {
+    if (! window.confirm(`確定要清空全部 ${total} 筆驗證紀錄嗎？此操作無法復原。`)) {
+        return;
+    }
+
+    clearingAll.value = true;
+    router.delete('/verifications', {
+        preserveScroll: true,
+        onFinish: () => {
+            clearingAll.value = false;
+        },
+    });
+}
+
+function flashMessage(status: string | undefined): string | null {
+    if (status === 'verification-deleted') {
+        return '已刪除驗證紀錄。';
+    }
+
+    if (status === 'verifications-cleared') {
+        return '已清空全部驗證紀錄。';
+    }
+
+    return null;
+}
 
 function statusLabel(status: string): string {
     const map: Record<string, string> = {
@@ -64,13 +105,31 @@ function trustClass(trust: string | null): string {
                     <h1 class="text-2xl font-semibold tracking-normal">我的驗證</h1>
                     <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">共 {{ verifications.total }} 筆</p>
                 </div>
-                <Link
-                    href="/verifications/create"
-                    class="inline-flex min-h-10 items-center gap-2 rounded-md bg-teal-600 px-4 text-sm font-semibold text-white transition hover:bg-teal-700"
-                >
-                    新建驗證
-                </Link>
+                <div class="flex flex-wrap items-center gap-2">
+                    <Button
+                        v-if="verifications.total > 0"
+                        type="button"
+                        variant="outline"
+                        :disabled="clearingAll"
+                        @click="clearAll(verifications.total)"
+                    >
+                        {{ clearingAll ? '清空中…' : '清空全部' }}
+                    </Button>
+                    <Link
+                        href="/verifications/create"
+                        class="inline-flex min-h-10 items-center gap-2 rounded-md bg-teal-600 px-4 text-sm font-semibold text-white transition hover:bg-teal-700"
+                    >
+                        新建驗證
+                    </Link>
+                </div>
             </div>
+
+            <p
+                v-if="flashMessage(flashStatus)"
+                class="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200"
+            >
+                {{ flashMessage(flashStatus) }}
+            </p>
 
             <div v-if="verifications.data.length === 0" class="rounded-lg border border-dashed border-neutral-300 p-8 text-center text-sm text-neutral-500 dark:border-neutral-700">
                 尚無驗證紀錄。
@@ -78,16 +137,15 @@ function trustClass(trust: string | null): string {
             </div>
 
             <div v-else class="divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 dark:divide-neutral-800 dark:border-neutral-800">
-                <Link
+                <div
                     v-for="v in verifications.data"
                     :key="v.id"
-                    :href="`/verifications/${v.id}`"
                     class="flex items-start justify-between gap-4 p-4 transition hover:bg-neutral-50 dark:hover:bg-neutral-900"
                 >
-                    <div class="min-w-0 flex-1">
+                    <Link :href="`/verifications/${v.id}`" class="min-w-0 flex-1">
                         <p class="truncate text-sm font-medium">{{ v.question }}</p>
                         <p class="mt-0.5 text-xs text-neutral-500">{{ v.created_at }}</p>
-                    </div>
+                    </Link>
                     <div class="flex shrink-0 items-center gap-2">
                         <span :class="statusClass(v.processing_status)" class="rounded-full px-2 py-0.5 text-xs font-medium">
                             {{ statusLabel(v.processing_status) }}
@@ -95,8 +153,18 @@ function trustClass(trust: string | null): string {
                         <span v-if="v.final_trust" :class="trustClass(v.final_trust)" class="rounded-full px-2 py-0.5 text-xs font-medium">
                             {{ v.final_trust }}
                         </span>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            class="text-rose-600 hover:text-rose-700 dark:text-rose-400"
+                            aria-label="刪除驗證"
+                            @click="deleteOne(v.id, v.question)"
+                        >
+                            <Trash2 class="size-4" />
+                        </Button>
                     </div>
-                </Link>
+                </div>
             </div>
 
             <!-- Pagination -->

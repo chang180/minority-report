@@ -17,6 +17,7 @@ use App\Consensus\DTO\Question;
 use App\Consensus\DTO\TrustLevelResult;
 use App\Consensus\DTO\VerdictInput;
 use App\Consensus\DTO\VerdictReport;
+use App\Consensus\Prompt\ProviderPromptBuilder;
 use App\Models\ConsensusResult as ConsensusResultModel;
 use App\Models\ProviderResponse as ProviderResponseModel;
 use App\Models\VerificationRequest;
@@ -31,6 +32,7 @@ class ConsensusWorkflow
         private readonly ConsensusAnalyzer $analyzer,
         private readonly TrustLevelScorer $trustLevelScorer,
         private readonly VerdictReporter $verdictReporter,
+        private readonly ProviderPromptBuilder $providerPromptBuilder,
     ) {}
 
     /**
@@ -64,7 +66,7 @@ class ConsensusWorkflow
             ]);
         }
 
-        $prompt = $providerPrompt ?? $this->buildProviderPrompt($question, $classification);
+        $prompt = $this->providerPromptBuilder->build($question, $classification, $providerPrompt);
         $rawResponses = $this->providerOrchestrator->dispatch($verificationRequest->id, $question, $prompt, $providers);
         $providerResponses = $this->extractionOrchestrator->extractAndPersist(
             $verificationRequest->id,
@@ -153,15 +155,6 @@ class ConsensusWorkflow
             extractionPrompt: $response->extraction_prompt ?? '',
             extractorModel: $response->extractor_model ?? '',
         );
-    }
-
-    private function buildProviderPrompt(Question $question, ClassificationResult $classification): string
-    {
-        return implode("\n", [
-            'Answer the user question for consensus verification.',
-            'Question: '.$question->text,
-            'Expected answer shape: '.$classification->answerShape,
-        ]);
     }
 
     /**

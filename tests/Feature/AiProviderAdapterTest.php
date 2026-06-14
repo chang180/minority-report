@@ -2,9 +2,9 @@
 
 use App\AI\Providers\AnthropicLlmProvider;
 use App\AI\Providers\ConfiguredLlmProviderFactory;
+use App\AI\Providers\ConfiguredRawAnswerAgent;
 use App\AI\Providers\GeminiLlmProvider;
 use App\AI\Providers\OpenAiLlmProvider;
-use App\AI\Providers\RawAnswerAgent;
 use App\Consensus\Contracts\LlmProvider;
 use App\Consensus\DTO\Question;
 use Laravel\Ai\Prompts\AgentPrompt;
@@ -14,8 +14,12 @@ test('sdk adapters prompt laravel ai with configured provider and model', functi
     string $providerName,
     string $model,
 ) {
-    RawAnswerAgent::fake(fn (string $prompt, $attachments, $provider, string $model): string => "SDK response for {$provider->name()}:{$model}")
-        ->preventStrayPrompts();
+    ConfiguredRawAnswerAgent::fake(fn (): array => [
+        'direct_answer' => 'yes',
+        'summary' => "SDK response for {$providerName}:{$model}",
+        'claims' => [],
+        'citations' => [],
+    ])->preventStrayPrompts();
 
     $provider = new $providerClass(enabled: true, model: $model, timeout: 17);
 
@@ -30,7 +34,8 @@ test('sdk adapters prompt laravel ai with configured provider and model', functi
         ->and($response->model)->toBe($model)
         ->and($response->providerStatus)->toBe('success')
         ->and($response->extractionStatus)->toBe('not_started')
-        ->and($response->rawAnswer)->toBe("SDK response for {$providerName}:{$model}")
+        ->and($response->rawAnswer)->toContain("SDK response for {$providerName}:{$model}")
+        ->and($response->metadata['structured_output'])->toBeTrue()
         ->and($response->usage)->toHaveKeys([
             'provider_input_tokens',
             'provider_output_tokens',
@@ -40,9 +45,10 @@ test('sdk adapters prompt laravel ai with configured provider and model', functi
             'ai_provider',
             'invocation_id',
             'citations',
+            'structured_output',
         ]);
 
-    RawAnswerAgent::assertPrompted(function (AgentPrompt $prompt) use ($providerName, $model): bool {
+    ConfiguredRawAnswerAgent::assertPrompted(function (AgentPrompt $prompt) use ($providerName, $model): bool {
         return $prompt->prompt === 'Answer exactly once.'
             && $prompt->provider()->name() === $providerName
             && $prompt->model === $model
@@ -55,7 +61,7 @@ test('sdk adapters prompt laravel ai with configured provider and model', functi
 ]);
 
 test('disabled adapter returns provider unavailable without prompting sdk', function () {
-    RawAnswerAgent::fake()->preventStrayPrompts();
+    ConfiguredRawAnswerAgent::fake()->preventStrayPrompts();
 
     $response = (new OpenAiLlmProvider(enabled: false, model: 'gpt-test'))->ask(
         new Question('What is Laravel?'),
@@ -68,7 +74,7 @@ test('disabled adapter returns provider unavailable without prompting sdk', func
         ->and($response->extractionStatus)->toBe('not_started')
         ->and($response->error['message'])->toBe('Provider is disabled or missing credentials.');
 
-    RawAnswerAgent::assertNeverPrompted();
+    ConfiguredRawAnswerAgent::assertNeverPrompted();
 });
 
 test('configured provider factory wires openai anthropic and gemini from config', function () {
@@ -89,14 +95,14 @@ test('configured provider factory wires openai anthropic and gemini from config'
         ->and($providers[2])->toBeInstanceOf(GeminiLlmProvider::class)
         ->and(app(LlmProvider::class))->toBeInstanceOf(OpenAiLlmProvider::class);
 
-    RawAnswerAgent::fake(['configured response'])->preventStrayPrompts();
+    ConfiguredRawAnswerAgent::fake(['configured response'])->preventStrayPrompts();
 
     $response = $providers[1]->ask(new Question('Question'), 'Prompt');
 
     expect($response->provider)->toBe('anthropic')
         ->and($response->providerStatus)->toBe('provider_unavailable');
 
-    RawAnswerAgent::assertNeverPrompted();
+    ConfiguredRawAnswerAgent::assertNeverPrompted();
 });
 
 test('live openai adapter can call laravel ai sdk when explicitly enabled', function () {

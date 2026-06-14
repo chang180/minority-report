@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\AI\Providers\ConsensusSlotReadiness;
+use App\AI\Providers\ProviderGenerationOptions;
 use App\Models\UserCustomProvider;
+use App\Rules\ProviderOptionsJson;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -35,6 +37,7 @@ class ProviderSettingsController extends Controller
                 'configured' => ConsensusSlotReadiness::isPresetReady($user, $preset['key']),
                 'api_url' => $setting?->api_url,
                 'model' => $setting?->model,
+                'provider_options_json' => ProviderGenerationOptions::toJson($setting?->provider_options),
                 'enabled' => $setting?->enabled ?? true,
             ];
         })->values()->all();
@@ -46,6 +49,7 @@ class ProviderSettingsController extends Controller
                 'label' => $p->label,
                 'api_url' => $p->api_url,
                 'model' => $p->model,
+                'provider_options_json' => ProviderGenerationOptions::toJson($p->provider_options),
                 'has_key' => filled($p->api_key),
                 'configured' => ConsensusSlotReadiness::isCustomReady($user, $p->id),
                 'enabled' => $p->enabled,
@@ -67,6 +71,7 @@ class ProviderSettingsController extends Controller
             'api_key' => ['nullable', 'string', 'max:512'],
             'api_url' => ['nullable', 'url', 'max:512'],
             'model' => ['nullable', 'string', 'max:128'],
+            'provider_options_json' => ['nullable', 'string', 'max:4096', new ProviderOptionsJson],
             'enabled' => ['required', 'boolean'],
         ]);
 
@@ -76,6 +81,7 @@ class ProviderSettingsController extends Controller
         $setting->enabled = $validated['enabled'];
         $setting->api_url = $validated['api_url'] ?? null;
         $setting->model = $validated['model'] ?? null;
+        $setting->provider_options = ProviderGenerationOptions::fromRequest($validated['provider_options_json'] ?? null);
 
         if (filled($validated['api_key'])) {
             $setting->api_key = $validated['api_key'];
@@ -93,10 +99,18 @@ class ProviderSettingsController extends Controller
             'api_url' => ['required', 'url', 'max:512'],
             'api_key' => ['nullable', 'string', 'max:512'],
             'model' => ['nullable', 'string', 'max:128'],
+            'provider_options_json' => ['nullable', 'string', 'max:4096', new ProviderOptionsJson],
             'enabled' => ['required', 'boolean'],
         ]);
 
-        $request->user()->customProviders()->create($validated);
+        $request->user()->customProviders()->create([
+            'label' => $validated['label'],
+            'api_url' => $validated['api_url'],
+            'api_key' => $validated['api_key'] ?? null,
+            'model' => $validated['model'] ?? null,
+            'enabled' => $validated['enabled'],
+            'provider_options' => ProviderGenerationOptions::fromRequest($validated['provider_options_json'] ?? null),
+        ]);
 
         return back()->with('status', '自訂供應端已新增。');
     }
@@ -110,14 +124,23 @@ class ProviderSettingsController extends Controller
             'api_url' => ['required', 'url', 'max:512'],
             'api_key' => ['nullable', 'string', 'max:512'],
             'model' => ['nullable', 'string', 'max:128'],
+            'provider_options_json' => ['nullable', 'string', 'max:4096', new ProviderOptionsJson],
             'enabled' => ['required', 'boolean'],
         ]);
 
-        if (! filled($validated['api_key'])) {
-            unset($validated['api_key']);
+        $payload = [
+            'label' => $validated['label'],
+            'api_url' => $validated['api_url'],
+            'model' => $validated['model'] ?? null,
+            'enabled' => $validated['enabled'],
+            'provider_options' => ProviderGenerationOptions::fromRequest($validated['provider_options_json'] ?? null),
+        ];
+
+        if (filled($validated['api_key'])) {
+            $payload['api_key'] = $validated['api_key'];
         }
 
-        $customProvider->update($validated);
+        $customProvider->update($payload);
 
         return back()->with('status', '自訂供應端已更新。');
     }

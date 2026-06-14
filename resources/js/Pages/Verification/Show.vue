@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ProviderLivePanel from '@/components/Verification/ProviderLivePanel.vue';
+import { CONSENSUS_SLOT_KEYS, consensusSlotLabel } from '@/lib/consensusSlots';
 import { Link, router } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
@@ -59,6 +61,16 @@ type ConsensusResult = {
     metadata: Record<string, unknown> | null;
 };
 
+const CONSENSUS_SLOTS = CONSENSUS_SLOT_KEYS;
+
+type SlotState = 'waiting' | 'running' | 'done' | 'failed';
+
+type StatusPayload = {
+    processing_status: string;
+    processing_error: string | null;
+    provider_responses: ProviderResponse[];
+};
+
 const props = defineProps<{
     verification: Verification;
     providerResponses: ProviderResponse[];
@@ -91,25 +103,73 @@ const groundingSources = computed(() => groundingMeta.value?.sources ?? []);
 const groundingSummary = computed(() => groundingMeta.value?.summary ?? '');
 
 const consensusStatus = computed(() => stringValue(props.consensusResult?.consensus?.status) ?? 'Unknown');
-const minorityProvider = computed(() => stringValue(props.consensusResult?.consensus?.minority_provider));
+const minorityProvider = computed(() => {
+    const key = stringValue(props.consensusResult?.consensus?.minority_provider);
+
+    return key ? consensusSlotLabel(key) : null;
+});
 const verdictSummary = computed(() => stringValue(props.consensusResult?.verdict_report?.summary));
 const verdictLines = computed(() => (props.verification.final_verdict ?? '').split('\n').filter(Boolean));
 const verdictMetadata = computed(() => props.consensusResult?.verdict_report?.metadata as Record<string, unknown> | undefined);
 const hasMinorityReport = computed(() => Boolean(verdictMetadata.value?.has_minority_report));
 
 const replayProcessing = ref(false);
+const liveStatus = ref(props.verification.processing_status);
+const liveProviderResponses = ref<ProviderResponse[]>([...props.providerResponses]);
 
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 
+function mergeLiveResponses(incoming: ProviderResponse[]): void {
+    const byProvider = new Map(liveProviderResponses.value.map((response) => [response.provider, response]));
+
+    for (const response of incoming) {
+        byProvider.set(response.provider, response);
+    }
+
+    liveProviderResponses.value = CONSENSUS_SLOTS
+        .map((slot) => byProvider.get(slot))
+        .filter((response): response is ProviderResponse => response !== undefined);
+}
+
+function responseForSlot(slot: (typeof CONSENSUS_SLOTS)[number]): ProviderResponse | null {
+    return liveProviderResponses.value.find((response) => response.provider === slot) ?? null;
+}
+
+function slotState(slot: (typeof CONSENSUS_SLOTS)[number]): SlotState {
+    const response = responseForSlot(slot);
+
+    if (response) {
+        return response.provider_status === 'success' ? 'done' : 'failed';
+    }
+
+    if (liveStatus.value === 'running') {
+        const completedCount = liveProviderResponses.value.length;
+
+        if (CONSENSUS_SLOTS[completedCount] === slot) {
+            return 'running';
+        }
+    }
+
+    return 'waiting';
+}
+
 function startPolling(): void {
     if (pollTimer) { return; }
+
     pollTimer = setInterval(async () => {
         try {
             const res = await fetch(`/verifications/${props.verification.id}/status`, {
                 headers: { Accept: 'application/json' },
             });
             if (!res.ok) { return; }
-            const data = await res.json();
+
+            const data = await res.json() as StatusPayload;
+            liveStatus.value = data.processing_status;
+
+            if (Array.isArray(data.provider_responses)) {
+                mergeLiveResponses(data.provider_responses);
+            }
+
             if (data.processing_status === 'completed' || data.processing_status === 'failed') {
                 stopPolling();
                 router.reload({ only: ['verification', 'providerResponses', 'consensusResult'] });
@@ -117,7 +177,7 @@ function startPolling(): void {
         } catch {
             // ignore network errors during polling
         }
-    }, 2500);
+    }, 1500);
 }
 
 function stopPolling(): void {
@@ -224,12 +284,33 @@ function statusLabel(status: string): string {
             </header>
 
             <!-- Pending / Running state -->
-            <section v-if="isProcessing" class="flex flex-col items-center gap-4 rounded border border-white/10 bg-white/5 py-16 text-center">
-                <div class="size-10 animate-spin rounded-full border-4 border-white/20 border-t-teal-400" />
-                <p class="text-lg font-medium text-white">
-                    {{ isPending ? '等待處理…' : '分析中…' }}
-                </p>
-                <p class="text-sm text-neutral-400">系統正在處理您的驗證請求，請稍候。</p>
+            <section v-if="isProcessing" class="space-y-4">
+                <div class="rounded border border-white/10 bg-white/5 p-4 text-center sm:text-left">
+                    <div class="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:gap-4">
+                        <div class="size-9 shrink-0 animate-spin rounded-full border-4 border-white/20 border-t-teal-400" />
+                        <div>
+                            <p class="text-lg font-medium text-white">
+                                {{ isPending ? '等待處理…' : '分析中…' }}
+                            </p>
+                            <p class="mt-1 text-sm text-neutral-400">
+                                三個模型依序回應，完成一個就會在下方逐字顯示。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 lg:grid-cols-3">
+                    <ProviderLivePanel
+                        v-for="slot in CONSENSUS_SLOTS"
+                        :key="slot"
+                        :slot-name="consensusSlotLabel(slot)"
+                        :state="slotState(slot)"
+                        :model="responseForSlot(slot)?.model ?? null"
+                        :provider-status="responseForSlot(slot)?.provider_status ?? null"
+                        :raw-answer="responseForSlot(slot)?.raw_answer ?? null"
+                        :error="responseForSlot(slot)?.error ?? null"
+                    />
+                </div>
             </section>
 
             <!-- Failed state -->
@@ -353,7 +434,7 @@ function statusLabel(status: string): string {
                         <header class="space-y-3 border-b border-white/10 p-4">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <h2 class="text-lg font-semibold text-white">{{ response.provider }}</h2>
+                                    <h2 class="text-lg font-semibold text-white">{{ consensusSlotLabel(response.provider) }}</h2>
                                     <p class="text-xs text-neutral-500">{{ response.model }}</p>
                                 </div>
                                 <span class="rounded border border-white/10 bg-neutral-900 px-2 py-1 text-xs text-neutral-300">

@@ -89,6 +89,63 @@ test('invalid json is marked without reprompting', function () {
         ->and($extracted->error['message'])->toBe('Extractor JSON could not be decoded.');
 });
 
+test('boolean direct answer is coerced to yes or no', function () {
+    $extractor = new JsonResponseExtractor;
+    $response = new ProviderResponse(
+        provider: 'openai',
+        providerStatus: 'success',
+        rawAnswer: '{"direct_answer": true, "summary": "Water is densest at 4C.", "claims": [], "citations": []}',
+    );
+
+    $extracted = $extractor->extract($response, new ClassificationResult(
+        type: 'B',
+        answerShape: 'discrete',
+        requiresGrounding: false,
+        classifierConfidence: 'high',
+    ));
+
+    expect($extracted->extractionStatus)->toBe('success')
+        ->and($extracted->normalized['direct_answer'])->toBe('yes');
+});
+
+test('markdown json and chinese direct answers are normalized', function () {
+    $extractor = new JsonResponseExtractor;
+    $response = new ProviderResponse(
+        provider: 'openai',
+        providerStatus: 'success',
+        rawAnswer: "```json\n{\"direct_answer\":\"是\",\"summary\":\"1加1等於2。\",\"claims\":[],\"citations\":[]}\n```",
+    );
+
+    $extracted = $extractor->extract($response, new ClassificationResult(
+        type: 'B',
+        answerShape: 'discrete',
+        requiresGrounding: false,
+        classifierConfidence: 'high',
+    ));
+
+    expect($extracted->extractionStatus)->toBe('success')
+        ->and($extracted->normalized['direct_answer'])->toBe('yes');
+});
+
+test('discrete answer can be inferred from summary when direct answer is missing', function () {
+    $extractor = new JsonResponseExtractor;
+    $response = new ProviderResponse(
+        provider: 'anthropic',
+        providerStatus: 'success',
+        rawAnswer: '{"summary":"yes","claims":[],"citations":[]}',
+    );
+
+    $extracted = $extractor->extract($response, new ClassificationResult(
+        type: 'B',
+        answerShape: 'discrete',
+        requiresGrounding: false,
+        classifierConfidence: 'high',
+    ));
+
+    expect($extracted->extractionStatus)->toBe('success')
+        ->and($extracted->normalized['direct_answer'])->toBe('yes');
+});
+
 test('provider failures keep extraction not started', function () {
     $extractor = new JsonResponseExtractor;
     $response = new ProviderResponse(

@@ -60,6 +60,13 @@ extraction_status = invalid_json
 4. lenient 解析成功 → `extraction_status = success`，納入 consensus。
 5. lenient 解析失敗 → 維持 `invalid_json`，排除於 consensus。
 
+**Development 實作（Post-M8 本機）**：`JsonResponseExtractor` **MAY** 額外容錯（仍為本地、無 re-prompt）：
+
+- 從 markdown ` ```json ` 區塊或內嵌 `{…}` 擷取 JSON
+- `direct_answer`：`true`/`false`、中文「是/否」、discrete 題缺欄位時從 `summary` 推斷
+- 巢狀 wrapper（如 `verifications[0].claim`）解包為 normalized 形狀
+- `ConfiguredRawAnswerAgent` 使用 Laravel AI `HasStructuredOutput`；SDK 結構化為空時 **SHOULD** 以 raw `text` 供 extractor
+
 ---
 
 ## 5. Missing API Key（§16.3）

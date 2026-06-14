@@ -10,7 +10,13 @@ use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', fn () => Inertia::render('Home/Welcome'))->name('home');
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return Inertia::render('Home/Welcome');
+})->name('home');
 
 Route::get('/demo', [VerificationController::class, 'index'])->name('demo.verifications.index');
 Route::post('/demo/verifications', [VerificationController::class, 'store'])->name('demo.verifications.store');
@@ -30,12 +36,14 @@ Route::middleware('auth')->group(function (): void {
     Route::put('/settings/providers/slots', [ProviderSettingsController::class, 'updateSlots'])->name('settings.providers.slots.update');
 });
 
-Route::middleware(['auth', 'verified'])->group(function (): void {
+Route::middleware(['auth', 'verified', 'verification.long'])->group(function (): void {
     // Authenticated verifications
     Route::get('/verifications', [AuthVerificationController::class, 'index'])->name('verifications.index');
     Route::get('/verifications/create', [AuthVerificationController::class, 'create'])->name('verifications.create');
     Route::post('/verifications', [AuthVerificationController::class, 'store'])->name('verifications.store');
+    Route::delete('/verifications', [AuthVerificationController::class, 'destroyAll'])->name('verifications.destroyAll');
     Route::get('/verifications/{verification}', [AuthVerificationController::class, 'show'])->name('verifications.show');
+    Route::delete('/verifications/{verification}', [AuthVerificationController::class, 'destroy'])->name('verifications.destroy');
     Route::get('/verifications/{verification}/status', [AuthVerificationController::class, 'status'])->name('verifications.status');
     Route::post('/verifications/{verification}/replay', [AuthVerificationController::class, 'replay'])->name('verifications.replay');
 });

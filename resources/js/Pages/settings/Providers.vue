@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { CONSENSUS_SLOT_KEYS, consensusSlotLabel } from '@/lib/consensusSlots';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -16,6 +17,7 @@ type PresetProvider = {
     configured: boolean;
     api_url: string | null;
     model: string | null;
+    provider_options_json: string;
     enabled: boolean;
 };
 
@@ -24,6 +26,7 @@ type CustomProvider = {
     label: string;
     api_url: string;
     model: string | null;
+    provider_options_json: string;
     has_key: boolean;
     configured: boolean;
     enabled: boolean;
@@ -38,7 +41,6 @@ const props = defineProps<{
 }>();
 
 const flashStatus = usePage().props.status as string | undefined;
-const SLOT_NAMES = ['openai', 'anthropic', 'gemini'] as const;
 
 // Preset edit state
 const editingPreset = ref<string | null>(null);
@@ -49,6 +51,7 @@ function presetForm(p: PresetProvider) {
         api_key: '',
         api_url: p.api_url ?? '',
         model: p.model ?? '',
+        provider_options_json: p.provider_options_json ?? '',
         enabled: p.enabled,
     });
 }
@@ -70,6 +73,7 @@ const addCustomForm = useForm({
     api_url: '',
     api_key: '',
     model: '',
+    provider_options_json: '',
     enabled: true,
 });
 
@@ -145,6 +149,19 @@ function saveSlots() {
                                 <Label :for="`model-${preset.provider_key}`">模型（選填）</Label>
                                 <Input :id="`model-${preset.provider_key}`" v-model="presetForms[preset.provider_key].model" type="text" placeholder="gpt-4o" />
                             </div>
+                            <div class="space-y-1">
+                                <Label :for="`options-${preset.provider_key}`">額外參數（JSON，選填）</Label>
+                                <textarea
+                                    :id="`options-${preset.provider_key}`"
+                                    v-model="presetForms[preset.provider_key].provider_options_json"
+                                    rows="4"
+                                    spellcheck="false"
+                                    placeholder='{"max_tokens": 2048, "temperature": 0.7}'
+                                    class="flex min-h-[6rem] w-full rounded-md border border-neutral-300 bg-white px-3 py-2 font-mono text-sm text-neutral-950 outline-none transition placeholder:text-neutral-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50 dark:placeholder:text-neutral-500"
+                                />
+                                <p class="text-xs text-neutral-500">OpenAI 相容 API 的額外 body 參數，例如 max_tokens、temperature。</p>
+                                <InputError :message="presetForms[preset.provider_key].errors.provider_options_json" />
+                            </div>
                             <div class="flex items-center gap-2">
                                 <input :id="`enabled-${preset.provider_key}`" v-model="presetForms[preset.provider_key].enabled" type="checkbox" class="rounded" />
                                 <Label :for="`enabled-${preset.provider_key}`">啟用此供應端</Label>
@@ -196,6 +213,19 @@ function saveSlots() {
                                 <Input id="custom-model" v-model="addCustomForm.model" type="text" placeholder="llama3" />
                             </div>
                         </div>
+                        <div class="space-y-1">
+                            <Label for="custom-options">額外參數（JSON，選填）</Label>
+                            <textarea
+                                id="custom-options"
+                                v-model="addCustomForm.provider_options_json"
+                                rows="4"
+                                spellcheck="false"
+                                placeholder='{"max_tokens": 2048, "temperature": 0.7}'
+                                class="flex min-h-[6rem] w-full rounded-md border border-neutral-300 bg-white px-3 py-2 font-mono text-sm text-neutral-950 outline-none transition placeholder:text-neutral-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50 dark:placeholder:text-neutral-500"
+                            />
+                            <p class="text-xs text-neutral-500">OpenAI 相容 API 的額外 body 參數，例如 max_tokens、temperature。</p>
+                            <InputError :message="addCustomForm.errors.provider_options_json" />
+                        </div>
                         <Button type="submit" :disabled="addCustomForm.processing">新增</Button>
                     </form>
                 </CardContent>
@@ -205,12 +235,12 @@ function saveSlots() {
             <Card>
                 <CardHeader>
                     <CardTitle>共識槽配置</CardTitle>
-                    <CardDescription>三個共識槽分別對應 openai / anthropic / gemini 邏輯名稱，可指向任意供應端。</CardDescription>
+                    <CardDescription>三個共識席（A / B / C）可各自指向不同供應端，與 API 品牌無關。</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form class="space-y-4" @submit.prevent="saveSlots">
-                        <div v-for="slot in SLOT_NAMES" :key="slot" class="space-y-2">
-                            <Label>{{ slot }} 槽</Label>
+                        <div v-for="slot in CONSENSUS_SLOT_KEYS" :key="slot" class="space-y-2">
+                            <Label>{{ consensusSlotLabel(slot) }}</Label>
                             <div class="flex flex-wrap gap-2">
                                 <label class="flex cursor-pointer items-center gap-2 rounded border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700">
                                     <input

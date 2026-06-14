@@ -89,11 +89,20 @@ test('GET /verifications/{id}/status returns JSON with processing_status', funct
     $this->actingAs($user)
         ->getJson("/verifications/{$verification->id}/status")
         ->assertOk()
-        ->assertJsonStructure(['id', 'processing_status', 'processing_error', 'final_trust', 'final_verdict', 'updated_at'])
+        ->assertJsonStructure([
+            'id',
+            'processing_status',
+            'processing_error',
+            'final_trust',
+            'final_verdict',
+            'updated_at',
+            'provider_responses',
+        ])
         ->assertJsonFragment([
             'id' => $verification->id,
             'processing_status' => 'running',
-        ]);
+        ])
+        ->assertJsonPath('provider_responses', []);
 });
 
 test('GET status returns processing_error for failed verification', function () {

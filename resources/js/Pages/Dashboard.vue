@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Auth } from '@/types';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { consensusSlotLabel } from '@/lib/consensusSlots';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { CheckCircle, Circle, PlusCircle, Settings, TestTubeDiagonal } from '@lucide/vue';
@@ -29,12 +30,6 @@ const props = defineProps<{
 const page = usePage();
 const user = computed(() => (page.props.auth as Auth | undefined)?.user);
 const readyCount = computed(() => props.slotStatuses.filter((s) => s.ready).length);
-
-const SLOT_LABEL: Record<string, string> = {
-    openai: 'OpenAI 槽',
-    anthropic: 'Anthropic 槽',
-    gemini: 'Gemini 槽',
-};
 
 function trustBadgeClass(trust: string | null) {
     if (!trust) return 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400';
@@ -81,7 +76,7 @@ function trustBadgeClass(trust: string | null) {
                         <CheckCircle v-if="s.ready" class="size-5 shrink-0 text-teal-500" />
                         <Circle v-else class="size-5 shrink-0 text-neutral-400" />
                         <div>
-                            <p class="text-sm font-medium">{{ SLOT_LABEL[s.slot] ?? s.slot }}</p>
+                            <p class="text-sm font-medium">{{ consensusSlotLabel(s.slot) }}</p>
                             <p class="text-xs text-neutral-500">{{ s.provider_label }}</p>
                         </div>
                     </div>
