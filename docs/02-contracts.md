@@ -235,6 +235,8 @@ yes | no | unknown | not_applicable
 
 MVP **MUST NOT** 依賴 embedding 或 LLM 語意對齊；語意相同但 `canonical_key` 差距過大時 **SHOULD** 保守視為 unmatched。
 
+**M8-C 擴充**（[11-semantic-alignment.md §5](11-semantic-alignment.md)）：Admin 可啟用 `semantic_llm` mode，**僅**合併語意等價的 `canonical_key`；預設 `string` mode 維持 MVP 行為。
+
 ---
 
 ## 8. Provider 策略

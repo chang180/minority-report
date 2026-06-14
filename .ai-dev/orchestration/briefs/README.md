@@ -6,7 +6,11 @@
 
 ## 當前可開工
 
-（無 — 等待 Orchestrator 發布 **M8-C** spec 與 brief）
+| Gate | Brief | 說明 |
+|------|-------|------|
+| **M8-C** | [M8-C/brief.md](M8-C/brief.md) | Semantic claim alignment、Admin 設定、F16 |
+
+Spec：[docs/11-semantic-alignment.md](../../docs/11-semantic-alignment.md)
 
 ---
 
@@ -25,10 +29,10 @@
 |------|------|
 | M8-A | **RELEASED** |
 | M8-B | **RELEASED** |
-| M8-C | 規劃中 |
+| M8-C | **可開工** |
 
 ---
 
 ## 目錄
 
-各 Gate 的 `brief.md` + `progress.md` 保留於 `M2-A/` … `M8-A/` 供稽核與回顧。
+各 Gate 的 `brief.md` + `progress.md` 保留於 `M2-A/` … `M8-C/` 供稽核與回顧。

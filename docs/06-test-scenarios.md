@@ -145,7 +145,7 @@ FakeProviderRegistry.register(fixtureId, behavior)
 | Consensus | `Full`（走 open 主鍵；**忽略** direct_answer） |
 | Trust | `High` |
 | Minority Report | 否 |
-| **備註** | 測 **extractor** `canonical_key` 一致性，**非** aligner 語意能力；語意對齊屬 Phase 3 |
+| **備註** | 測 **extractor** `canonical_key` 一致性（三方 key 已可字串配對）；**非** aligner 語意能力；語意對齊見 **F16** |
 
 ---
 
@@ -233,6 +233,23 @@ FakeProviderRegistry.register(fixtureId, behavior)
 
 ---
 
+### F16 — Semantic key alignment（M8-C）
+
+| 項目 | 值 |
+|------|-----|
+| 名稱 | F16 — Semantic Key Alignment |
+| 分類 | Type B, **open** |
+| 輸入 | 三方 analyzable；`date` claim **value 相同**（如 `2024-03-12`）；`canonical_key` 分別為 `release date` / `product launch date` / `official launch date` |
+| `string` mode | keys 字串不配對 → 多 unmatched |
+| `semantic_llm` mode（mock） | keys 合併 aligned → **無 major 衝突** |
+| N | 3 |
+| Consensus（semantic） | `Full`（open 主鍵） |
+| Trust（semantic） | `High` |
+| Minority Report | 否 |
+| **備註** | 與 F08 互補：F08 測 **一致 key**；F16 測 **aligner 語意** 合併 |
+
+---
+
 ## 4. Classifier 單元測試（T2-G fail-safe bias）
 
 Fail-safe bias（[02-contracts.md §2.4](02-contracts.md)）是 Trust-cap 體系的地基，但**不適合**以 consensus fixture 覆蓋（F04 只驗 Type C 處理，不驗低信心降級）。  
@@ -269,8 +286,9 @@ tests/Unit/Consensus/Classifier/FailSafeBiasTest.php
 | 11 | No Consensus | F03, F12, F14 |
 | 12 | base + caps 瀑布 | F01–F14 vs [04](04-trust-level.md) §4 |
 | 13 | audit trail 完整 | Milestone 5 驗收 |
-| 14 | MVP 字串對齊 vs Phase 3 語意 | F08 文件註記 |
-| 15 | Fixture 1–14 regression | 本文件全集 |
+| 14 | MVP 字串對齊 vs M8-C 語意 | F08、F16 |
+| 15 | Fixture 1–14 regression | 本文件 F01–F14 |
+| 16 | M8-C semantic alignment | F16 + `M8CSemanticAlignmentTest` |
 
 ---
 
@@ -278,6 +296,7 @@ tests/Unit/Consensus/Classifier/FailSafeBiasTest.php
 
 ```text
 tests/Fixtures/Consensus/F{01..14}Test.php   ← PHPUnit 整合（Milestone 4+）
+tests/Fixtures/Consensus/F16Test.php         ← M8-C semantic（opt-in / mock）
 tests/Unit/Consensus/Classifier/FailSafeBiasTest.php  ← CT-G1–G3
 fixture_id: F01 .. F14
 classifier_test_id: CT-G1 .. CT-G3

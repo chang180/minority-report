@@ -221,7 +221,7 @@
 
 ## Milestone 8: 產品成熟 + Grounding（進行中）
 
-> 規格：[09-grounding-and-trust.md](09-grounding-and-trust.md) · 規劃：[m8-roadmap.md](../.ai-dev/planning/m8-roadmap.md)
+> 規格：[09-grounding-and-trust.md](09-grounding-and-trust.md) · [10-product-ux-and-async.md](10-product-ux-and-async.md) · [11-semantic-alignment.md](11-semantic-alignment.md) · 規劃：[m8-roadmap.md](../.ai-dev/planning/m8-roadmap.md)
 
 ### 概覽
 
@@ -229,7 +229,7 @@
 |------|------|------|
 | M8-B | Grounding v1 + trust cap + Admin 設定 | **RELEASED** |
 | M8-A | Verification 列表 + async + Email verification | **RELEASED** |
-| M8-C | Semantic claim alignment | 規劃中 |
+| M8-C | Semantic claim alignment | **可開工** |
 
 ### M8-B 進入條件
 
@@ -270,7 +270,21 @@
 
 ### M8-C（概要）
 
-- Semantic aligner；更新 03 / 06
+### M8-C 進入條件
+
+- M8-A **RELEASED**
+- [11-semantic-alignment.md](11-semantic-alignment.md) **已發布**（2026-06-14）
+
+### M8-C 交付物
+
+- `system_aligner_settings`；Admin `/admin/aligner`
+- `app/Alignment/` — `ClaimAlignmentService` + `semantic_llm` provider
+- 預設 `string` mode；F16 fixture；`M8CSemanticAlignmentTest`
+- **MUST NOT** 改 Cases 1–6 / Trust / Grounding
+
+### M8-C 驗收
+
+- 詳見 [11-semantic-alignment.md §10](11-semantic-alignment.md)
 
 ---
 

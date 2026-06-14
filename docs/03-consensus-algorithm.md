@@ -71,9 +71,11 @@ MVP 對齊規則 **MUST** 保守、可測試：
 4. 出現在 ≥2 provider 的配對 claim → **aligned claim**，進入 §5 比對。
 5. 只出現在單一 provider → **unmatched claim**；不計入衝突判定，**MUST** 在報告 surface。
 
-**已知限制**：字串比對無法處理語意相同但措辭差距大的 claim。語意對齊（embedding / LLM）延後 Phase 3。
+**已知限制**：字串比對無法處理語意相同但措辭差距大的 claim。
 
-> Fixture 8 測試的是 extractor 的 `canonical_key` 一致性，**不是** aligner 語意能力。
+> **M8-C（Post-MVP）**：可選 **語意 key 聚類**（Admin `semantic_llm` mode）；見 [11-semantic-alignment.md §5](11-semantic-alignment.md)。**value 衝突判準仍為本節 §5 確定性規則**；LLM **MUST NOT** 作 value 裁決。
+
+> Fixture 8 測試的是 extractor 的 `canonical_key` 一致性，**不是** aligner 語意能力。語意對齊見 Fixture F16（[06-test-scenarios.md](06-test-scenarios.md)）。
 
 ---
 

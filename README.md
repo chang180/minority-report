@@ -72,9 +72,9 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | M7-B Provider + Dashboard | ✅ 完成（2026-06-14） |
 | M8-B Grounding v1 | ✅ 完成（2026-06-14） |
 | M8-A UX + Email verification | ✅ 完成（2026-06-14） |
-| M8-C Semantic alignment | 📋 **下一 Gate** |
+| M8-C Semantic alignment | 🔨 **可開工** |
 
-**M1–M7 + M8-A + M8-B 已完成**。**M8-C**（Semantic alignment）為下一 Gate — 待 Orchestrator 發布 spec。
+**M1–M7 + M8-A + M8-B 已完成**。**M8-C** 可開工：Semantic claim alignment — [brief](.ai-dev/orchestration/briefs/M8-C/brief.md)。
 
 ### Web 路由（摘要）
 
@@ -98,6 +98,8 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | `PUT /admin/demo` | admin | 更新 demo 設定 |
 | `GET /admin/grounding` | admin | Grounding 後端設定（**M8-B**） |
 | `PUT /admin/grounding` | admin | 更新 grounding 設定 |
+| `GET /admin/aligner` | admin | Aligner 後端設定（**M8-C**） |
+| `PUT /admin/aligner` | admin | 更新 aligner 設定 |
 | `GET /health` | public | JSON health check |
 
 測試現況：`php artisan test` → **167 passed**，1 skipped。
