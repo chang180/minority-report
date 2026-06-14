@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\AI\Providers\ConfiguredLlmProviderFactory;
-use App\Consensus\Aligner\StringClaimAligner;
+use App\Alignment\ClaimAlignmentService;
 use App\Consensus\Analyzer\HybridConsensusAnalyzer;
 use App\Consensus\Classifier\FailSafeQuestionClassifier;
 use App\Consensus\Contracts\ClaimAligner;
@@ -27,7 +27,7 @@ class ConsensusServiceProvider extends ServiceProvider
     public $bindings = [
         QuestionClassifier::class => FailSafeQuestionClassifier::class,
         ResponseExtractor::class => JsonResponseExtractor::class,
-        ClaimAligner::class => StringClaimAligner::class,
+        ClaimAligner::class => ClaimAlignmentService::class,
         ConsensusAnalyzer::class => HybridConsensusAnalyzer::class,
         TrustLevelScorer::class => CascadeTrustLevelScorer::class,
         VerdictReporter::class => StructuredVerdictReporter::class,

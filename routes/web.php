@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminAlignerController;
 use App\Http\Controllers\AdminDemoController;
 use App\Http\Controllers\AdminGroundingController;
 use App\Http\Controllers\AuthVerificationController;
@@ -45,6 +46,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/demo', [AdminDemoController::class, 'update'])->name('demo.update');
     Route::get('/grounding', [AdminGroundingController::class, 'show'])->name('grounding.show');
     Route::put('/grounding', [AdminGroundingController::class, 'update'])->name('grounding.update');
+    Route::get('/aligner', [AdminAlignerController::class, 'show'])->name('aligner.show');
+    Route::put('/aligner', [AdminAlignerController::class, 'update'])->name('aligner.update');
 });
 
 Route::get('/health', function () {

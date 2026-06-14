@@ -1,7 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：**M8 進行中** — M8-A、M8-B **RELEASED**；**M8-C 可開工**。  
-> **派工**：[M8-C/brief.md](briefs/M8-C/brief.md) · Spec：[11-semantic-alignment.md](../../docs/11-semantic-alignment.md)
+> **當前階段**：**M8 ✅ 已完成**（M8-A / M8-B / M8-C 全 RELEASED）。  
+> **下一階段**：Post-M8 待規劃 · [m8-roadmap.md](../planning/m8-roadmap.md)
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -121,15 +121,15 @@ M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結
 
 ---
 
-## Milestone 8（Gate 制 · 規劃中）
+## Milestone 8（Gate 制 · 3 Gate）— ✅ 已完成
 
 | Gate | 說明 | 狀態 |
 |------|------|------|
 | **M8-B** | [briefs/M8-B/](briefs/M8-B/) | **RELEASED** |
 | **M8-A** | [briefs/M8-A/](briefs/M8-A/) | **RELEASED** |
-| **M8-C** | [briefs/M8-C/](briefs/M8-C/) | **可開工** |
+| **M8-C** | [briefs/M8-C/](briefs/M8-C/) | **RELEASED** |
 
-詳見 [.ai-dev/planning/m8-roadmap.md](../planning/m8-roadmap.md)。
+**M8 已完成**（2026-06-14）。規格：`docs/09`–`11` · [m8-roadmap.md](../planning/m8-roadmap.md)
 
 ---
 

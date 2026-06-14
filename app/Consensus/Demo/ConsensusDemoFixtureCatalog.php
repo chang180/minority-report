@@ -145,6 +145,19 @@ class ConsensusDemoFixtureCatalog
                     'gemini' => [$this->claim('date', 'launch date', '2024-03')],
                 ],
             ),
+            $this->fixtureDefinition(
+                id: 'M8-F16',
+                label: 'Semantic key alignment',
+                description: 'Three providers report the same date value under different canonical keys. String aligner leaves them unmatched; semantic aligner merges them.',
+                directAnswers: ['openai' => 'yes', 'anthropic' => 'yes', 'gemini' => 'yes'],
+                expectedConsensus: 'Full',
+                expectedTrust: 'High',
+                claims: [
+                    'openai' => [$this->claim('date', 'release date', '2024-03-15')],
+                    'anthropic' => [$this->claim('date', 'product launch date', '2024-03-15')],
+                    'gemini' => [$this->claim('date', 'official launch date', '2024-03-15')],
+                ],
+            ),
         ];
     }
 

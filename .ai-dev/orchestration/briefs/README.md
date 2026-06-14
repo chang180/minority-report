@@ -6,11 +6,7 @@
 
 ## 當前可開工
 
-| Gate | Brief | 說明 |
-|------|-------|------|
-| **M8-C** | [M8-C/brief.md](M8-C/brief.md) | Semantic claim alignment、Admin 設定、F16 |
-
-Spec：[docs/11-semantic-alignment.md](../../docs/11-semantic-alignment.md)
+（無 — **Milestone 8 已完成**；下一 Milestone 待 Orchestrator 規劃）
 
 ---
 
@@ -20,16 +16,9 @@ Spec：[docs/11-semantic-alignment.md](../../docs/11-semantic-alignment.md)
 |------|------|
 | M8-A | **RELEASED** |
 | M8-B | **RELEASED** |
+| M8-C | **RELEASED** |
 
----
-
-## Milestone 8
-
-| Gate | 狀態 |
-|------|------|
-| M8-A | **RELEASED** |
-| M8-B | **RELEASED** |
-| M8-C | **可開工** |
+**Milestone 8**：✅ **已完成**（2026-06-14）
 
 ---
 

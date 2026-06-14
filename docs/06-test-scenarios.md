@@ -237,7 +237,7 @@ FakeProviderRegistry.register(fixtureId, behavior)
 
 | 項目 | 值 |
 |------|-----|
-| 名稱 | F16 — Semantic Key Alignment |
+| 名稱 | F16 — Semantic Key Alignment（demo catalog：`M8-F16`） |
 | 分類 | Type B, **open** |
 | 輸入 | 三方 analyzable；`date` claim **value 相同**（如 `2024-03-12`）；`canonical_key` 分別為 `release date` / `product launch date` / `official launch date` |
 | `string` mode | keys 字串不配對 → 多 unmatched |

@@ -181,7 +181,7 @@ public function clusterKeys(array $candidates): array;
 
 | 項目 | 值 |
 |------|-----|
-| 名稱 | F16 — Semantic Key Alignment |
+| 名稱 | F16 — Semantic Key Alignment（demo catalog：`M8-F16`） |
 | 分類 | Type B, **open** |
 | 輸入 | 三方 analyzable；`date` claim **value 相同**；canonical_key：`release date` / `product launch date` / `official launch date` |
 | `string` mode | keys 不配對 → 多個 unmatched → 可能 **Full (low-discriminability)** 或 open Full（視 claims 結構） |
@@ -220,13 +220,18 @@ public function clusterKeys(array $candidates): array;
 
 ## 10. Milestone 8-C 驗收
 
-- [ ] `system_aligner_settings` + Admin UI + seeder（預設 `string`）
-- [ ] `app/Alignment/` — `ClaimAlignmentService` + semantic provider
-- [ ] `ClaimAligner` DI 改綁 service；`StringClaimAligner` 保留
-- [ ] F16 fixture + `M8CSemanticAlignmentTest`
-- [ ] F01–F15 string mode 回歸
-- [ ] **MUST NOT** 改 Cases 1–6 / Trust caps
-- [ ] Show **MAY** 顯示 aligner metadata（繁中）
+- [x] `system_aligner_settings` + Admin UI + seeder（預設 `string`）
+- [x] `app/Alignment/` — `ClaimAlignmentService` + semantic provider
+- [x] `ClaimAligner` DI 改綁 service；`StringClaimAligner` 保留
+- [x] F16 fixture（`M8-F16`）+ `M8CSemanticAlignmentTest`
+- [x] F01–F15 string mode 回歸（180 passed）
+- [x] **MUST NOT** 改 Cases 1–6 / Trust caps
+- [ ] Show aligner metadata（**MAY** · 未實作，不阻擋 RELEASED）
+
+### 10.1 實作備註（RELEASED 2026-06-14）
+
+- Admin UI 為 `admin/AlignerSettings.vue`（非 brief 草稿名 `Aligner.vue`）
+- Demo fixture id：`M8-F16`（catalog）；spec 文檔仍稱 F16
 
 ---
 

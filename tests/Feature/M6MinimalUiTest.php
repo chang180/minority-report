@@ -13,7 +13,7 @@ test('M6-A renders the question input page with demo fixtures', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('Demo/Index')
             ->where('defaultFixtureId', 'M6-F02')
-            ->has('fixtures', 5)
+            ->has('fixtures', 6)
             ->where('fixtures.1.expected_consensus', 'Majority')
             ->where('fixtures.1.expected_trust', 'Medium')
         );

@@ -27,6 +27,8 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 
 `[Grounding]`：M8-B 起，Admin 可設定之外部查證步驟（本機 LLM `web_search` tool loop 或 Search API）；詳見 [docs/09](docs/09-grounding-and-trust.md)。
 
+`Claim Alignment`：M8-C 起，Admin 可選 `semantic_llm` 合併語意等價的 `canonical_key`（預設 `string`）；詳見 [docs/11](docs/11-semantic-alignment.md)。
+
 核心能力：
 
 | 能力 | 說明 |
@@ -72,9 +74,9 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | M7-B Provider + Dashboard | ✅ 完成（2026-06-14） |
 | M8-B Grounding v1 | ✅ 完成（2026-06-14） |
 | M8-A UX + Email verification | ✅ 完成（2026-06-14） |
-| M8-C Semantic alignment | 🔨 **可開工** |
+| M8-C Semantic alignment | ✅ 完成（2026-06-14） |
 
-**M1–M7 + M8-A + M8-B 已完成**。**M8-C** 可開工：Semantic claim alignment — [brief](.ai-dev/orchestration/briefs/M8-C/brief.md)。
+**Milestone 8 已完成**（M8-A + M8-B + M8-C · 2026-06-14）。
 
 ### Web 路由（摘要）
 
@@ -102,7 +104,7 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | `PUT /admin/aligner` | admin | 更新 aligner 設定 |
 | `GET /health` | public | JSON health check |
 
-測試現況：`php artisan test` → **167 passed**，1 skipped。
+測試現況：`php artisan test` → **180 passed**，1 skipped。
 
 ---
 
@@ -113,7 +115,7 @@ app/
 ├── Consensus/              # domain（MUST NOT 直接依賴 Laravel AI SDK）
 │   ├── Classifier/         # FailSafeQuestionClassifier
 │   ├── Extractor/          # JsonResponseExtractor（逐 provider）
-│   ├── Aligner/            # StringClaimAligner
+│   ├── Aligner/            # StringClaimAligner（M8-C 經 ClaimAlignmentService 委派）
 │   ├── Analyzer/           # HybridConsensusAnalyzer（Cases 1–6）
 │   ├── Scorer/             # CascadeTrustLevelScorer
 │   ├── Verdict/            # StructuredVerdictReporter（non-binding）
@@ -123,8 +125,10 @@ app/
 │   ├── Contracts/
 │   ├── DTO/
 │   └── ConsensusWorkflow.php
-├── Http/Controllers/       # Demo / auth verification、Provider、Admin demo & grounding
+├── Alignment/              # ClaimAlignmentService、semantic LLM provider（M8-C）
 ├── Grounding/              # GroundingService + providers（M8-B · 非 Consensus domain）
+├── Http/Controllers/       # Demo / auth verification、Provider、Admin
+├── Jobs/                   # RunAuthenticatedVerificationJob（M8-A）
 ├── Policies/               # VerificationRequestPolicy
 ├── Actions/Fortify/        # Fortify user lifecycle（M7-A）
 ├── AI/Providers/

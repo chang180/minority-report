@@ -219,7 +219,7 @@
 
 ---
 
-## Milestone 8: 產品成熟 + Grounding（進行中）
+## Milestone 8: 產品成熟 + Grounding（✅ 已完成 · 2026-06-14）
 
 > 規格：[09-grounding-and-trust.md](09-grounding-and-trust.md) · [10-product-ux-and-async.md](10-product-ux-and-async.md) · [11-semantic-alignment.md](11-semantic-alignment.md) · 規劃：[m8-roadmap.md](../.ai-dev/planning/m8-roadmap.md)
 
@@ -229,7 +229,7 @@
 |------|------|------|
 | M8-B | Grounding v1 + trust cap + Admin 設定 | **RELEASED** |
 | M8-A | Verification 列表 + async + Email verification | **RELEASED** |
-| M8-C | Semantic claim alignment | **可開工** |
+| M8-C | Semantic claim alignment | **RELEASED** |
 
 ### M8-B 進入條件
 
@@ -285,6 +285,8 @@
 ### M8-C 驗收
 
 - 詳見 [11-semantic-alignment.md §10](11-semantic-alignment.md)
+
+**Milestone 8 全 Gate RELEASED**（2026-06-14）
 
 ---
 
