@@ -2,8 +2,21 @@
 
 > Orchestrator 維護。每個 Gate 只有 Orchestrator 審核整合後可標為 **RELEASED**。
 
-**當前 Milestone**：**M7 — 產品 UI + Auth** ✅ **完成**（2026-06-14）  
-**下一 Milestone**：待規劃（Post-M7）
+**當前 Milestone**：**M8 規劃中**（Post-M7 · 2026-06-14）  
+**規劃文件**：[planning/m8-roadmap.md](../planning/m8-roadmap.md)  
+**下一可開工 Gate**：待 spec + brief（預計 **M8-A**）
+
+---
+
+## Milestone 8 — 產品成熟 + Grounding（規劃中）
+
+| Gate | 說明 | 狀態 | 備註 |
+|------|------|------|------|
+| M8-A | Verification 列表 + async + UX 完成度 | **規劃中** | 待 brief |
+| M8-B | Grounding v1 + trust cap | **規劃中** | 待 `docs/09` |
+| M8-C | Semantic claim alignment | **規劃中** | 待 spec |
+
+**Milestone 8**：未開工
 
 ---
 

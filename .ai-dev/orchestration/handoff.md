@@ -1,7 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：**M7 完成**（M7-A + M7-B **RELEASED**，2026-06-14）。  
-> **下一 Milestone**：待 Orchestrator 規劃。
+> **當前階段**：**M7 完成** · **M8 規劃中**（[m8-roadmap.md](../planning/m8-roadmap.md)）。  
+> **下一 Gate（預計）**：M8-A 產品 UX → 待 spec/brief 發布。
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -117,17 +117,19 @@ M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結
 | **M7-A** | [briefs/M7-A/](briefs/M7-A/) | **RELEASED** |
 | **M7-B** | [briefs/M7-B/](briefs/M7-B/) | **RELEASED** |
 
-**M7 已完成**（2026-06-14）。
+**M7 已完成**（2026-06-14）。規格：[docs/08-ui-auth-providers.md](../../docs/08-ui-auth-providers.md)。
 
-**M7 目標**（產品基本 UI，非 M6 minimal）：
+---
 
-- **Spec**：[docs/08-ui-auth-providers.md](../../docs/08-ui-auth-providers.md)（含 **§3.4 繁體中文**）
-- **Auth**：Laravel 13 官方 **Fortify** + vue-starter-kit **選擇性移植**（非整包安裝）— **不用 Breeze**
-- **角色**：admin / user；開放註冊
-- **頁面**：Welcome `/`、訪客 Demo `/demo`（admin 可管理，M7-B）、登入後 Dashboard、Provider 設定（M7-B）
-- **Provider**：SDK preset + 使用者自訂 endpoint（M7-B）；per-user 憑證 encrypted
+## Milestone 8（Gate 制 · 規劃中）
 
-M7-A **MUST NOT** 做 provider DB / 真 provider verification（屬 M7-B）。
+| Gate | 說明 | 狀態 |
+|------|------|------|
+| **M8-A** | Verification 列表、async、UX 完成度 | 規劃中 |
+| **M8-B** | Grounding v1 + trust cap | 規劃中（需 `docs/09`） |
+| **M8-C** | Semantic claim alignment | 規劃中 |
+
+詳見 [.ai-dev/planning/m8-roadmap.md](../planning/m8-roadmap.md)。
 
 ---
 

@@ -15,9 +15,11 @@
 | M5 | Audit Trail | **完成**（2026-06-14） |
 | M6 | Minimal UI | **完成**（2026-06-14） |
 | M7 | Product UI + Auth | **完成**（2026-06-14） |
+| M8 | UX 成熟 + Grounding + Semantic | **規劃中** |
 
 **M1 完成前 MUST NOT 撰寫 Laravel application code。** M2 起可開始實作。  
-**M7 開工前 MUST** 先完成 [08-ui-auth-providers.md](08-ui-auth-providers.md) 與本文件 §M7（spec-driven）。
+**M7 開工前 MUST** 先完成 [08-ui-auth-providers.md](08-ui-auth-providers.md) 與本文件 §M7（spec-driven）。  
+**M8-B 開工前 MUST** 先完成 `docs/09-grounding-and-trust.md`（規劃見 [.ai-dev/planning/m8-roadmap.md](../.ai-dev/planning/m8-roadmap.md)）。
 
 ---
 
@@ -217,7 +219,44 @@
 
 ---
 
-## Phase 3 延後項目（Non-MVP · M1–M6）
+## Milestone 8: 產品成熟 + Grounding（規劃中）
+
+> 詳細 Gate 切分與待決策見 [.ai-dev/planning/m8-roadmap.md](../.ai-dev/planning/m8-roadmap.md)。**尚未**發布 Worker brief。
+
+### 概覽
+
+| Gate | 名稱 | 狀態 |
+|------|------|------|
+| M8-A | Verification 列表 + async + UX 完成度 | 規劃中 |
+| M8-B | Grounding v1 + trust cap | 規劃中 |
+| M8-C | Semantic claim alignment | 規劃中 |
+
+### 進入條件
+
+- M7 **RELEASED**
+- M8-B 需 `docs/09-grounding-and-trust.md`（Orchestrator 撰寫中）
+
+### M8-A 交付物（草案）
+
+- `GET /verifications` 列表；policy 沿用 M7-B
+- Async verification（Job + 結果頁 polling / deferred）
+- Replay UI 入口；繁中狀態文案
+- Feature tests：`M8A*`
+
+### M8-B 交付物（草案）
+
+- Grounding adapter（Web Search）；`grounding_available` 真值路徑
+- Trust cap 調整（對齊 04）；audit 擴充
+- **MUST NOT** 完整 RAG、Evidence 勝負 LLM 裁定
+
+### M8-C 交付物（草案）
+
+- `SemanticClaimAligner` 或等價；feature-flag
+- 更新 03 / 06 fixture 語意路徑
+
+---
+
+## Phase 3 延後項目（Non-MVP · M1–M7）
 
 以下 **MUST NOT** 在 M1–M6 引入：
 
