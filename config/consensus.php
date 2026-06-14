@@ -4,7 +4,7 @@ return [
     'number_conflict_relative_threshold' => 0.05,
     'providers' => [
         'openai' => [
-            'enabled' => filled(env('OPENAI_API_KEY')),
+            'enabled' => filled(env('OPENAI_API_KEY')) || filled(env('LOCAL_AI_API_URL')),
             'model' => env('OPENAI_MODEL'),
         ],
         'anthropic' => [
