@@ -110,12 +110,14 @@ M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結
 
 ---
 
-## Milestone 7（Gate 制 · 2 Gate）— Post-MVP
+## Milestone 7（Gate 制 · 2 Gate）— Post-MVP ✅
 
 | Gate | 派工文件 | 狀態 |
 |------|----------|------|
 | **M7-A** | [briefs/M7-A/](briefs/M7-A/) | **RELEASED** |
 | **M7-B** | [briefs/M7-B/](briefs/M7-B/) | **RELEASED** |
+
+**M7 已完成**（2026-06-14）。
 
 **M7 目標**（產品基本 UI，非 M6 minimal）：
 
