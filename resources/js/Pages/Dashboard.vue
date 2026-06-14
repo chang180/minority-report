@@ -119,6 +119,9 @@ function trustBadgeClass(trust: string | null) {
             <section class="space-y-3">
                 <div class="flex items-center justify-between">
                     <h2 class="text-base font-semibold">近期驗證</h2>
+                    <Link href="/verifications" class="text-sm text-teal-600 hover:underline dark:text-teal-400">
+                        查看全部
+                    </Link>
                 </div>
 
                 <div v-if="recentVerifications.length === 0" class="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">

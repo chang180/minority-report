@@ -106,7 +106,7 @@ test('demo returns index when demo_enabled is true', function () {
 
     $this->get('/demo')
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('Verification/Index'));
+        ->assertInertia(fn (Assert $page) => $page->component('Demo/Index'));
 });
 
 test('demo post is blocked when demo_enabled is false', function () {

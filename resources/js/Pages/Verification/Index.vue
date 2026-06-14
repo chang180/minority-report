@@ -1,115 +1,121 @@
 <script setup lang="ts">
-import { Link, useForm } from '@inertiajs/vue3';
-import { ArrowLeft } from '@lucide/vue';
-import { computed } from 'vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { Link } from '@inertiajs/vue3';
 
-type FixtureOption = {
-    id: string;
-    label: string;
-    description: string;
-    expected_consensus: string;
-    expected_trust: string;
+type Verification = {
+    id: number;
+    question: string;
+    processing_status: string;
+    final_trust: string | null;
+    created_at: string;
 };
 
-const props = defineProps<{
-    fixtures: FixtureOption[];
-    defaultFixtureId: string;
+type PaginatedVerifications = {
+    data: Verification[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    prev_page_url: string | null;
+    next_page_url: string | null;
+    links: { url: string | null; label: string; active: boolean }[];
+};
+
+defineProps<{
+    verifications: PaginatedVerifications;
 }>();
 
-const form = useForm({
-    question: '產品發布日期是否通過共識驗證？',
-    fixture_id: props.defaultFixtureId,
-});
+function statusLabel(status: string): string {
+    const map: Record<string, string> = {
+        pending: '等待處理',
+        running: '分析中',
+        completed: '已完成',
+        failed: '處理失敗',
+    };
+    return map[status] ?? status;
+}
 
-const selectedFixture = computed(() => props.fixtures.find((fixture) => fixture.id === form.fixture_id));
+function statusClass(status: string): string {
+    if (status === 'completed') {
+        return 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300';
+    }
+    if (status === 'running') {
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
+    }
+    if (status === 'failed') {
+        return 'bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300';
+    }
+    return 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400';
+}
 
-function submit(): void {
-    form.post('/demo/verifications');
+function trustClass(trust: string | null): string {
+    if (!trust) { return 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'; }
+    if (trust === 'High') { return 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300'; }
+    if (trust === 'Medium') { return 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300'; }
+    return 'bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300';
 }
 </script>
 
 <template>
-    <main class="min-h-screen bg-neutral-950 text-neutral-100">
-        <section class="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-5 py-8 sm:px-8 lg:px-10">
-            <header class="flex flex-col gap-3 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
-                <div class="space-y-2">
-                    <p class="text-sm font-medium text-teal-300">關鍵報告 · Minority Report</p>
-                    <h1 class="text-3xl font-semibold tracking-normal text-white sm:text-4xl">
-                        問題驗證
-                    </h1>
+    <AppLayout>
+        <div class="space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-semibold tracking-normal">我的驗證</h1>
+                    <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">共 {{ verifications.total }} 筆</p>
                 </div>
-                <div class="flex flex-wrap items-center gap-2 text-sm text-neutral-300 sm:justify-end">
-                    <Link href="/" class="inline-flex min-h-10 items-center gap-2 rounded border border-white/15 bg-white/10 px-3 font-medium text-white transition hover:bg-white/15">
-                        <ArrowLeft class="size-4" />
-                        回首頁
-                    </Link>
-                    <span class="rounded bg-white/10 px-3 py-2">模擬供應端</span>
-                    <span class="rounded bg-white/10 px-3 py-2">已保存稽核紀錄</span>
-                </div>
-            </header>
+                <Link
+                    href="/verifications/create"
+                    class="inline-flex min-h-10 items-center gap-2 rounded-md bg-teal-600 px-4 text-sm font-semibold text-white transition hover:bg-teal-700"
+                >
+                    新建驗證
+                </Link>
+            </div>
 
-            <form class="grid gap-6 lg:grid-cols-[1fr_18rem]" @submit.prevent="submit">
-                <section class="space-y-4">
-                    <div class="space-y-2">
-                        <label for="question" class="text-sm font-medium text-neutral-200">問題</label>
-                        <textarea
-                            id="question"
-                            v-model="form.question"
-                            name="question"
-                            rows="9"
-                            class="w-full resize-y rounded border border-white/15 bg-white px-4 py-3 text-base leading-7 text-neutral-950 outline-none transition focus:border-teal-300 focus:ring-4 focus:ring-teal-300/20"
-                        />
-                        <p v-if="form.errors.question" class="text-sm text-rose-300">
-                            {{ form.errors.question }}
-                        </p>
-                    </div>
+            <div v-if="verifications.data.length === 0" class="rounded-lg border border-dashed border-neutral-300 p-8 text-center text-sm text-neutral-500 dark:border-neutral-700">
+                尚無驗證紀錄。
+                <Link href="/verifications/create" class="ml-1 text-teal-600 underline dark:text-teal-400">立即新建</Link>
+            </div>
 
-                    <div class="flex flex-wrap items-center gap-3">
-                        <button
-                            type="submit"
-                            class="inline-flex min-h-11 items-center justify-center rounded bg-teal-300 px-5 text-sm font-semibold text-neutral-950 transition hover:bg-teal-200 disabled:cursor-not-allowed disabled:bg-neutral-600 disabled:text-neutral-300"
-                            :disabled="form.processing"
-                        >
-                            {{ form.processing ? '驗證中...' : '執行驗證' }}
-                        </button>
+            <div v-else class="divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 dark:divide-neutral-800 dark:border-neutral-800">
+                <Link
+                    v-for="v in verifications.data"
+                    :key="v.id"
+                    :href="`/verifications/${v.id}`"
+                    class="flex items-start justify-between gap-4 p-4 transition hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                >
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-medium">{{ v.question }}</p>
+                        <p class="mt-0.5 text-xs text-neutral-500">{{ v.created_at }}</p>
                     </div>
-                </section>
+                    <div class="flex shrink-0 items-center gap-2">
+                        <span :class="statusClass(v.processing_status)" class="rounded-full px-2 py-0.5 text-xs font-medium">
+                            {{ statusLabel(v.processing_status) }}
+                        </span>
+                        <span v-if="v.final_trust" :class="trustClass(v.final_trust)" class="rounded-full px-2 py-0.5 text-xs font-medium">
+                            {{ v.final_trust }}
+                        </span>
+                    </div>
+                </Link>
+            </div>
 
-                <aside class="space-y-4 rounded border border-white/10 bg-white/5 p-4">
-                    <div class="space-y-2">
-                        <label for="fixture_id" class="text-sm font-medium text-neutral-200">示範範例</label>
-                        <select
-                            id="fixture_id"
-                            v-model="form.fixture_id"
-                            name="fixture_id"
-                            class="w-full rounded border border-white/15 bg-neutral-900 px-3 py-2 text-sm text-white outline-none transition focus:border-teal-300 focus:ring-4 focus:ring-teal-300/20"
-                        >
-                            <option v-for="fixture in fixtures" :key="fixture.id" :value="fixture.id">
-                                {{ fixture.label }}
-                            </option>
-                        </select>
-                        <p v-if="form.errors.fixture_id" class="text-sm text-rose-300">
-                            {{ form.errors.fixture_id }}
-                        </p>
-                    </div>
-
-                    <div v-if="selectedFixture" class="space-y-4 text-sm">
-                        <p class="leading-6 text-neutral-300">
-                            {{ selectedFixture.description }}
-                        </p>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="rounded border border-white/10 bg-neutral-900 p-3">
-                                <p class="text-xs uppercase text-neutral-500">共識</p>
-                                <p class="mt-1 font-semibold text-white">{{ selectedFixture.expected_consensus }}</p>
-                            </div>
-                            <div class="rounded border border-white/10 bg-neutral-900 p-3">
-                                <p class="text-xs uppercase text-neutral-500">信任等級</p>
-                                <p class="mt-1 font-semibold text-white">{{ selectedFixture.expected_trust }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
-            </form>
-        </section>
-    </main>
+            <!-- Pagination -->
+            <nav v-if="verifications.last_page > 1" class="flex flex-wrap items-center justify-center gap-1">
+                <template v-for="link in verifications.links" :key="link.label">
+                    <Link
+                        v-if="link.url"
+                        :href="link.url"
+                        class="inline-flex min-h-9 min-w-9 items-center justify-center rounded-md px-3 text-sm transition"
+                        :class="link.active ? 'bg-teal-600 text-white' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'"
+                        v-html="link.label"
+                    />
+                    <span
+                        v-else
+                        class="inline-flex min-h-9 min-w-9 items-center justify-center rounded-md px-3 text-sm text-neutral-400"
+                        v-html="link.label"
+                    />
+                </template>
+            </nav>
+        </div>
+    </AppLayout>
 </template>

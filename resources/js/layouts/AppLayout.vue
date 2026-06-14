@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Auth } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { Database, Globe, LogOut, ServerCog, Settings, ShieldCheck, TestTubeDiagonal } from '@lucide/vue';
+import { ClipboardList, Database, Globe, LogOut, ServerCog, Settings, ShieldCheck, TestTubeDiagonal } from '@lucide/vue';
 import { computed } from 'vue';
 
 const page = usePage();
@@ -18,6 +18,10 @@ const isAdmin = computed(() => user.value?.role === 'admin');
                         關鍵報告
                     </Link>
                     <nav class="flex items-center gap-1 text-sm">
+                        <Link href="/verifications" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
+                            <ClipboardList class="size-4" />
+                            我的驗證
+                        </Link>
                         <Link href="/verifications/create" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
                             <ShieldCheck class="size-4" />
                             新建驗證

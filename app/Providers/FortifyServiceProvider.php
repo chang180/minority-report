@@ -6,8 +6,11 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -56,12 +59,33 @@ class FortifyServiceProvider extends ServiceProvider
 
         Fortify::confirmPasswordView(fn () => Inertia::render('auth/ConfirmPassword'));
 
+        Fortify::verifyEmailView(fn () => Inertia::render('auth/VerifyEmail'));
+
+        $this->registerAutoVerify();
+
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
             return Limit::perMinute(5)->by($throttleKey);
         });
 
+    }
+
+    private function registerAutoVerify(): void
+    {
+        $autoVerify = config('app.env') === 'local'
+            || config('app.env') === 'testing'
+            || (bool) config('auth.auto_verify_email', false);
+
+        if (! $autoVerify) {
+            return;
+        }
+
+        Event::listen(Registered::class, function (Registered $event): void {
+            if ($event->user instanceof User && ! $event->user->hasVerifiedEmail()) {
+                $event->user->markEmailAsVerified();
+            }
+        });
     }
 
     private function passwordRuleDescription(): string

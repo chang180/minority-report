@@ -36,21 +36,33 @@ class ConsensusWorkflow
     /**
      * @param  LlmProvider[]  $providers
      */
-    public function run(Question $question, array $providers, ?string $providerPrompt = null): VerificationRequest
+    public function run(Question $question, array $providers, ?string $providerPrompt = null, ?VerificationRequest $existingRequest = null): VerificationRequest
     {
         $classification = $this->classifier->classify($question);
         $groundingAvailable = (bool) ($question->metadata['grounding_available'] ?? false);
         $groundingStatus = (string) ($question->metadata['grounding']['status'] ?? '');
 
-        $verificationRequest = VerificationRequest::create([
-            'question' => $question->text,
-            'classified_type' => $classification->type,
-            'classifier_confidence' => $classification->classifierConfidence,
-            'answer_shape' => $classification->answerShape,
-            'requires_grounding' => $classification->requiresGrounding,
-            'grounding_available' => $groundingAvailable,
-            'metadata' => $question->metadata,
-        ]);
+        if ($existingRequest !== null) {
+            $existingRequest->update([
+                'classified_type' => $classification->type,
+                'classifier_confidence' => $classification->classifierConfidence,
+                'answer_shape' => $classification->answerShape,
+                'requires_grounding' => $classification->requiresGrounding,
+                'grounding_available' => $groundingAvailable,
+                'metadata' => $question->metadata,
+            ]);
+            $verificationRequest = $existingRequest;
+        } else {
+            $verificationRequest = VerificationRequest::create([
+                'question' => $question->text,
+                'classified_type' => $classification->type,
+                'classifier_confidence' => $classification->classifierConfidence,
+                'answer_shape' => $classification->answerShape,
+                'requires_grounding' => $classification->requiresGrounding,
+                'grounding_available' => $groundingAvailable,
+                'metadata' => $question->metadata,
+            ]);
+        }
 
         $prompt = $providerPrompt ?? $this->buildProviderPrompt($question, $classification);
         $rawResponses = $this->providerOrchestrator->dispatch($verificationRequest->id, $question, $prompt, $providers);

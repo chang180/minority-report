@@ -36,7 +36,7 @@ class VerificationController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('Verification/Index', [
+        return Inertia::render('Demo/Index', [
             'fixtures' => $options,
             'defaultFixtureId' => $settings->default_fixture_id,
         ]);

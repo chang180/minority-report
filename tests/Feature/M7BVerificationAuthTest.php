@@ -2,9 +2,11 @@
 
 use App\AI\Providers\ConfiguredLlmProviderFactory;
 use App\Consensus\ConsensusWorkflow;
+use App\Jobs\RunAuthenticatedVerificationJob;
 use App\Models\User;
 use App\Models\VerificationRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
@@ -22,26 +24,44 @@ test('authenticated user can view verification create page', function () {
         ->assertInertia(fn (Assert $page) => $page->component('Verification/Create'));
 });
 
-test('authenticated user can post verification and gets user_id assigned', function () {
+test('authenticated user can post verification and job is dispatched with correct ids', function () {
+    Bus::fake();
+
     $user = User::factory()->create();
 
-    $factory = Mockery::mock(ConfiguredLlmProviderFactory::class);
-    $workflow = Mockery::mock(ConsensusWorkflow::class);
+    $this->actingAs($user)
+        ->post('/verifications', ['question' => 'Test question for M7B?'])
+        ->assertRedirect();
+
+    $verification = VerificationRequest::where('user_id', $user->id)->first();
+    expect($verification)->not->toBeNull()
+        ->and($verification->processing_status)->toBe('pending');
+
+    Bus::assertDispatched(RunAuthenticatedVerificationJob::class, function ($job) use ($user, $verification) {
+        return $job->verificationRequestId === $verification->id
+            && $job->userId === $user->id;
+    });
+});
+
+test('job sets user_id and source on completion', function () {
+    $user = User::factory()->create();
 
     $fakeVerification = VerificationRequest::create([
         'question' => 'Test question for M7B?',
         'metadata' => [],
     ]);
 
-    $factory->shouldReceive('forUser')->with(Mockery::on(fn ($u) => $u->is($user)))->andReturn([]);
+    $factory = Mockery::mock(ConfiguredLlmProviderFactory::class);
+    $workflow = Mockery::mock(ConsensusWorkflow::class);
+
+    $factory->shouldReceive('forUser')->andReturn([]);
     $workflow->shouldReceive('run')->andReturn($fakeVerification);
 
     app()->instance(ConfiguredLlmProviderFactory::class, $factory);
     app()->instance(ConsensusWorkflow::class, $workflow);
 
-    $this->actingAs($user)
-        ->post('/verifications', ['question' => 'Test question for M7B?'])
-        ->assertRedirect();
+    $job = new RunAuthenticatedVerificationJob($fakeVerification->id, $user->id);
+    app()->call([$job, 'handle']);
 
     $fakeVerification->refresh();
     expect($fakeVerification->user_id)->toBe($user->id)
@@ -53,6 +73,7 @@ test('user can view their own verification', function () {
     $verification = VerificationRequest::create([
         'user_id' => $user->id,
         'question' => 'My verification',
+        'processing_status' => 'completed',
     ]);
 
     $this->actingAs($user)
@@ -68,6 +89,7 @@ test('user cannot view another user\'s verification', function () {
     $verification = VerificationRequest::create([
         'user_id' => $owner->id,
         'question' => 'Private question',
+        'processing_status' => 'completed',
     ]);
 
     $this->actingAs($attacker)
@@ -81,6 +103,7 @@ test('admin can view any verification', function () {
     $verification = VerificationRequest::create([
         'user_id' => $user->id,
         'question' => 'Some verification',
+        'processing_status' => 'completed',
     ]);
 
     $this->actingAs($admin)
@@ -93,6 +116,7 @@ test('user cannot view guest demo verification', function () {
     $demoVerification = VerificationRequest::create([
         'user_id' => null,
         'question' => 'Guest demo question',
+        'processing_status' => 'completed',
     ]);
 
     $this->actingAs($user)
@@ -104,6 +128,7 @@ test('demo verification stores source=demo in metadata', function () {
     $verification = VerificationRequest::create([
         'question' => 'test',
         'metadata' => ['source' => 'demo', 'demo_mode' => 'fake_fixtures'],
+        'processing_status' => 'completed',
     ]);
 
     expect($verification->metadata['source'])->toBe('demo')

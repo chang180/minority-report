@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\AI\Providers\ConfiguredLlmProviderFactory;
-use App\Consensus\ConsensusWorkflow;
-use App\Consensus\DTO\Question;
-use App\Grounding\GroundingService;
+use App\Consensus\Replay\ConsensusReplayService;
+use App\Jobs\RunAuthenticatedVerificationJob;
 use App\Models\ProviderResponse;
 use App\Models\VerificationRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,10 +15,30 @@ use Inertia\Response;
 class AuthVerificationController extends Controller
 {
     public function __construct(
-        private readonly ConsensusWorkflow $workflow,
-        private readonly ConfiguredLlmProviderFactory $factory,
-        private readonly GroundingService $groundingService,
+        private readonly ConsensusReplayService $replayService,
     ) {}
+
+    public function index(Request $request): Response
+    {
+        $user = $request->user();
+        $this->authorize('viewAny', VerificationRequest::class);
+
+        $query = $user->isAdmin()
+            ? VerificationRequest::latest()
+            : VerificationRequest::where('user_id', $user->id)->latest();
+
+        $verifications = $query->paginate(15)->through(fn (VerificationRequest $v): array => [
+            'id' => $v->id,
+            'question' => $v->question,
+            'processing_status' => $v->processing_status,
+            'final_trust' => $v->final_trust,
+            'created_at' => $v->created_at?->toDateTimeString(),
+        ]);
+
+        return Inertia::render('Verification/Index', [
+            'verifications' => $verifications,
+        ]);
+    }
 
     public function create(): Response
     {
@@ -33,58 +52,15 @@ class AuthVerificationController extends Controller
         ]);
 
         $user = $request->user();
-        $providers = $this->factory->forUser($user);
-        $questionText = trim($validated['question']);
 
-        // Classify early to know requiresGrounding — we pass an empty metadata
-        // so the workflow will classify; here we do a lightweight pre-check.
-        // The workflow re-classifies internally, so we use a best-effort flag.
-        // Per spec §6: grounding MUST run before ConsensusWorkflow::run().
-        // We use a temporary Question to detect requiresGrounding via the grounding service.
-        $preMetadata = ['source' => 'authenticated'];
-
-        // Fetch grounding — GroundingService skips when requiresGrounding=false.
-        // Since we don't have classification yet, we always attempt grounding;
-        // the workflow's classifier will set requiresGrounding on the record.
-        // For M8-B we conservatively attempt grounding and let the workflow persist
-        // grounding_available from the metadata we pass.
-        $grounding = $this->groundingService->fetch($questionText, true);
-
-        $metadata = array_merge($preMetadata, [
-            'grounding_available' => $grounding->groundingAvailable,
-            'grounding' => $grounding->toMetadataArray(),
-        ]);
-
-        $providerPrompt = null;
-        if ($grounding->groundingAvailable && $grounding->summary !== '') {
-            $sourceLines = array_map(
-                fn (array $s) => "- {$s['title']}: {$s['url']}",
-                $grounding->toMetadataArray()['sources'],
-            );
-            $providerPrompt = implode("\n", [
-                'External grounding summary (non-authoritative, for reference):',
-                $grounding->summary,
-                '',
-                'Sources:',
-                implode("\n", $sourceLines),
-            ]);
-        }
-
-        $verification = $this->workflow->run(
-            question: new Question(
-                text: $questionText,
-                metadata: $metadata,
-            ),
-            providers: $providers,
-            providerPrompt: $providerPrompt,
-        );
-
-        $verification->update([
+        $verification = VerificationRequest::create([
             'user_id' => $user->id,
-            'metadata' => array_merge($verification->metadata ?? [], [
-                'source' => 'authenticated',
-            ]),
+            'question' => trim($validated['question']),
+            'processing_status' => 'pending',
+            'metadata' => ['source' => 'authenticated'],
         ]);
+
+        dispatch(new RunAuthenticatedVerificationJob($verification->id, $user->id));
 
         return redirect()->route('verifications.show', $verification);
     }
@@ -120,6 +96,37 @@ class AuthVerificationController extends Controller
         ]);
     }
 
+    public function status(VerificationRequest $verification): JsonResponse
+    {
+        $this->authorize('view', $verification);
+
+        return response()->json([
+            'id' => $verification->id,
+            'processing_status' => $verification->processing_status,
+            'processing_error' => $verification->metadata['processing_error'] ?? null,
+            'final_trust' => $verification->final_trust,
+            'final_verdict' => $verification->final_verdict,
+            'updated_at' => $verification->updated_at?->toISOString(),
+        ]);
+    }
+
+    public function replay(Request $request, VerificationRequest $verification): RedirectResponse
+    {
+        $this->authorize('replay', $verification);
+
+        $newVerification = $this->replayService->replayRequest($verification->id);
+
+        $newVerification->update([
+            'user_id' => $request->user()->id,
+            'processing_status' => 'completed',
+            'metadata' => array_merge($newVerification->metadata ?? [], [
+                'source' => 'authenticated',
+            ]),
+        ]);
+
+        return redirect()->route('verifications.show', $newVerification);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -128,6 +135,7 @@ class AuthVerificationController extends Controller
         return [
             'id' => $verification->id,
             'question' => $verification->question,
+            'processing_status' => $verification->processing_status,
             'classified_type' => $verification->classified_type,
             'classifier_confidence' => $verification->classifier_confidence,
             'answer_shape' => $verification->answer_shape,

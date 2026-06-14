@@ -6,11 +6,7 @@
 
 ## 當前可開工
 
-| Gate | Brief | 說明 |
-|------|-------|------|
-| **M8-A** | [M8-A/brief.md](M8-A/brief.md) | 列表、async Job、Email verification、Replay |
-
-Spec：[docs/10-product-ux-and-async.md](../../docs/10-product-ux-and-async.md)
+（無 — 等待 Orchestrator 發布 **M8-C** spec 與 brief）
 
 ---
 
@@ -18,6 +14,7 @@ Spec：[docs/10-product-ux-and-async.md](../../docs/10-product-ux-and-async.md)
 
 | Gate | 狀態 |
 |------|------|
+| M8-A | **RELEASED** |
 | M8-B | **RELEASED** |
 
 ---
@@ -26,7 +23,7 @@ Spec：[docs/10-product-ux-and-async.md](../../docs/10-product-ux-and-async.md)
 
 | Gate | 狀態 |
 |------|------|
-| M8-A | **可開工** |
+| M8-A | **RELEASED** |
 | M8-B | **RELEASED** |
 | M8-C | 規劃中 |
 
@@ -34,4 +31,4 @@ Spec：[docs/10-product-ux-and-async.md](../../docs/10-product-ux-and-async.md)
 
 ## 目錄
 
-各 Gate 的 `brief.md` + `progress.md` 保留於 `M2-A/` … `M8-B/` 供稽核與回顧。
+各 Gate 的 `brief.md` + `progress.md` 保留於 `M2-A/` … `M8-A/` 供稽核與回顧。

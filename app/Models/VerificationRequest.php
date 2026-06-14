@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Fillable([
     'user_id',
     'question',
+    'processing_status',
     'classified_type',
     'classifier_confidence',
     'answer_shape',

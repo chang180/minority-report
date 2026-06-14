@@ -27,11 +27,16 @@ Route::middleware('auth')->group(function (): void {
     Route::put('/settings/providers/custom/{customProvider}', [ProviderSettingsController::class, 'updateCustom'])->name('settings.providers.custom.update');
     Route::delete('/settings/providers/custom/{customProvider}', [ProviderSettingsController::class, 'destroyCustom'])->name('settings.providers.custom.destroy');
     Route::put('/settings/providers/slots', [ProviderSettingsController::class, 'updateSlots'])->name('settings.providers.slots.update');
+});
 
+Route::middleware(['auth', 'verified'])->group(function (): void {
     // Authenticated verifications
+    Route::get('/verifications', [AuthVerificationController::class, 'index'])->name('verifications.index');
     Route::get('/verifications/create', [AuthVerificationController::class, 'create'])->name('verifications.create');
     Route::post('/verifications', [AuthVerificationController::class, 'store'])->name('verifications.store');
     Route::get('/verifications/{verification}', [AuthVerificationController::class, 'show'])->name('verifications.show');
+    Route::get('/verifications/{verification}/status', [AuthVerificationController::class, 'status'])->name('verifications.status');
+    Route::post('/verifications/{verification}/replay', [AuthVerificationController::class, 'replay'])->name('verifications.replay');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
