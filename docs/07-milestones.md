@@ -14,8 +14,10 @@
 | M4 | Consensus Engine | **完成**（2026-06-13） |
 | M5 | Audit Trail | **完成**（2026-06-14） |
 | M6 | Minimal UI | **完成**（2026-06-14） |
+| M7 | Product UI + Auth | **進行中**（M7-A OPEN） |
 
-**M1 完成前 MUST NOT 撰寫 Laravel application code。** M2 起可開始實作。
+**M1 完成前 MUST NOT 撰寫 Laravel application code。** M2 起可開始實作。  
+**M7 開工前 MUST** 先完成 [08-ui-auth-providers.md](08-ui-auth-providers.md) 與本文件 §M7（spec-driven）。
 
 ---
 
@@ -163,9 +165,58 @@
 - 可透過 UI 跑 fake fixture demo
 - Type A 走單模型短路徑
 
+**備註**：M6 為 **Minimal UI**（workflow 閉環證明），非產品級前端。完整 IA、Auth、Dashboard 見 **M7** 與 [08-ui-auth-providers.md](08-ui-auth-providers.md)。
+
 ---
 
-## Phase 3 延後項目（Non-MVP）
+## Milestone 7: Product UI + Auth + Provider Settings（Post-MVP）
+
+### 進入條件
+
+- M6 **RELEASED**
+- [08-ui-auth-providers.md](08-ui-auth-providers.md) 已由 Orchestrator 寫入並對齊
+
+### 概覽
+
+| Gate | 名稱 | 狀態 |
+|------|------|------|
+| M7-A | Fortify + Vue kit 基礎 + Welcome + Demo 路由 | **OPEN** |
+| M7-B | Provider 設定 + Admin demo + Dashboard + 真 verification | 未開 |
+
+詳細規格 **MUST** 以 [08-ui-auth-providers.md](08-ui-auth-providers.md) 為準。
+
+### M7-A 交付物
+
+- Laravel **Fortify**（**MUST NOT** 使用 Breeze）
+- vue-starter-kit **選擇性移植**（**MUST NOT** 整包 `laravel new --vue`；見 08 §1.4）：layouts、auth 頁、settings（Profile/Password）
+- `users.role`（`admin` \| `user`）；admin middleware
+- Welcome `GET /`；Demo 遷至 `GET /demo/*`
+- Feature test：`M7AAuthTest`；更新 `M6MinimalUiTest`
+
+### M7-A 驗收
+
+- 開放註冊 + login/logout + password reset
+- `/` Welcome；`/demo` 保留 M6 fake fixture 行為
+- `npm run typecheck`；全 suite 綠
+
+### M7-B 交付物
+
+- `user_provider_settings`、`user_custom_providers`、`system_demo_settings`
+- `users.consensus_slots`；`ConfiguredLlmProviderFactory::forUser()` / `forDemo()`
+- Provider 設定 UI；Admin demo 管理；產品 Dashboard
+- 登入使用者 verification（`user_id`、policy）
+- Feature tests：M7B*
+
+### M7-B 驗收
+
+- 使用者可設定 SDK preset + 自訂 endpoint
+- Admin 可切換 demo mode（fake / shared local API）
+- 登入 verification 使用 per-user provider；audit 含 `user_id`，**不含** secret
+- 詳見 [08-ui-auth-providers.md §7](08-ui-auth-providers.md)
+
+---
+
+## Phase 3 延後項目（Non-MVP · M1–M6）
 
 以下 **MUST NOT** 在 M1–M6 引入：
 
@@ -199,6 +250,7 @@
 | 本文件章節 | description.md |
 |------------|----------------|
 | M1–M6 | §21 |
+| M7 | [08-ui-auth-providers.md](08-ui-auth-providers.md)、Orchestrator M7 brief |
 | Cross-Review | §23, Changelog T1–T3 |
 | Phase 3 延後 | §5, §14, §12.2 |
 

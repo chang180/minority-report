@@ -72,23 +72,42 @@ Question → Verification → Consensus → Verdict
 
 的最小閉環。
 
-MVP **不追求**：完整 Agent Framework、商業化、多租戶、完整 RAG、完整 grounding、完整 semantic alignment。
+MVP **不追求**：完整 Agent Framework、商業化、多租戶、完整 RAG、完整 grounding、完整 semantic alignment、**產品級 UI / 帳號系統**（見 §7）。
 
 ---
 
-## 5. Non Goals
+## 5. Non Goals（M1–M6 MVP）
 
 MVP 階段 **MUST NOT** 做：
 
 - RAG / 向量資料庫
 - Agent Marketplace / MCP Marketplace
-- 多使用者團隊協作
+- 多使用者**團隊**協作（組織 workspace、共享專案）
 - 付費機制
 - 複雜工作流編排
 - 多輪辯論
 - 完整匿名互評
 - 自動長期記憶
 - Phase 3 等級的來源可信度裁定
+- per-user provider 設定 UI（屬 M7，見 §7）
+
+---
+
+## 7. Post-MVP Scope（Milestone 7）
+
+M6 完成後，產品進入 **基本可用** 階段（非 MVP 閉環）。M7 **ONLY** 擴充應用層，**MUST NOT** 改寫 consensus 核心。
+
+M7 **MUST** 交付：
+
+1. **身份**：開放註冊、session auth（Fortify）、`admin` / `user` 角色
+2. **UI 骨架**：Welcome、訪客 Demo、登入後 Dashboard（vue-starter-kit 移植）
+3. **Provider 設定**：SDK preset + 自訂 endpoint；各使用者自管 API 憑證（encrypted）
+4. **Demo 管理**：Admin 設定 fake fixture 或 shared local API
+5. **真 verification 路徑**：登入使用者以自身 provider 跑 `ConsensusWorkflow`
+
+M7 **MUST NOT** 做：多租戶、團隊共享、Phase 3 grounding。
+
+規格詳見 [08-ui-auth-providers.md](08-ui-auth-providers.md)。
 
 ---
 
@@ -124,3 +143,4 @@ MVP 成功時 **MUST** 滿足以下能力（詳見 [06-test-scenarios.md](06-tes
 | §4 MVP Scope | §4 |
 | §5 Non Goals | §5 |
 | §6 Success Criteria | §22 |
+| §7 Post-MVP M7 | [08-ui-auth-providers.md](08-ui-auth-providers.md) |

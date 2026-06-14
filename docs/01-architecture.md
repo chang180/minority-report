@@ -11,7 +11,8 @@
 | Framework | **Laravel 13** | 覆寫 description.md §6 的 Laravel 12+ |
 | PHP | 8.4+ | |
 | Database | MySQL 或 SQLite | MVP 可先用 SQLite |
-| Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 | M6 Minimal UI；頁面於 `resources/js/Pages/` |
+| Frontend | **Vue 3** + **Inertia.js** + **TypeScript** + Tailwind CSS 4 | M6 Minimal UI；M7 產品 UI 見 [08](08-ui-auth-providers.md) |
+| Auth（M7+） | **Laravel Fortify** + vue-starter-kit 移植 | Session；**MUST NOT** 用 Breeze |
 | Testing | **Pest** | TDD；CI 於 push/PR 執行 |
 | AI Infrastructure | **Laravel AI SDK**（`laravel/ai`） | 已安裝；MVP bridge 限 `app/AI/`；Consensus **MUST NOT** 直接依賴 SDK facade |
 | AI 開發規範 | **Laravel Boost** | guidelines / skills / MCP；含 `ai-sdk-development` |
@@ -182,6 +183,44 @@ Job dispatch → Polling → Result page
 
 ---
 
+## 7. Presentation、Auth 與 Credential 層（M7+）
+
+本節定義 **HTTP / Inertia / Auth / 使用者 provider 設定** 邊界。詳細契約見 [08-ui-auth-providers.md](08-ui-auth-providers.md)。
+
+### 7.1 分層
+
+```text
+resources/js/Pages/     ← Inertia 頁（Welcome、Demo、Dashboard、Settings…）
+app/Http/               ← Controllers、Form Requests、Policies、Middleware
+app/Actions/Fortify/    ← Fortify user lifecycle
+app/AI/Providers/       ← forUser() / forDemo() 憑證 → LlmProvider[]
+        │
+        ▼
+app/Consensus/          ← 僅接收 LlmProvider[]；MUST NOT 讀 Auth/DB 憑證
+```
+
+### 7.2 依賴規則（M7 新增）
+
+| 規則 | 說明 |
+|------|------|
+| `app/Consensus` **MUST NOT** 依賴 Fortify、Session、`User` model | 憑證在 HTTP/AI 層解析後注入 |
+| Provider 憑證 **MUST** encrypted 儲存 | **MUST NOT** 進 audit / log / 前端 props |
+| 頁面目錄 **MUST** 維持 `resources/js/Pages/` | 見 08 §3.1 |
+| Auth **MUST** 使用 Fortify | 對齊 Laravel 13 starter kit |
+| Starter kit **MUST** 選擇性移植 | **MUST NOT** 整包 `laravel new --vue`；見 [08 §1.4](08-ui-auth-providers.md) |
+
+### 7.3 路由 IA（摘要）
+
+| 區域 | 路由 prefix | 存取 |
+|------|-------------|------|
+| Welcome | `/` | public |
+| Demo | `/demo` | public |
+| Auth | Fortify | guest / auth |
+| App | `/dashboard`, `/verifications`, `/settings` | auth |
+| Admin | `/admin` | admin |
+
+---
+
 ## Traceability
 
 | 本文件章節 | description.md |
@@ -192,5 +231,6 @@ Job dispatch → Polling → Result page
 | §4 AI Layer | §6, §10 |
 | §5 Latency | §17, T3-J |
 | §6 References | §20 |
+| §7 Presentation / Auth | [08-ui-auth-providers.md](08-ui-auth-providers.md) |
 
 **技術決策覆寫**：Framework Laravel 13 見 [.ai-dev/planning/plan.md](../.ai-dev/planning/plan.md)。AI infrastructure 採 Laravel AI SDK 作介面層，非 SDK 選型競賽。

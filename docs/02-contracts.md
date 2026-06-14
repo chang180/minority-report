@@ -380,6 +380,27 @@ interface FakeProviderRegistry
 
 目的：debug、fixture generation、regression testing、demo replay。
 
+### 10.1 M7 擴充欄位
+
+| 欄位 | 寫入 Stage | 說明 |
+|------|------------|------|
+| `user_id` | Request | nullable；訪客 demo 為 null |
+| `metadata.source` | Request | `demo` \| `authenticated` |
+| `metadata.demo_mode` | Request | demo 時：`fake_fixtures` \| `shared_local_api` |
+
+**MUST NOT** 將 API key、token 寫入 audit 或 metadata。
+
+---
+
+## 11. Identity 與 Provider 憑證（M7+）
+
+應用層契約詳見 [08-ui-auth-providers.md](08-ui-auth-providers.md)。摘要：
+
+- 三 **consensus slot** 邏輯名：`openai`、`anthropic`、`gemini`（§8 不變）
+- **preset**：對應 `config/ai.php` driver + user `api_key`（+ optional `api_url`）
+- **custom**：user 自訂 `label`、`api_url`、`api_key`
+- `LlmProvider[]` **MUST** 由 `app/AI/` factory 依 User 或 DemoSettings 組裝後注入 `ConsensusWorkflow`
+
 ---
 
 ## Traceability
@@ -393,5 +414,6 @@ interface FakeProviderRegistry
 | §8 Provider | §10 |
 | §9 Interfaces | §7 |
 | §10 Audit Trail | §18 |
+| §11 Identity / Provider 憑證 | [08-ui-auth-providers.md](08-ui-auth-providers.md) |
 
 **技術決策覆寫**：Framework 見 [.ai-dev/planning/plan.md](../.ai-dev/planning/plan.md)（Laravel 13）；description §6 寫 Laravel 12+ 以本專案 plan 為準。

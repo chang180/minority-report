@@ -1,7 +1,8 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：**M1–M6 MVP 已完成**（2026-06-14）。  
-> UI 入口：`/`（fake fixture demo）。Health：`GET /health`。
+> **當前階段**：**M7 進行中** — Post-MVP 產品 UI + Auth。  
+> **可開工 Gate**：[M7-A](briefs/M7-A/)（Fortify + Vue Starter Kit 移植）。  
+> MVP UI：`/demo`（M7-A 完成後；目前 M6 仍為 `/`）。Health：`GET /health`。
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -23,7 +24,8 @@
 | [04-trust-level.md](../../docs/04-trust-level.md) | base + caps 瀑布、decision table |
 | [05-failure-modes.md](../../docs/05-failure-modes.md) | Provider/Extractor 失敗、3/3–0/3 狀態機 |
 | [06-test-scenarios.md](../../docs/06-test-scenarios.md) | Fixture F01–F14、CT-G 測試 |
-| [07-milestones.md](../../docs/07-milestones.md) | M1–M6 拆解與驗收 |
+| [07-milestones.md](../../docs/07-milestones.md) | M1–M7 拆解與驗收 |
+| [08-ui-auth-providers.md](../../docs/08-ui-auth-providers.md) | M7 Auth、UI、Provider 憑證（Post-MVP） |
 
 ---
 
@@ -106,6 +108,25 @@ M5-A **RELEASED**（2026-06-14）：`ConsensusReplayService` replay + `auditTrai
 M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結果頁；`ConsensusDemoFixtureCatalog` fake demo。
 
 **M1–M6 MVP 完成。**
+
+---
+
+## Milestone 7（Gate 制 · 2 Gate）— Post-MVP
+
+| Gate | 派工文件 | 狀態 |
+|------|----------|------|
+| **M7-A** | [briefs/M7-A/](briefs/M7-A/) | **OPEN** |
+| **M7-B** | （M7-A RELEASED 後發布） | 未開 |
+
+**M7 目標**（產品基本 UI，非 M6 minimal）：
+
+- **Spec**：[docs/08-ui-auth-providers.md](../../docs/08-ui-auth-providers.md)（M7 canonical；Worker 必讀）
+- **Auth**：Laravel 13 官方 **Fortify** + vue-starter-kit **選擇性移植**（非整包安裝）— **不用 Breeze**
+- **角色**：admin / user；開放註冊
+- **頁面**：Welcome `/`、訪客 Demo `/demo`（admin 可管理，M7-B）、登入後 Dashboard、Provider 設定（M7-B）
+- **Provider**：SDK preset + 使用者自訂 endpoint（M7-B）；per-user 憑證 encrypted
+
+M7-A **MUST NOT** 做 provider DB / 真 provider verification（屬 M7-B）。
 
 ---
 
