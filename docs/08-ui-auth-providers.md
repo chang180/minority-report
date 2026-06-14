@@ -300,23 +300,23 @@ public function forDemo(SystemDemoSettings $settings): array;
 
 ### M7-A
 
-- [ ] Fortify 安裝；register / login / logout / password reset 可運作
-- [ ] vue-starter-kit layouts + auth 頁移植；`npm run typecheck` 通過
-- [ ] `users.role` + admin middleware + admin seeder
-- [ ] `GET /` Welcome；`/demo/*` 保留 M6 demo 行為
-- [ ] **使用者可見 UI 文案為繁體中文**（§3.4）
-- [ ] `M7AAuthTest` + 更新 `M6MinimalUiTest`
-- [ ] **MUST NOT** 引入 Breeze
+- [x] Fortify 安裝；register / login / logout / password reset 可運作
+- [x] vue-starter-kit layouts + auth 頁移植；`npm run typecheck` 通過
+- [x] `users.role` + admin middleware + admin seeder
+- [x] `GET /` Welcome；`/demo/*` 保留 M6 demo 行為
+- [x] **使用者可見 UI 文案為繁體中文**（§3.4）
+- [x] `M7AAuthTest` + 更新 `M6MinimalUiTest`
+- [x] **MUST NOT** 引入 Breeze
 
 ### M7-B
 
-- [ ] Provider settings CRUD（preset + custom）；encrypted 儲存
-- [ ] `forUser()` / `forDemo()` 解析三槽 provider
-- [ ] 登入使用者 `POST /verifications` 走真 provider（或 unavailable 降級）
-- [ ] Admin demo settings；兩種 demo mode
-- [ ] 產品 Dashboard（摘要、最近 verification、provider 就緒度）
-- [ ] `VerificationRequestPolicy`；`user_id` 持久化
-- [ ] Feature tests：`M7BProviderSettingsTest`、`M7BDemoAdminTest`、`M7BVerificationAuthTest`
+- [x] Provider settings CRUD（preset + custom）；encrypted 儲存
+- [x] `forUser()` / `forDemo()` 解析三槽 provider
+- [x] 登入使用者 `POST /verifications` 走真 provider（或 unavailable 降級）
+- [x] Admin demo settings；兩種 demo mode
+- [x] 產品 Dashboard（摘要、最近 verification、provider 就緒度）
+- [x] `VerificationRequestPolicy`；`user_id` 持久化
+- [x] Feature tests：`M7BProviderSettingsTest`、`M7BDemoAdminTest`、`M7BVerificationAuthTest`
 
 ---
 

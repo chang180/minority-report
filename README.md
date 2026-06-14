@@ -67,9 +67,9 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M5 Audit Trail | ✅ 完成 |
 | M6 Minimal UI | ✅ 完成 |
 | M7-A Auth + UI 基礎 | ✅ 完成（2026-06-14） |
-| M7-B Provider + Dashboard | 🔜 待開 |
+| M7-B Provider + Dashboard | ✅ 完成（2026-06-14） |
 
-**M1–M6 MVP 已完成**（2026-06-14）。**M7-A** 已交付 Fortify auth、Welcome/Demo 路由，以及繁體中文 UI（`APP_LOCALE=zh_TW`）。
+**M1–M7 已完成**（2026-06-14）。產品 UI 含 Fortify auth、BYOK Provider 設定、Admin demo 管理、登入 verification 與繁體中文介面（`APP_LOCALE=zh_TW`）。
 
 ### Web 路由（摘要）
 
@@ -80,13 +80,17 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | `POST /demo/verifications` | 公開 | 提交 demo 驗證 |
 | `GET /demo/verifications/{id}` | 公開 | Demo 結果 |
 | `GET /login`, `/register` | guest | Fortify auth |
-| `GET /dashboard` | auth | 登入後首頁（M7-B 換產品內容） |
+| `GET /dashboard` | auth | 儀表板（provider 就緒度、最近 verification） |
 | `GET /settings/profile`, `/settings/password` | auth | 帳號設定 |
+| `GET /settings/providers` | auth | BYOK Provider 設定（preset + 自訂 endpoint） |
+| `GET /verifications/create` | auth | 新建驗證（無 fixture） |
+| `POST /verifications` | auth | 提交登入 verification |
+| `GET /verifications/{id}` | auth | 登入 verification 結果（policy 限制本人） |
+| `GET /admin/demo` | admin | 訪客 Demo 模式管理 |
+| `PUT /admin/demo` | admin | 更新 demo 設定 |
 | `GET /health` | 公開 | JSON health check |
 
-**後續（M7-B）**：Provider 設定、Admin demo 管理、登入使用者真 provider 驗證。
-
-測試現況：`php artisan test` → **101 passed**，1 skipped。
+測試現況：`php artisan test` → **131 passed**，1 skipped。
 
 ---
 
@@ -107,7 +111,8 @@ app/
 │   ├── Contracts/
 │   ├── DTO/
 │   └── ConsensusWorkflow.php
-├── Http/Controllers/       # VerificationController（demo + 未來 auth 驗證）
+├── Http/Controllers/       # Demo / auth verification、Provider settings、Admin demo
+├── Policies/               # VerificationRequestPolicy
 ├── Actions/Fortify/        # Fortify user lifecycle（M7-A）
 ├── AI/Providers/
 ├── Models/                 # VerificationRequest, ProviderResponse, ConsensusResult
@@ -116,6 +121,9 @@ app/
 config/consensus.php        # provider keys、timeout、conflict threshold
 tests/
 ├── Feature/M7AAuthTest.php
+├── Feature/M7BProviderSettingsTest.php
+├── Feature/M7BDemoAdminTest.php
+├── Feature/M7BVerificationAuthTest.php
 ├── Feature/M6MinimalUiTest.php
 ├── Feature/Consensus/      # F01–F14、M5 replay
 └── Unit/Consensus/
@@ -123,8 +131,9 @@ tests/
 resources/js/
 ├── Pages/Home/Welcome.vue
 ├── Pages/auth/             # Login、Register…
-├── Pages/settings/         # Profile、Password
-├── Pages/Verification/     # Demo Index、Show
+├── Pages/settings/         # Profile、Password、Providers
+├── Pages/admin/            # DemoSettings
+├── Pages/Verification/     # Index、Create、Show
 ├── layouts/
 └── components/ui/
 ```
@@ -148,7 +157,7 @@ resources/js/
 | [docs/07-milestones.md](docs/07-milestones.md) | 開發里程碑 |
 | [docs/08-ui-auth-providers.md](docs/08-ui-auth-providers.md) | M7 Auth、UI、Provider 規格 |
 
-協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M7-A ✅ · M7-B 待開**）
+協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M7 ✅**）
 
 ---
 
@@ -234,7 +243,7 @@ npm run dev         # Vite 開發伺服器
 npm run build       # 正式建置
 ```
 
-M7 UI 已就緒（繁體中文 Welcome、`/demo` Verification、Fortify auth、settings）。
+M7 產品 UI 已就緒（繁體中文 Welcome、`/demo`、BYOK Provider 設定、登入 verification、Admin demo、Dashboard）。
 
 ### Laravel AI SDK
 
@@ -245,7 +254,7 @@ M7 UI 已就緒（繁體中文 Welcome、`/demo` Verification、Fortify auth、s
 php artisan migrate
 ```
 
-API keys 見 `.env.example`（`OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`GEMINI_API_KEY`）。缺 key 時 adapter 回傳 `provider_unavailable`，不呼叫遠端 API。
+登入使用者 **SHOULD** 在 `/settings/providers` 設定自己的 API key（BYOK）；全域 `.env` key 可作 fallback / CI。缺 key 時 adapter 回傳 `provider_unavailable`，不呼叫遠端 API。
 
 Opt-in  live adapter 測試：`M3_B_LIVE_OPENAI=1` + `OPENAI_API_KEY`。
 

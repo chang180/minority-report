@@ -2,75 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\AI\Providers\ConfiguredLlmProviderFactory;
 use App\Consensus\ConsensusWorkflow;
-use App\Consensus\Demo\ConsensusDemoFixtureCatalog;
 use App\Consensus\DTO\Question;
-use App\Http\Requests\StoreVerificationRequest;
 use App\Models\ProviderResponse;
-use App\Models\SystemDemoSettings;
 use App\Models\VerificationRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class VerificationController extends Controller
+class AuthVerificationController extends Controller
 {
     public function __construct(
         private readonly ConsensusWorkflow $workflow,
-        private readonly ConsensusDemoFixtureCatalog $fixtures,
+        private readonly ConfiguredLlmProviderFactory $factory,
     ) {}
 
-    public function index(): Response
+    public function create(): Response
     {
-        $settings = SystemDemoSettings::instance();
-
-        if (! $settings->demo_enabled) {
-            return Inertia::render('Demo/Closed');
-        }
-
-        $enabledIds = $settings->enabled_fixture_ids ?? $this->fixtures->ids();
-        $options = collect($this->fixtures->options())
-            ->filter(fn (array $opt) => in_array($opt['id'], $enabledIds, true))
-            ->values()
-            ->all();
-
-        return Inertia::render('Verification/Index', [
-            'fixtures' => $options,
-            'defaultFixtureId' => $settings->default_fixture_id,
-        ]);
+        return Inertia::render('Verification/Create');
     }
 
-    public function store(StoreVerificationRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        $settings = SystemDemoSettings::instance();
+        $validated = $request->validate([
+            'question' => ['required', 'string', 'min:8', 'max:2000'],
+        ]);
 
-        if (! $settings->demo_enabled) {
-            abort(404);
-        }
-
-        $validated = $request->validated();
-        $fixtureId = $validated['fixture_id'];
+        $user = $request->user();
+        $providers = $this->factory->forUser($user);
 
         $verification = $this->workflow->run(
             question: new Question(
-                text: $validated['question'],
-                metadata: $this->fixtures->metadataFor($fixtureId),
+                text: trim($validated['question']),
+                metadata: ['source' => 'authenticated'],
             ),
-            providers: $this->fixtures->providersFor($fixtureId),
+            providers: $providers,
         );
 
+        // Attach user and audit metadata without touching app/Consensus/.
         $verification->update([
+            'user_id' => $user->id,
             'metadata' => array_merge($verification->metadata ?? [], [
-                'source' => 'demo',
-                'demo_mode' => $settings->mode,
+                'source' => 'authenticated',
             ]),
         ]);
 
-        return redirect()->route('demo.verifications.show', $verification);
+        return redirect()->route('verifications.show', $verification);
     }
 
-    public function show(VerificationRequest $verification): Response
+    public function show(Request $request, VerificationRequest $verification): Response
     {
+        $this->authorize('view', $verification);
+
         $verification->load([
             'providerResponses' => fn ($query) => $query->oldest('id'),
             'consensusResult',

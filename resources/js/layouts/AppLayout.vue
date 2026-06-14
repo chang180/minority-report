@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { Auth } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { LogOut, Settings, TestTubeDiagonal } from '@lucide/vue';
+import { Database, LogOut, ServerCog, Settings, ShieldCheck, TestTubeDiagonal } from '@lucide/vue';
 import { computed } from 'vue';
 
 const page = usePage();
 const user = computed(() => (page.props.auth as Auth | undefined)?.user ?? null);
+const isAdmin = computed(() => user.value?.role === 'admin');
 </script>
 
 <template>
@@ -17,9 +18,21 @@ const user = computed(() => (page.props.auth as Auth | undefined)?.user ?? null)
                         關鍵報告
                     </Link>
                     <nav class="flex items-center gap-1 text-sm">
+                        <Link href="/verifications/create" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
+                            <ShieldCheck class="size-4" />
+                            新建驗證
+                        </Link>
                         <Link href="/demo" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
                             <TestTubeDiagonal class="size-4" />
                             訪客示範
+                        </Link>
+                        <Link href="/settings/providers" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
+                            <ServerCog class="size-4" />
+                            供應端設定
+                        </Link>
+                        <Link v-if="isAdmin" href="/admin/demo" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950">
+                            <Database class="size-4" />
+                            Demo 管理
                         </Link>
                         <Link href="/settings/profile" class="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900">
                             <Settings class="size-4" />
