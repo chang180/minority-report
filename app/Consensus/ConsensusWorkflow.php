@@ -18,6 +18,7 @@ use App\Consensus\DTO\TrustLevelResult;
 use App\Consensus\DTO\VerdictInput;
 use App\Consensus\DTO\VerdictReport;
 use App\Models\ConsensusResult as ConsensusResultModel;
+use App\Models\ProviderResponse as ProviderResponseModel;
 use App\Models\VerificationRequest;
 
 class ConsensusWorkflow
@@ -58,6 +59,32 @@ class ConsensusWorkflow
             $classification,
         );
 
+        return $this->completeFromResponses($verificationRequest, $classification, $providerResponses, $groundingAvailable);
+    }
+
+    public function replayFromPersisted(VerificationRequest $verificationRequest): VerificationRequest
+    {
+        $verificationRequest->loadMissing(['providerResponses' => fn ($query) => $query->oldest('id')]);
+
+        return $this->completeFromResponses(
+            verificationRequest: $verificationRequest,
+            classification: $this->classificationFromRequest($verificationRequest),
+            providerResponses: $verificationRequest->providerResponses
+                ->map(fn (ProviderResponseModel $response): ProviderResponse => $this->providerResponseFromModel($response))
+                ->all(),
+            groundingAvailable: $verificationRequest->grounding_available,
+        );
+    }
+
+    /**
+     * @param  ProviderResponse[]  $providerResponses
+     */
+    private function completeFromResponses(
+        VerificationRequest $verificationRequest,
+        ClassificationResult $classification,
+        array $providerResponses,
+        bool $groundingAvailable,
+    ): VerificationRequest {
         $analyzableResponses = $this->analyzableResponses($providerResponses);
         $alignment = $this->aligner->align($analyzableResponses);
         $consensus = $this->analyzer->analyze($classification, $analyzableResponses, $alignment);
@@ -84,6 +111,33 @@ class ConsensusWorkflow
         );
 
         return $verificationRequest->refresh()->load(['providerResponses', 'consensusResult']);
+    }
+
+    private function classificationFromRequest(VerificationRequest $verificationRequest): ClassificationResult
+    {
+        return new ClassificationResult(
+            type: $verificationRequest->classified_type ?? 'B',
+            answerShape: $verificationRequest->answer_shape ?? 'open',
+            requiresGrounding: $verificationRequest->requires_grounding,
+            classifierConfidence: $verificationRequest->classifier_confidence ?? 'low',
+        );
+    }
+
+    private function providerResponseFromModel(ProviderResponseModel $response): ProviderResponse
+    {
+        return new ProviderResponse(
+            provider: $response->provider,
+            model: $response->model ?? '',
+            providerStatus: $response->provider_status,
+            extractionStatus: $response->extraction_status,
+            rawAnswer: $response->raw_answer ?? '',
+            normalized: $response->normalized,
+            usage: $response->usage ?? [],
+            error: $response->error,
+            metadata: $response->metadata ?? [],
+            extractionPrompt: $response->extraction_prompt ?? '',
+            extractorModel: $response->extractor_model ?? '',
+        );
     }
 
     private function buildProviderPrompt(Question $question, ClassificationResult $classification): string

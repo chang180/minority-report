@@ -62,13 +62,13 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M2 Laravel Skeleton | ✅ 完成 |
 | M3 Provider Integration | ✅ 完成 |
 | M4 Consensus Engine | ✅ 完成 |
-| M5 Audit Trail | 🚧 進行中（**M5-A**：replay + §10 完整性） |
-| M6 Minimal UI | 待開始 |
+| M5 Audit Trail | ✅ 完成 |
+| M6 Minimal UI | 🚧 進行中（**M6-A** 下一步） |
 
-**已完成**：Consensus 引擎全鏈路、F01–F14 fixture 回歸（87 tests / 398 assertions）、SDK provider adapter、audit 三表持久化。  
-**尚未提供**：問題提交 UI、request replay API、真 LLM verdict narrative（目前 Verdict 為 deterministic structured fallback）。
+**已完成**：Consensus 全鏈路、F01–F14 回歸、`ConsensusReplayService`（request / fixture_id replay + audit 還原）。  
+**尚未提供**：問題提交 UI、HTTP replay API、真 LLM verdict narrative。
 
-測試現況：`php artisan test` → 87 passed，1 skipped（opt-in live OpenAI）。
+測試現況：`php artisan test` → 90 passed，1 skipped（opt-in live OpenAI）。
 
 ---
 
@@ -84,6 +84,7 @@ app/
 │   ├── Scorer/             # CascadeTrustLevelScorer
 │   ├── Verdict/            # StructuredVerdictReporter（non-binding）
 │   ├── Fake/               # fake LlmProvider + registry
+│   ├── Replay/             # ConsensusReplayService（request / fixture replay）
 │   ├── Contracts/          # domain interfaces
 │   ├── DTO/
 │   └── ConsensusWorkflow.php
@@ -115,7 +116,7 @@ tests/
 | [docs/06-test-scenarios.md](docs/06-test-scenarios.md) | Fixture F01–F14、CT-G 測試 |
 | [docs/07-milestones.md](docs/07-milestones.md) | 開發里程碑 |
 
-協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md) · 當前 brief：[M5-A](.ai-dev/orchestration/briefs/M5-A/)
+協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md) · 當前 brief：[M6-A](.ai-dev/orchestration/briefs/M6-A/)
 
 ---
 
@@ -162,6 +163,7 @@ curl -s http://127.0.0.1:8000/health
 
 ```bash
 php artisan test                              # 全 suite
+php artisan test --filter=M5AReplayAuditTest     # replay + audit trail
 php artisan test --filter=M4CFixtureRegressionTest   # F01–F14 回歸
 php artisan test --filter=FailSafeBias        # CT-G1–G3
 php artisan test --filter=TrustLevelDecisionTable

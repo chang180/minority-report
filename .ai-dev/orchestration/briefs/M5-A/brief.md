@@ -2,7 +2,7 @@
 
 **Milestone 5 · Audit Trail + Replay**  
 **前置**：M4 全 Gate **RELEASED**  
-**狀態**：OPEN
+**狀態**：**RELEASED**（2026-06-14）
 
 > 合併原規劃 M5-A/B：replay mechanism + §10 欄位完整性驗收。M4-C 已寫入大部分 persistence，本 Gate 聚焦 **可重播** 與 **稽核缺口補齊**。
 

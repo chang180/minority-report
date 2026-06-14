@@ -170,6 +170,8 @@ M5-A/B、M6-A/B 不變。
 
 **M5（2026-06-13 精簡）**：原 M5-A/B 合併為 **M5-A**（replay + §10 完整性）。
 
+**M6（2026-06-14 精簡）**：原 M6-A/B 合併為 **M6-A**（問題輸入 + 結果 UI）。
+
 ---
 
 ## 6. Worker Brief 模板
@@ -217,8 +219,8 @@ M5-A/B、M6-A/B 不變。
 
 ## 9. 當前 Gate
 
-**M5-A** — 派工：[briefs/M5-A/](briefs/M5-A/) · 狀態：[gate-status.md](gate-status.md)
+**M6-A** — 派工：[briefs/M6-A/](briefs/M6-A/) · 狀態：[gate-status.md](gate-status.md)
 
-M4 已完成；M5 表：[briefs/README.md](briefs/README.md)
+M5 已完成；M6 表：[briefs/README.md](briefs/README.md)
 
 M3 已完成；M4 表：[briefs/README.md](briefs/README.md)
