@@ -76,7 +76,7 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | M8-A UX + Email verification | ✅ 完成（2026-06-14） |
 | M8-C Semantic alignment | ✅ 完成（2026-06-14） |
 
-**Milestone 8 已完成**（M8-A + M8-B + M8-C · 2026-06-14）。
+**Milestone 8 已完成**（M8-A + M8-B + M8-C · 2026-06-14）。M1–M8 全數交付，產品具備 BYOK、Grounding、非同步 verification、語意對齊等 Post-MVP 能力。
 
 ### Web 路由（摘要）
 
@@ -142,14 +142,16 @@ tests/
 ├── Feature/M7BDemoAdminTest.php
 ├── Feature/M7BVerificationAuthTest.php
 ├── Feature/M6MinimalUiTest.php
-├── Feature/Consensus/      # F01–F14、M5 replay
+├── Feature/M8BGroundingTest.php
+├── Feature/M8A*.php / M8CSemanticAlignmentTest.php
+├── Feature/Consensus/      # F01–F16、M5 replay
 └── Unit/Consensus/
 
 resources/js/
 ├── Pages/Home/Welcome.vue
 ├── Pages/auth/             # Login、Register…
 ├── Pages/settings/         # Profile、Password、Providers
-├── Pages/admin/            # DemoSettings、GroundingSettings（M8-B）
+├── Pages/admin/            # DemoSettings、GroundingSettings、AlignerSettings
 ├── Pages/Verification/     # Index、Create、Show
 ├── layouts/
 └── components/ui/
@@ -170,12 +172,53 @@ resources/js/
 | [docs/03-consensus-algorithm.md](docs/03-consensus-algorithm.md) | 共識演算法 Cases 1–6 |
 | [docs/04-trust-level.md](docs/04-trust-level.md) | Trust base + caps 瀑布 |
 | [docs/05-failure-modes.md](docs/05-failure-modes.md) | 失敗模式狀態機 |
-| [docs/06-test-scenarios.md](docs/06-test-scenarios.md) | Fixture F01–F14、CT-G 測試 |
-| [docs/07-milestones.md](docs/07-milestones.md) | 開發里程碑 |
+| [docs/06-test-scenarios.md](docs/06-test-scenarios.md) | Fixture F01–F16、CT-G 測試 |
+| [docs/07-milestones.md](docs/07-milestones.md) | 開發里程碑（M1–M8） |
 | [docs/08-ui-auth-providers.md](docs/08-ui-auth-providers.md) | M7 Auth、UI、Provider 規格 |
 | [docs/09-grounding-and-trust.md](docs/09-grounding-and-trust.md) | M8-B Grounding、Admin 後端、Trust cap |
+| [docs/10-product-ux-and-async.md](docs/10-product-ux-and-async.md) | M8-A 列表、async Job、Email verification |
+| [docs/11-semantic-alignment.md](docs/11-semantic-alignment.md) | M8-C Semantic claim alignment |
 
-協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M8-B ✅ · M8-A 下一 Gate**）
+協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M8 已完成** · Post-M8 待規劃）
+
+---
+
+## 後續路線（Post-M8 · 尚未開 spec）
+
+M8 完成後，**M9 尚未立項**；以下依 [docs/00](docs/00-product-vision.md)、[docs/07 §Phase 3](docs/07-milestones.md) 與現況整理，供下一輪 Orchestrator 規劃參考。
+
+### 已交付（M1–M8）
+
+| 能力 | 狀態 |
+|------|------|
+| MVP 共識引擎 + audit + demo UI | ✅ M1–M6 |
+| 帳號、BYOK、Dashboard、真 verification | ✅ M7 |
+| Grounding v1 + Type C Trust 放寬 | ✅ M8-B |
+| 列表、async Job、Email verification、Replay | ✅ M8-A |
+| 語意 key 對齊（`semantic_llm`） | ✅ M8-C |
+
+### 已知缺口（spec 未寫 · 需規劃）
+
+| 項目 | 說明 |
+|------|------|
+| **來源／證據信任** | Phase 3 延後：來源可信度裁定、Evidence Comparison「哪方證據較強」；[09 §9.2](docs/09-grounding-and-trust.md) 亦列「官方來源驗證」cap 解除 |
+| **Embedding 對齊** | M8-C 僅 `semantic_llm`；`semantic_embedding` mode 未做 |
+| **生產部署** | Queue worker 常駐、SMTP 驗證信、監控／health 擴充 — 無正式 runbook |
+| **UI 細節** | Show 頁 aligner metadata badge（spec MAY）、Grounding 與對齊狀態 UX 統一 |
+| **真模型 Minority** | Grounding + 語意對齊已就緒，但真 API 路徑仍少自然觸發 minority — 需產品驗證與可能的新 fixture／live 測試 |
+| **Non Goals 仍排除** | 多租戶／團隊 workspace、付費、完整 RAG、Agent marketplace（見 [00 §5](docs/00-product-vision.md)） |
+
+### M9 可能方向（草案 · 待你拍板）
+
+目前 repo **沒有** `docs/12` 或 M9 brief。依產品願景與 Phase 3  backlog，較合理的 **M9 主題候選**：
+
+1. **Evidence & Source Trust（推薦優先）** — 在 Grounding 摘要之上，對 **來源** 做可稽核的分級或比對（仍 **MUST NOT** 用 LLM 作唯一裁決）；可能放寬部分 Trust cap（對齊 09 官方來源路徑）。這是 M8 之後「Trust 還能再有意義一點」的主線。
+2. **Production & Ops** — 部署文件、queue supervisor、生產 Email、可選 observability；偏工程而非 domain。
+3. **Alignment v2** — `semantic_embedding`、成本／延遲優化、Show 對齊 UX。
+
+**建議**：M9 不要混太多 Gate；先由 User 選 **Evidence** 或 **Ops** 其中一條作主 Milestone，Orchestrator 再寫 spec + brief（同 M8 流程）。
+
+規劃索引：[.ai-dev/planning/m8-roadmap.md](.ai-dev/planning/m8-roadmap.md)（M8 已完成）· 下一版可新增 `m9-roadmap.md`。
 
 ---
 
@@ -214,6 +257,7 @@ ADMIN_PASSWORD=your-secure-password
 composer dev           # artisan serve + queue + pail + vite（一鍵）
 # 或分開：
 php artisan serve
+php artisan queue:work   # M8-A：登入 verification 需 worker 處理 Job
 npm run dev
 ```
 
@@ -236,6 +280,9 @@ php artisan test --filter=M7AAuthTest           # Fortify auth
 php artisan test --filter=M6MinimalUiTest        # Demo UI 流程
 php artisan test --filter=M5AReplayAuditTest     # replay + audit trail
 php artisan test --filter=M4CFixtureRegressionTest   # F01–F14 回歸
+php artisan test --filter=M8C                        # semantic alignment
+php artisan test --filter=M8A                        # async + email verify
+php artisan test --filter=M8B                        # grounding
 php artisan test --filter=FailSafeBias        # CT-G1–G3
 php artisan test --filter=TrustLevelDecisionTable
 php artisan test --filter=ConsensusAnalyzerCases
@@ -261,7 +308,11 @@ npm run dev         # Vite 開發伺服器
 npm run build       # 正式建置
 ```
 
-M7 產品 UI 已就緒。**M8-B Grounding** 已交付：Admin `/admin/grounding`、三 mode 後端、Type C Trust 放寬路徑。詳見 [docs/09](docs/09-grounding-and-trust.md)。
+M7–M8 產品 UI 已就緒。Post-MVP 重點：
+
+- **M8-A**：`POST /verifications` 為 async；本機需 `queue:work`（或 `composer dev`）
+- **M8-B**：Admin `/admin/grounding` — `disabled` | `local_llm_tool_loop` | `search_api`
+- **M8-C**：Admin `/admin/aligner` — `string`（預設）| `semantic_llm`
 
 ### Grounding（M8-B）
 
@@ -279,6 +330,15 @@ OPENAI_MODEL=gemma-4-E2B_q4_0-it.gguf
 ```
 
 Opt-in live grounding test：`M8_B_LIVE_GROUNDING=1`（CI 預設 skip）。
+
+### Semantic alignment（M8-C）
+
+- **Admin 設定**（`/admin/aligner`）：`string` | `semantic_llm`
+- **預設 `string`**：與 MVP 字串對齊相同；F01–F15 回歸不受影響
+- **`semantic_llm`**：本機 OpenAI-compatible LLM 合併語意等價的 `canonical_key`（**不**裁定 value 衝突）
+- Demo fixture **M8-F16** 展示同義 key 合併；詳見 [docs/11](docs/11-semantic-alignment.md)
+
+Opt-in live semantic test：`M8_C_LIVE_SEMANTIC=1`（CI 預設 skip）。
 
 ### Laravel AI SDK
 
