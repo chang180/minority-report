@@ -9,12 +9,13 @@
 | 階段 | Milestone | Spec 狀態 | 實作 |
 |------|-----------|-----------|------|
 | **MVP** | M1–M6 | `docs/00..07` **完成** | **RELEASED**（2026-06-14） |
-| **Post-MVP** | M7+ | `docs/08` + `07` §M7 | M7-A **REOPEN**（R1 繁中）· M7-B 暫停 |
+| **Post-MVP** | M7+ | `docs/08` + `07` §M7 | **RELEASED**（2026-06-14） |
+| **M8** | M8-B 進行中 | `docs/09` + `07` §M8 | M8-B **可開工** · M8-A 待 brief |
 
 ### Spec-driven 規則（M2 起）
 
 1. **M1**：`docs/00..07` 完成前 **MUST NOT** 撰寫 Laravel application code。
-2. **M7+**：對應 spec 章節（如 [08-ui-auth-providers.md](08-ui-auth-providers.md)）與 [07-milestones.md](07-milestones.md) §M7 **MUST** 由 Orchestrator 寫入並對齊後，Worker **MAY** 開工該 Gate。
+2. **M7+**：對應 spec 章節（如 [08-ui-auth-providers.md](08-ui-auth-providers.md)、[09-grounding-and-trust.md](09-grounding-and-trust.md)）與 [07-milestones.md](07-milestones.md) **MUST** 由 Orchestrator 寫入並對齊後，Worker **MAY** 開工該 Gate。
 3. Worker **MUST NOT** 直接修改 `docs/`；需求變更寫 progress §4，由 Orchestrator 回寫 spec。
 4. 實作 **MUST** 對齊 spec；spec 與程式不一致時，先修 spec 或先修 code，**MUST NOT** 無 spec 漂移合併。
 
@@ -40,8 +41,9 @@
 | 文件 | 用途 | 依賴 |
 |------|------|------|
 | [08-ui-auth-providers.md](08-ui-auth-providers.md) | Auth、UI 路由、per-user provider、Demo 管理 | 00, 01, 02, 07 |
+| [09-grounding-and-trust.md](09-grounding-and-trust.md) | Grounding v1、Admin 後端、Trust cap（M8-B） | 02, 04, 07, 08 |
 
-**M7 Worker 必讀**：`08-ui-auth-providers.md` + `07-milestones.md` §M7 + 當前 Gate brief。
+**M8-B Worker 必讀**：`09-grounding-and-trust.md` + `07-milestones.md` §M8-B + [M8-B brief](../.ai-dev/orchestration/briefs/M8-B/brief.md)。
 
 ---
 
@@ -80,6 +82,8 @@
 | `preset provider` | 對應 `config/ai.php` 官方 driver 的 user 設定列 |
 | `custom provider` | 使用者自訂 label + api_url + api_token |
 | `demo mode` | `fake_fixtures` \| `shared_local_api`；Admin 設定 |
+| `grounding mode` | `disabled` \| `local_llm_tool_loop` \| `search_api`；Admin 設定（M8-B） |
+| `grounding_available` | Runtime：本次 verification 是否成功取得外部來源（M8-B 前恆 false） |
 | `Fortify` | Laravel 13 官方 starter kit 使用的 auth 後端；**本專案 M7 MUST 使用，MUST NOT 使用 Breeze** |
 | starter kit 移植 | **選擇性**自 vue-starter-kit 複製所需檔案；**MUST NOT** 整包 `laravel new --vue`（見 08 §1.4） |
 | UI 顯示語言 | **僅繁體中文**（API/domain 參數除外）；見 [08 §3.4](08-ui-auth-providers.md) |

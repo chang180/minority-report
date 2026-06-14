@@ -6,9 +6,11 @@
 
 ## 當前可開工
 
-**無** — **M8 規劃中**。下一 Gate 預計 **M8-A**（待 Orchestrator 發布 brief）。
+| Gate | Brief | 說明 |
+|------|-------|------|
+| **M8-B** | [M8-B/brief.md](M8-B/brief.md) | Grounding v1 · Admin 可設定後端 · Trust cap |
 
-規劃：[planning/m8-roadmap.md](../planning/m8-roadmap.md)
+Spec：[docs/09-grounding-and-trust.md](../../docs/09-grounding-and-trust.md)
 
 ---
 
@@ -18,16 +20,16 @@
 
 ---
 
-## Milestone 8（規劃中）
+## Milestone 8
 
 | Gate | 狀態 |
 |------|------|
+| M8-B | **可開工** |
 | M8-A | 規劃中 |
-| M8-B | 規劃中（需 `docs/09`） |
 | M8-C | 規劃中 |
 
 ---
 
 ## 目錄
 
-各 Gate 的 `brief.md` + `progress.md` 保留於 `M2-A/` … `M7-B/` 供稽核與回顧。
+各 Gate 的 `brief.md` + `progress.md` 保留於 `M2-A/` … `M8-B/` 供稽核與回顧。

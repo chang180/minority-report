@@ -21,9 +21,11 @@
 一套 **Multi-LLM Consensus Engine**（Laravel 13），流程如下：
 
 ```text
-Question → Classification → Multi-Provider Answers → Independent Extraction
+Question → [Grounding] → Classification → Multi-Provider Answers → Independent Extraction
     → Claim Alignment → Deterministic Consensus → Trust Level → Verdict Report
 ```
+
+`[Grounding]`：M8-B 起，Admin 可設定之外部查證步驟（本機 LLM `web_search` tool loop 或 Search API）；詳見 [docs/09](docs/09-grounding-and-trust.md)。
 
 核心能力：
 
@@ -68,8 +70,11 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | M6 Minimal UI | ✅ 完成 |
 | M7-A Auth + UI 基礎 | ✅ 完成（2026-06-14） |
 | M7-B Provider + Dashboard | ✅ 完成（2026-06-14） |
+| M8-B Grounding v1 | 🔨 **可開工** |
+| M8-A UX + Email verification | 📋 規劃中 |
+| M8-C Semantic alignment | 📋 規劃中 |
 
-**M1–M7 已完成**（2026-06-14）。產品 UI 含 Fortify auth、BYOK Provider 設定、Admin demo 管理、登入 verification 與繁體中文介面（`APP_LOCALE=zh_TW`）。
+**M1–M7 已完成**（2026-06-14）。**M8-B** 規格見 [docs/09-grounding-and-trust.md](docs/09-grounding-and-trust.md)；Worker brief：[M8-B/brief.md](.ai-dev/orchestration/briefs/M8-B/brief.md)。
 
 ### Web 路由（摘要）
 
@@ -88,7 +93,9 @@ Question → Classification → Multi-Provider Answers → Independent Extractio
 | `GET /verifications/{id}` | auth | 登入 verification 結果（policy 限制本人） |
 | `GET /admin/demo` | admin | 訪客 Demo 模式管理 |
 | `PUT /admin/demo` | admin | 更新 demo 設定 |
-| `GET /health` | 公開 | JSON health check |
+| `GET /admin/grounding` | admin | Grounding 後端設定（**M8-B**） |
+| `PUT /admin/grounding` | admin | 更新 grounding 設定 |
+| `GET /health` | public | JSON health check |
 
 測試現況：`php artisan test` → **131 passed**，1 skipped。
 
@@ -111,7 +118,8 @@ app/
 │   ├── Contracts/
 │   ├── DTO/
 │   └── ConsensusWorkflow.php
-├── Http/Controllers/       # Demo / auth verification、Provider settings、Admin demo
+├── Http/Controllers/       # Demo / auth verification、Provider、Admin demo & grounding
+├── Grounding/              # GroundingService + providers（M8-B · 非 Consensus domain）
 ├── Policies/               # VerificationRequestPolicy
 ├── Actions/Fortify/        # Fortify user lifecycle（M7-A）
 ├── AI/Providers/
@@ -132,7 +140,7 @@ resources/js/
 ├── Pages/Home/Welcome.vue
 ├── Pages/auth/             # Login、Register…
 ├── Pages/settings/         # Profile、Password、Providers
-├── Pages/admin/            # DemoSettings
+├── Pages/admin/            # DemoSettings、GroundingSettings（M8-B）
 ├── Pages/Verification/     # Index、Create、Show
 ├── layouts/
 └── components/ui/
@@ -156,8 +164,9 @@ resources/js/
 | [docs/06-test-scenarios.md](docs/06-test-scenarios.md) | Fixture F01–F14、CT-G 測試 |
 | [docs/07-milestones.md](docs/07-milestones.md) | 開發里程碑 |
 | [docs/08-ui-auth-providers.md](docs/08-ui-auth-providers.md) | M7 Auth、UI、Provider 規格 |
+| [docs/09-grounding-and-trust.md](docs/09-grounding-and-trust.md) | M8-B Grounding、Admin 後端、Trust cap |
 
-協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M7 ✅**）
+協作與派工：[.ai-dev/orchestration/handoff.md](.ai-dev/orchestration/handoff.md) · Gate 狀態：[gate-status.md](.ai-dev/orchestration/gate-status.md)（**M8-B 可開工**）
 
 ---
 
@@ -243,7 +252,24 @@ npm run dev         # Vite 開發伺服器
 npm run build       # 正式建置
 ```
 
-M7 產品 UI 已就緒（繁體中文 Welcome、`/demo`、BYOK Provider 設定、登入 verification、Admin demo、Dashboard）。
+M7 產品 UI 已就緒。**M8-B Grounding** 進行中：Admin 可設定 grounding 後端（本機 LLM `web_search` / Search API），見 [docs/09](docs/09-grounding-and-trust.md)。
+
+### Grounding（M8-B）
+
+- **Admin 設定**（`/admin/grounding`）：`disabled` | `local_llm_tool_loop` | `search_api`
+- **Dev 預設**：`LOCAL_AI_API_URL` + 本機 Gemma 的 `web_search` tool loop（Laravel 端執行 search 回圈）
+- **Production 選項**：Tavily / Serper 等 Search API（Admin 設定 API key，encrypted 儲存）
+- Type C 題在 grounding 成功後可放寬 Trust cap（仍非「共識 = 正確」）
+
+本機 llama.cpp 範例（`.env`）：
+
+```bash
+LOCAL_AI_API_URL=http://localhost:8080
+OPENAI_API_KEY=local
+OPENAI_MODEL=gemma-4-E2B_q4_0-it.gguf
+```
+
+Opt-in live grounding test：`M8_B_LIVE_GROUNDING=1`（CI 預設 skip）。
 
 ### Laravel AI SDK
 
