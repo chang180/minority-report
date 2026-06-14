@@ -7,11 +7,10 @@ use Laravel\Ai\Enums\Lab;
 class OpenAiLlmProvider extends LaravelAiLlmProvider
 {
     public function __construct(
-        bool $enabled = true,
-        ?string $model = null,
-        int $timeout = 60,
+        LlmConnectionConfig $connection,
         array $providerOptions = [],
+        ?AiTextProviderFactory $textProviderFactory = null,
     ) {
-        parent::__construct('openai', Lab::OpenAI, $enabled, $model, $timeout, $providerOptions);
+        parent::__construct('openai', Lab::OpenAI, $connection, $providerOptions, textProviderFactory: $textProviderFactory);
     }
 }

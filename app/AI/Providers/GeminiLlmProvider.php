@@ -7,11 +7,10 @@ use Laravel\Ai\Enums\Lab;
 class GeminiLlmProvider extends LaravelAiLlmProvider
 {
     public function __construct(
-        bool $enabled = true,
-        ?string $model = null,
-        int $timeout = 60,
+        LlmConnectionConfig $connection,
         array $providerOptions = [],
+        ?AiTextProviderFactory $textProviderFactory = null,
     ) {
-        parent::__construct('gemini', Lab::Gemini, $enabled, $model, $timeout, $providerOptions);
+        parent::__construct('gemini', Lab::Gemini, $connection, $providerOptions, textProviderFactory: $textProviderFactory);
     }
 }

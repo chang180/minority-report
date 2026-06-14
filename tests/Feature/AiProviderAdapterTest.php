@@ -1,9 +1,11 @@
 <?php
 
+use App\AI\Providers\AiTextProviderFactory;
 use App\AI\Providers\AnthropicLlmProvider;
 use App\AI\Providers\ConfiguredLlmProviderFactory;
 use App\AI\Providers\ConfiguredRawAnswerAgent;
 use App\AI\Providers\GeminiLlmProvider;
+use App\AI\Providers\LlmConnectionConfig;
 use App\AI\Providers\OpenAiLlmProvider;
 use App\Consensus\Contracts\LlmProvider;
 use App\Consensus\DTO\Question;
@@ -21,7 +23,14 @@ test('sdk adapters prompt laravel ai with configured provider and model', functi
         'citations' => [],
     ])->preventStrayPrompts();
 
-    $provider = new $providerClass(enabled: true, model: $model, timeout: 17);
+    $connection = new LlmConnectionConfig(
+        aiProviderKey: $providerName,
+        enabled: true,
+        model: $model,
+        timeout: 17,
+    );
+
+    $provider = new $providerClass($connection, textProviderFactory: app(AiTextProviderFactory::class));
 
     $response = $provider->ask(
         new Question('What is Laravel?'),
@@ -63,7 +72,13 @@ test('sdk adapters prompt laravel ai with configured provider and model', functi
 test('disabled adapter returns provider unavailable without prompting sdk', function () {
     ConfiguredRawAnswerAgent::fake()->preventStrayPrompts();
 
-    $response = (new OpenAiLlmProvider(enabled: false, model: 'gpt-test'))->ask(
+    $connection = new LlmConnectionConfig(
+        aiProviderKey: 'openai',
+        enabled: false,
+        model: 'gpt-test',
+    );
+
+    $response = (new OpenAiLlmProvider($connection, textProviderFactory: app(AiTextProviderFactory::class)))->ask(
         new Question('What is Laravel?'),
         'Prompt should not be sent.',
     );

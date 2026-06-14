@@ -105,6 +105,7 @@ FakeProviderRegistry.register(fixtureId, behavior)
 | Consensus | `Full (2-only)` |
 | Trust | `Medium` |
 | Minority Report | 否 |
+| `final_verdict` | **MUST** 含「參與 provider」「缺席 provider」；缺席席標示 `failed_timeout`（繁中：呼叫逾時） |
 
 ---
 
@@ -119,6 +120,7 @@ FakeProviderRegistry.register(fixtureId, behavior)
 | Consensus | `Full (2-only)` |
 | Trust | `Medium` |
 | 約束 | **MUST NOT** re-prompt |
+| `final_verdict` | **MUST** 含缺席席與 `JSON 解析失敗` 標籤 |
 
 ---
 

@@ -3,6 +3,7 @@
 namespace App\Consensus\Replay;
 
 use App\Consensus\ConsensusWorkflow;
+use App\Consensus\ProviderResponseCatalog;
 use App\Models\ProviderResponse;
 use App\Models\VerificationRequest;
 
@@ -25,7 +26,7 @@ class ConsensusReplayService
             'metadata' => $this->replayMetadata($source),
         ]);
 
-        $source->providerResponses
+        ProviderResponseCatalog::latestForVerification($source->id)
             ->each(fn (ProviderResponse $response): ProviderResponse => $this->copyProviderResponse($response, $replay));
 
         return $this->workflow->replayFromPersisted($replay);
@@ -63,7 +64,7 @@ class ConsensusReplayService
                 'requires_grounding' => $request->requires_grounding,
                 'grounding_available' => $request->grounding_available,
             ],
-            'providers' => $request->providerResponses
+            'providers' => ProviderResponseCatalog::latestForVerification($request->id)
                 ->map(fn (ProviderResponse $response): array => $this->providerAuditPayload($response))
                 ->values()
                 ->all(),
@@ -74,7 +75,6 @@ class ConsensusReplayService
     private function sourceRequest(int $verificationRequestId): VerificationRequest
     {
         return VerificationRequest::with([
-            'providerResponses' => fn ($query) => $query->oldest('id'),
             'consensusResult',
         ])->findOrFail($verificationRequestId);
     }

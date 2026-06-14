@@ -93,7 +93,7 @@
 | `grounding_available` | Runtime：本次 verification 是否成功取得外部來源（M8-B 前恆 false） |
 | `Fortify` | Laravel 13 官方 starter kit 使用的 auth 後端；**本專案 M7 MUST 使用，MUST NOT 使用 Breeze** |
 | starter kit 移植 | **選擇性**自 vue-starter-kit 複製所需檔案；**MUST NOT** 整包 `laravel new --vue`（見 08 §1.4） |
-| UI 顯示語言 | **僅繁體中文**（API/domain 參數除外）；見 [08 §3.4](08-ui-auth-providers.md) |
+| UI 顯示語言 | **僅繁體中文**（含 `final_verdict`、provider `summary`；API/domain 參數除外）；見 [08 §3.4](08-ui-auth-providers.md) |
 
 ---
 

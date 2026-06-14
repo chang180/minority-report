@@ -42,10 +42,7 @@ test('extraction updates provider response persistence fields', function () {
 
     $repository->save($request->id, $rawResponse, 'provider prompt');
 
-    $responses = (new ResponseExtractionOrchestrator(
-        new JsonResponseExtractor,
-        $repository,
-    ))->extractAndPersist(
+    $responses = app(ResponseExtractionOrchestrator::class)->extractAndPersist(
         $request->id,
         [$rawResponse],
         new ClassificationResult(
@@ -119,7 +116,9 @@ test('extractor is called independently for each provider response', function ()
         }
     };
 
-    (new ResponseExtractionOrchestrator($extractor, $repository))->extractAndPersist(
+    app()->instance(ResponseExtractor::class, $extractor);
+
+    app(ResponseExtractionOrchestrator::class)->extractAndPersist(
         $request->id,
         $responses,
         new ClassificationResult(

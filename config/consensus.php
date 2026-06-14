@@ -22,4 +22,11 @@ return [
         'provider_seconds' => (int) env('CONSENSUS_PROVIDER_TIMEOUT_SECONDS', 90),
         'extractor_seconds' => (int) env('CONSENSUS_EXTRACTOR_TIMEOUT_SECONDS', 30),
     ],
+    'parallel' => [
+        'enabled' => filter_var(env('CONSENSUS_PARALLEL_ENABLED', true), FILTER_VALIDATE_BOOL),
+    ],
+    'synthesis' => [
+        'enabled_by_default' => filter_var(env('CONSENSUS_SYNTHESIS_ENABLED', true), FILTER_VALIDATE_BOOL),
+        'default_slot' => env('CONSENSUS_SYNTHESIZER_SLOT', 'gemini'),
+    ],
 ];

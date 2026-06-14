@@ -175,6 +175,8 @@ test('user can save consensus slots', function () {
         'openai' => ['type' => 'preset', 'provider_key' => 'openai'],
         'anthropic' => ['type' => 'preset', 'provider_key' => 'anthropic'],
         'gemini' => ['type' => 'preset', 'provider_key' => 'gemini'],
+        'synthesis_enabled' => false,
+        'synthesizer_slot' => 'anthropic',
     ];
 
     $this->actingAs($user)

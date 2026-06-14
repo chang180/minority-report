@@ -21,23 +21,23 @@ class StructuredVerdictReporter implements VerdictReporter
 
         return match ($input->consensus->status) {
             'Failure' => new VerdictReport(
-                verdict: '',
-                summary: 'No final answer was produced because no provider response could be extracted.',
+                verdict: $this->failureVerdict($input),
+                summary: '無任何 provider 回應可抽取，未產出最終答案。',
                 metadata: $metadata + ['report_type' => 'extraction_failure'],
             ),
             'Insufficient' => new VerdictReport(
                 verdict: $this->singleProviderVerdict($input),
-                summary: 'Single Provider Answer - Unverified.',
+                summary: '僅單一 provider 可分析，答案未經交叉驗證。',
                 metadata: $metadata + ['report_type' => 'single_provider_unverified'],
             ),
             'Majority' => new VerdictReport(
                 verdict: $this->minorityReport($input),
-                summary: 'A majority answer exists, with a minority provider that must be surfaced.',
+                summary: '多數方已成立，必須呈現少數 provider 的意見。',
                 metadata: $metadata + ['report_type' => 'minority_report'],
             ),
             'None' => new VerdictReport(
                 verdict: $this->noConsensusReport($input),
-                summary: 'No consensus could be established across the analyzable providers.',
+                summary: '可分析的 provider 之間無法建立共識。',
                 metadata: $metadata + ['report_type' => 'no_consensus'],
             ),
             default => new VerdictReport(
@@ -50,70 +50,176 @@ class StructuredVerdictReporter implements VerdictReporter
 
     private function fullConsensusReport(VerdictInput $input): string
     {
-        $answer = $this->representativeSummary($input->providerResponses);
+        $answer = $this->representativeSummary($this->analyzableResponses($input->providerResponses));
         $lowDiscriminability = str_contains($input->consensus->status, 'low-discriminability');
         $limitations = $lowDiscriminability
-            ? 'Only the absence of mechanically comparable major conflicts was confirmed.'
-            : 'Provider citations and claims were not externally grounded.';
+            ? '僅確認未偵測到可機械比對的重大衝突。'
+            : 'provider 自報引用與主張尚未經外部查證。';
+
+        if ($this->hasPartialParticipation($input)) {
+            $limitations = '部分 provider 無法分析；以下判定僅反映可分析 provider 的回應。'.$limitations;
+        }
 
         return implode("\n", array_filter([
-            'Final Verdict: '.$answer,
-            'Consensus: '.$input->consensus->status,
-            'Trust Level: '.$input->trustLevel->trustLevel,
-            $lowDiscriminability ? 'Low-Discriminability: no boolean, date, number, or version claim was available for mechanical comparison.' : null,
-            'Known Limitations: '.$limitations,
+            '最終判定：'.$answer,
+            '共識狀態：'.$input->consensus->status,
+            ...$this->participationLines($input),
+            '信任等級：'.$input->trustLevel->trustLevel,
+            $lowDiscriminability ? '低可辨識度：無可供機械比對的 boolean、date、number 或 version 主張。' : null,
+            '已知限制：'.$limitations,
         ]));
     }
 
     private function fullConsensusSummary(VerdictInput $input): string
     {
         if (str_contains($input->consensus->status, 'low-discriminability')) {
-            return 'Providers did not expose mechanically comparable major claims; no mechanical major conflict was detected.';
+            return 'provider 未提供可機械比對的重大主張；未偵測到機械性重大衝突。';
         }
 
-        return 'Providers converge without detected major claim conflicts.';
+        return 'provider 之間未偵測到重大主張衝突。';
     }
 
     private function minorityReport(VerdictInput $input): string
     {
         $minorityProvider = $input->consensus->minorityProvider;
         $majorityResponses = array_values(array_filter(
-            $input->providerResponses,
-            fn (ProviderResponse $response): bool => $response->extractionStatus === 'success'
-                && $response->provider !== $minorityProvider,
+            $this->analyzableResponses($input->providerResponses),
+            fn (ProviderResponse $response): bool => $response->provider !== $minorityProvider,
         ));
         $minorityResponse = $this->findProvider($input->providerResponses, $minorityProvider);
 
         return implode("\n", [
-            'Majority Opinion: '.$this->representativeSummary($majorityResponses),
-            'Minority Opinion: '.$this->responseSummary($minorityResponse),
-            'Disputed Claims: '.$this->disputeSummary($input),
-            'Evidence Comparison: Provider self-reported citations are surfaced only; no external source quality judgment was made.',
-            'Final Verdict: '.$this->representativeSummary($majorityResponses),
-            'Trust Level: '.$input->trustLevel->trustLevel,
-            'Known Limitations: External grounding and evidence quality ranking are outside the MVP verdict reporter.',
+            '多數意見：'.$this->representativeSummary($majorityResponses),
+            '少數意見：'.$this->responseSummary($minorityResponse),
+            '爭議主張：'.$this->disputeSummary($input),
+            '證據比對：僅並陳 provider 自報引用；未對外部來源品質做出裁定。',
+            '最終判定：'.$this->representativeSummary($majorityResponses),
+            '信任等級：'.$input->trustLevel->trustLevel,
+            '已知限制：外部查證與證據品質排序不在本 verdict reporter 的範圍內。',
         ]);
     }
 
     private function noConsensusReport(VerdictInput $input): string
     {
-        return implode("\n", [
-            'Final Verdict: No consensus.',
-            'Consensus: None',
-            'Disputed Claims: '.$this->disputeSummary($input),
-            'Trust Level: '.$input->trustLevel->trustLevel,
-            'Known Limitations: The reporter does not override deterministic consensus.',
-        ]);
+        return implode("\n", array_filter([
+            '最終判定：無共識。',
+            '共識狀態：None',
+            '爭議主張：'.$this->disputeSummary($input),
+            ...$this->participationLines($input),
+            '信任等級：'.$input->trustLevel->trustLevel,
+            '已知限制：reporter 不會覆寫確定性共識結果。',
+        ]));
     }
 
     private function singleProviderVerdict(VerdictInput $input): string
     {
+        return implode("\n", array_filter([
+            '最終判定：'.$this->representativeSummary($this->analyzableResponses($input->providerResponses)),
+            '共識狀態：Insufficient',
+            ...$this->participationLines($input),
+            '信任等級：'.$input->trustLevel->trustLevel,
+            '已知限制：僅有一個 provider 回應可分析。',
+        ]));
+    }
+
+    private function failureVerdict(VerdictInput $input): string
+    {
+        $absentLines = $this->absentProviderLines($input->providerResponses);
+
+        if ($absentLines === []) {
+            return '';
+        }
+
         return implode("\n", [
-            'Final Verdict: '.$this->representativeSummary($input->providerResponses),
-            'Consensus: Insufficient',
-            'Trust Level: '.$input->trustLevel->trustLevel,
-            'Known Limitations: Only one provider response was analyzable.',
+            '缺席 provider：'.implode('；', $absentLines),
         ]);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function participationLines(VerdictInput $input): array
+    {
+        if (! $this->hasPartialParticipation($input)) {
+            return [];
+        }
+
+        $analyzable = $this->analyzableResponses($input->providerResponses);
+        $participating = array_map(fn (ProviderResponse $r): string => $r->provider, $analyzable);
+        $absent = $this->absentProviderLines($input->providerResponses);
+
+        $lines = [
+            '參與 provider：'.implode('、', $participating).'（'.$input->context->analyzableCount.'/'.$input->context->providerCount.'）',
+        ];
+
+        if ($absent !== []) {
+            $lines[] = '缺席 provider：'.implode('；', $absent);
+        }
+
+        return $lines;
+    }
+
+    private function hasPartialParticipation(VerdictInput $input): bool
+    {
+        return $input->context->providerCount > 0
+            && $input->context->analyzableCount < $input->context->providerCount;
+    }
+
+    /**
+     * @param  ProviderResponse[]  $responses
+     * @return string[]
+     */
+    private function absentProviderLines(array $responses): array
+    {
+        $lines = [];
+
+        foreach ($responses as $response) {
+            if ($this->isAnalyzable($response)) {
+                continue;
+            }
+
+            $lines[] = $this->absentReasonLine($response);
+        }
+
+        return $lines;
+    }
+
+    private function absentReasonLine(ProviderResponse $response): string
+    {
+        $label = match (true) {
+            $response->providerStatus === 'failed_timeout' => '呼叫逾時',
+            $response->providerStatus === 'provider_unavailable' => '提供者不可用',
+            $response->providerStatus === 'provider_error' => '提供者錯誤',
+            $response->extractionStatus === 'invalid_json' => 'JSON 解析失敗',
+            $response->extractionStatus === 'extraction_failed' => '抽取失敗',
+            default => $response->providerStatus.' / '.$response->extractionStatus,
+        };
+
+        $message = is_array($response->error) ? ($response->error['message'] ?? '') : '';
+
+        if (is_string($message) && $message !== '') {
+            return $response->provider.' — '.$label.'：'.$message;
+        }
+
+        return $response->provider.' — '.$label;
+    }
+
+    private function isAnalyzable(ProviderResponse $response): bool
+    {
+        return $response->providerStatus === 'success'
+            && $response->extractionStatus === 'success';
+    }
+
+    /**
+     * @param  ProviderResponse[]  $responses
+     * @return ProviderResponse[]
+     */
+    private function analyzableResponses(array $responses): array
+    {
+        return array_values(array_filter(
+            $responses,
+            fn (ProviderResponse $response): bool => $this->isAnalyzable($response),
+        ));
     }
 
     /**
@@ -127,20 +233,20 @@ class StructuredVerdictReporter implements VerdictReporter
             }
         }
 
-        return 'No verified provider answer is available.';
+        return '沒有可驗證的 provider 答案。';
     }
 
     private function responseSummary(?ProviderResponse $response): string
     {
         if ($response === null || ! is_array($response->normalized)) {
-            return 'No provider summary is available.';
+            return '沒有 provider 摘要。';
         }
 
         $summary = $response->normalized['summary'] ?? null;
 
         return is_string($summary) && $summary !== ''
             ? $summary
-            : 'No provider summary is available.';
+            : '沒有 provider 摘要。';
     }
 
     /**
@@ -163,11 +269,7 @@ class StructuredVerdictReporter implements VerdictReporter
 
         if ($input->classification->answerShape === 'discrete') {
             $votes = [];
-            foreach ($input->providerResponses as $response) {
-                if ($response->extractionStatus !== 'success') {
-                    continue;
-                }
-
+            foreach ($this->analyzableResponses($input->providerResponses) as $response) {
                 $directAnswer = $response->normalized['direct_answer'] ?? 'unknown';
                 if ($directAnswer !== 'unknown') {
                     $votes[$response->provider] = $directAnswer;
@@ -175,7 +277,7 @@ class StructuredVerdictReporter implements VerdictReporter
             }
 
             if (count(array_unique(array_values($votes))) > 1) {
-                $parts[] = 'direct_answer split: '.$this->formatProviderMap($votes);
+                $parts[] = '直接回答分歧：'.$this->formatProviderMap($votes);
             }
         }
 
@@ -183,12 +285,12 @@ class StructuredVerdictReporter implements VerdictReporter
             $key = $conflict['canonical_key'] ?? $conflict['normalized_key'] ?? 'claim';
             $type = $conflict['type'] ?? 'claim';
             $providers = $conflict['providers'] ?? [];
-            $parts[] = "{$type} {$key}: ".$this->formatConflictProviders($providers);
+            $parts[] = "{$type} {$key}：".$this->formatConflictProviders($providers);
         }
 
         return $parts === []
-            ? 'No major claim conflict was detected.'
-            : implode('; ', $parts);
+            ? '未偵測到重大主張衝突。'
+            : implode('；', $parts);
     }
 
     /**
@@ -216,13 +318,13 @@ class StructuredVerdictReporter implements VerdictReporter
             $formatted[] = $provider.'='.(string) $value;
         }
 
-        return implode(', ', $formatted);
+        return implode('、', $formatted);
     }
 
     private function buildNarrativePrompt(VerdictInput $input): string
     {
         return implode("\n", [
-            'Produce a concise non-binding verdict narrative.',
+            'Produce a concise non-binding verdict narrative in Traditional Chinese.',
             'Do not change consensus, minority provider, or trust level.',
             'Consensus: '.$input->consensus->status,
             'Trust: '.$input->trustLevel->trustLevel,

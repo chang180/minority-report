@@ -12,10 +12,13 @@ class ResponseExtractionOrchestrator
     public function __construct(
         private readonly ResponseExtractor $extractor,
         private readonly ProviderResponseRepository $repository,
+        private readonly VerificationWorkflowProgress $workflowProgress,
     ) {}
 
     /**
      * Extract each provider response independently and persist extraction fields.
+     * Runs sequentially — extraction is local CPU work; process-based concurrency
+     * would serialize heavy closures without latency benefit.
      *
      * @param  ProviderResponse[]  $providerResponses
      * @return ProviderResponse[]
@@ -25,24 +28,16 @@ class ResponseExtractionOrchestrator
         array $providerResponses,
         ClassificationResult $classification,
     ): array {
-        return array_values(array_map(
-            fn (ProviderResponse $response): ProviderResponse => $this->extractOne(
-                $verificationRequestId,
-                $response,
-                $classification,
-            ),
-            $providerResponses,
-        ));
-    }
+        $this->workflowProgress->setPhase($verificationRequestId, VerificationWorkflowProgress::PHASE_EXTRACTING);
 
-    private function extractOne(
-        int $verificationRequestId,
-        ProviderResponse $response,
-        ClassificationResult $classification,
-    ): ProviderResponse {
-        $extracted = $this->extractor->extract($response, $classification);
-        $this->repository->updateExtraction($verificationRequestId, $extracted);
+        $results = [];
 
-        return $extracted;
+        foreach ($providerResponses as $response) {
+            $extracted = $this->extractor->extract($response, $classification);
+            $this->repository->updateExtraction($verificationRequestId, $extracted);
+            $results[] = $extracted;
+        }
+
+        return $results;
     }
 }

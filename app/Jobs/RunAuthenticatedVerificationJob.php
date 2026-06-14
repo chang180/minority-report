@@ -98,6 +98,7 @@ class RunAuthenticatedVerificationJob implements ShouldQueue
             providers: $providers,
             providerPrompt: $providerPrompt,
             existingRequest: $verification,
+            consensusSlots: $user->consensus_slots,
         );
 
         $result->update([

@@ -232,21 +232,33 @@ Minority Provider = provider_name
 
 ## 10. Minority Report 輸出
 
-當 `Consensus = Majority` 時，輸出 **MUST** 包含：
+當 `Consensus = Majority` 時，輸出 **MUST** 包含（使用者可見標題為**繁體中文**；audit `report_type` / `consensus.status` 仍英文）：
 
 ```text
-Majority Opinion
-Minority Opinion
-Disputed Claims
-Evidence Comparison
-Final Verdict
-Trust Level
-Known Limitations
+多數意見
+少數意見
+爭議主張
+證據比對
+最終判定
+信任等級
+已知限制
 ```
 
 **MUST NOT** 忽略少數意見。
 
-### 10.1 Evidence Comparison（MVP 範圍）
+### 10.1 Partial participation（M8-D）
+
+當 `analyzableCount < providerCount`（例如 F05 逾時、F06 抽取失敗）且仍產出 `final_verdict` 時，輸出 **MUST** 額外包含：
+
+```text
+參與 provider：{names}（N/M）
+缺席 provider：{name} — {原因標籤}：{error.message 若有}
+```
+
+- **MUST NOT** 將技術缺席列為 Minority（見 Case 4：`2/3 MUST NOT` Minority Report）。
+- 缺席原因標籤對照見 [05-failure-modes.md §10](05-failure-modes.md)。
+
+### 10.2 Evidence Comparison（MVP 範圍）
 
 MVP 無外部 grounding，**MUST NOT** 裁定哪方證據較強。
 

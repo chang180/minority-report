@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Consensus\ProviderResponseCatalog;
 use App\Consensus\Replay\ConsensusReplayService;
 use App\Jobs\RunAuthenticatedVerificationJob;
 use App\Models\ProviderResponse;
@@ -70,14 +71,11 @@ class AuthVerificationController extends Controller
     {
         $this->authorize('view', $verification);
 
-        $verification->load([
-            'providerResponses' => fn ($query) => $query->oldest('id'),
-            'consensusResult',
-        ]);
+        $verification->load(['consensusResult']);
 
         return Inertia::render('Verification/Show', [
             'verification' => $this->verificationPayload($verification),
-            'providerResponses' => $verification->providerResponses
+            'providerResponses' => ProviderResponseCatalog::latestForVerification($verification->id)
                 ->map(fn (ProviderResponse $response): array => $this->providerPayload($response))
                 ->values()
                 ->all(),
@@ -101,18 +99,17 @@ class AuthVerificationController extends Controller
     {
         $this->authorize('view', $verification);
 
-        $verification->load([
-            'providerResponses' => fn ($query) => $query->oldest('id'),
-        ]);
+        $verification->load(['consensusResult']);
 
         return response()->json([
             'id' => $verification->id,
             'processing_status' => $verification->processing_status,
+            'workflow_phase' => $verification->metadata['workflow_phase'] ?? null,
             'processing_error' => $verification->metadata['processing_error'] ?? null,
             'final_trust' => $verification->final_trust,
             'final_verdict' => $verification->final_verdict,
             'updated_at' => $verification->updated_at?->toISOString(),
-            'provider_responses' => $verification->providerResponses
+            'provider_responses' => ProviderResponseCatalog::latestForVerification($verification->id)
                 ->map(fn (ProviderResponse $response): array => $this->providerPayload($response))
                 ->values()
                 ->all(),

@@ -38,6 +38,10 @@ const props = defineProps<{
     presets: PresetProvider[];
     customProviders: CustomProvider[];
     consensusSlots: Record<string, SlotDef>;
+    synthesisSettings: {
+        synthesis_enabled: boolean;
+        synthesizer_slot: string;
+    };
 }>();
 
 const flashStatus = usePage().props.status as string | undefined;
@@ -91,11 +95,27 @@ function deleteCustom(id: number) {
 
 // Consensus slots form
 const slotsForm = useForm({
-    consensus_slots: { ...props.consensusSlots } as Record<string, SlotDef>,
+    consensus_slots: {
+        openai: props.consensusSlots.openai ?? null,
+        anthropic: props.consensusSlots.anthropic ?? null,
+        gemini: props.consensusSlots.gemini ?? null,
+    } as Record<string, SlotDef>,
+    synthesis_enabled: props.synthesisSettings.synthesis_enabled,
+    synthesizer_slot: props.synthesisSettings.synthesizer_slot,
 });
 
 function saveSlots() {
-    slotsForm.put('/settings/providers/slots', { preserveScroll: true });
+    slotsForm
+        .transform((data) => ({
+            consensus_slots: {
+                openai: data.consensus_slots.openai ?? null,
+                anthropic: data.consensus_slots.anthropic ?? null,
+                gemini: data.consensus_slots.gemini ?? null,
+                synthesis_enabled: data.synthesis_enabled,
+                synthesizer_slot: data.synthesizer_slot,
+            },
+        }))
+        .put('/settings/providers/slots', { preserveScroll: true });
 }
 </script>
 
@@ -279,6 +299,36 @@ function saveSlots() {
                                     <span>{{ c.label }}（自訂）</span>
                                     <span v-if="!c.configured" class="text-xs text-rose-500">未設定</span>
                                 </label>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="font-medium">AI 整理最終報告（Mode B）</p>
+                                    <p class="mt-1 text-sm text-neutral-500">
+                                        三席見證後，由指定席以 AI 撰寫可讀的最終敘述；共識與信任等級仍由系統 deterministic 判定。若整理失敗，會自動 fallback 至模板報告。
+                                    </p>
+                                </div>
+                                <label class="flex shrink-0 cursor-pointer items-center gap-2 text-sm">
+                                    <input v-model="slotsForm.synthesis_enabled" type="checkbox" class="rounded accent-teal-500" />
+                                    <span>啟用</span>
+                                </label>
+                            </div>
+
+                            <div v-if="slotsForm.synthesis_enabled" class="space-y-2">
+                                <Label for="synthesizer-slot">整理席</Label>
+                                <select
+                                    id="synthesizer-slot"
+                                    v-model="slotsForm.synthesizer_slot"
+                                    class="flex h-10 w-full max-w-xs rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-950"
+                                >
+                                    <option v-for="slot in CONSENSUS_SLOT_KEYS" :key="slot" :value="slot">
+                                        {{ consensusSlotLabel(slot) }}
+                                    </option>
+                                </select>
+                                <p class="text-xs text-neutral-500">整理席會讀取三席 summary / claims，不會覆寫系統已判定的共識狀態。</p>
+                                <InputError :message="slotsForm.errors['consensus_slots.synthesizer_slot']" />
                             </div>
                         </div>
 

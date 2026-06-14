@@ -13,7 +13,14 @@ test('configured agent defines consensus structured output schema', function () 
     expect($schema)->toHaveKeys(['direct_answer', 'summary', 'claims', 'citations']);
 });
 
-test('provider prompt builder includes question and answer shape guidance', function () {
+test('configured agent instructions require Traditional Chinese summaries', function () {
+    $instructions = (new ConfiguredRawAnswerAgent)->instructions();
+
+    expect($instructions)->toContain('Traditional Chinese')
+        ->and($instructions)->toContain('繁體中文');
+});
+
+test('provider prompt builder includes question and answer shape guidance in Traditional Chinese', function () {
     $builder = new ProviderPromptBuilder;
 
     $discrete = $builder->build(
@@ -22,8 +29,9 @@ test('provider prompt builder includes question and answer shape guidance', func
     );
 
     expect($discrete)->toContain('Is water densest at 4C?')
-        ->and($discrete)->toContain('Expected answer shape: discrete')
-        ->and($discrete)->toContain('Set direct_answer to exactly one of: yes, no, unknown.');
+        ->and($discrete)->toContain('預期答案型態：discrete')
+        ->and($discrete)->toContain('繁體中文')
+        ->and($discrete)->toContain('yes、no、unknown');
 
     $open = $builder->build(
         new Question('Explain MVC.'),

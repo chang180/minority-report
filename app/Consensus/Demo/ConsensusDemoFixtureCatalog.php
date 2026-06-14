@@ -25,6 +25,7 @@ class ConsensusDemoFixtureCatalog
                 'id' => $fixture['id'],
                 'label' => $fixture['label'],
                 'description' => $fixture['description'],
+                'sample_question' => $fixture['sample_question'],
                 'expected_consensus' => $fixture['expected_consensus'],
                 'expected_trust' => $fixture['expected_trust'],
             ])
@@ -96,24 +97,27 @@ class ConsensusDemoFixtureCatalog
         return [
             $this->fixtureDefinition(
                 id: 'M6-F01',
-                label: 'Full consensus',
-                description: 'All providers answer yes with no detected major conflict.',
+                label: '完全一致',
+                description: '三席皆回答「是」，且未偵測到重大主張衝突。',
+                sampleQuestion: '水的沸點在海平面是否為攝氏 100 度？',
                 directAnswers: ['openai' => 'yes', 'anthropic' => 'yes', 'gemini' => 'yes'],
                 expectedConsensus: 'Full',
                 expectedTrust: 'High',
             ),
             $this->fixtureDefinition(
                 id: 'M6-F02',
-                label: 'Minority report',
-                description: 'Two providers answer yes and Gemini disagrees.',
+                label: '少數意見報告',
+                description: '兩席回答「是」，Gemini 持不同意見（2 對 1）。',
+                sampleQuestion: '產品發布日期是否通過共識驗證？',
                 directAnswers: ['openai' => 'yes', 'anthropic' => 'yes', 'gemini' => 'no'],
                 expectedConsensus: 'Majority',
                 expectedTrust: 'Medium',
             ),
             $this->fixtureDefinition(
                 id: 'M6-F07',
-                label: 'Claim conflict',
-                description: 'Direct answers align, but Gemini reports a conflicting launch date.',
+                label: '主張衝突',
+                description: '直接回答一致，但 Gemini 的發布日期主張與其他兩席不同。',
+                sampleQuestion: '產品是否已於 2024 年 3 月 15 日正式發布？',
                 directAnswers: ['openai' => 'yes', 'anthropic' => 'yes', 'gemini' => 'yes'],
                 expectedConsensus: 'Majority',
                 expectedTrust: 'Low',
@@ -125,8 +129,9 @@ class ConsensusDemoFixtureCatalog
             ),
             $this->fixtureDefinition(
                 id: 'M6-F10',
-                label: 'Insufficient',
-                description: 'Only one provider is analyzable after extractor and timeout failures.',
+                label: '證據不足',
+                description: '抽取失敗與逾時後，僅剩一席可分析。',
+                sampleQuestion: '此套件是否仍由官方維護？',
                 directAnswers: ['openai' => 'yes', 'anthropic' => 'yes', 'gemini' => 'unknown'],
                 expectedConsensus: 'Insufficient',
                 expectedTrust: 'Unknown',
@@ -134,8 +139,9 @@ class ConsensusDemoFixtureCatalog
             ),
             $this->fixtureDefinition(
                 id: 'M6-F14',
-                label: 'No consensus',
-                description: 'Multiple conflict axes point to different providers, so no majority is reported.',
+                label: '無共識',
+                description: '多個衝突軸指向不同 provider，無法判定單一少數方。',
+                sampleQuestion: '產品發布時間是否已確定為 2024 年 3 月？',
                 directAnswers: ['openai' => 'yes', 'anthropic' => 'yes', 'gemini' => 'no'],
                 expectedConsensus: 'None',
                 expectedTrust: 'Low',
@@ -147,8 +153,9 @@ class ConsensusDemoFixtureCatalog
             ),
             $this->fixtureDefinition(
                 id: 'M8-F16',
-                label: 'Semantic key alignment',
-                description: 'Three providers report the same date value under different canonical keys. String aligner leaves them unmatched; semantic aligner merges them.',
+                label: '語意鍵對齊',
+                description: '三席回報相同日期，但 canonical_key 不同；字串對齊無法合併，語意對齊可合併。',
+                sampleQuestion: '產品正式發布日期是否為 2024 年 3 月 15 日？',
                 directAnswers: ['openai' => 'yes', 'anthropic' => 'yes', 'gemini' => 'yes'],
                 expectedConsensus: 'Full',
                 expectedTrust: 'High',
@@ -171,6 +178,7 @@ class ConsensusDemoFixtureCatalog
         string $id,
         string $label,
         string $description,
+        string $sampleQuestion,
         array $directAnswers,
         string $expectedConsensus,
         string $expectedTrust,
@@ -181,6 +189,7 @@ class ConsensusDemoFixtureCatalog
             'id' => $id,
             'label' => $label,
             'description' => $description,
+            'sample_question' => $sampleQuestion,
             'type' => 'B',
             'answer_shape' => 'discrete',
             'expected_consensus' => $expectedConsensus,
@@ -205,7 +214,7 @@ class ConsensusDemoFixtureCatalog
     {
         return function (Question $question, string $prompt) use ($spec, $answerShape): ProviderResponse {
             if ($spec['mode'] === 'timeout') {
-                throw new ProviderTimeoutException('Demo fixture provider timed out.');
+                throw new ProviderTimeoutException('示範範例 provider 呼叫逾時。');
             }
 
             if ($spec['mode'] === 'invalid_json') {
@@ -254,10 +263,17 @@ class ConsensusDemoFixtureCatalog
 
     private function summary(string $provider, string $directAnswer): string
     {
+        $seat = match ($provider) {
+            'openai' => 'OpenAI 席',
+            'anthropic' => 'Anthropic 席',
+            'gemini' => 'Gemini 席',
+            default => $provider,
+        };
+
         return match ($directAnswer) {
-            'yes' => "{$provider} says the claim is supported.",
-            'no' => "{$provider} says the claim is not supported.",
-            default => "{$provider} cannot determine the claim.",
+            'yes' => "{$seat}認為該說法成立。",
+            'no' => "{$seat}認為該說法不成立。",
+            default => "{$seat}無法判定。",
         };
     }
 }

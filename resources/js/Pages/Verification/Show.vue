@@ -67,6 +67,7 @@ type SlotState = 'waiting' | 'running' | 'done' | 'failed';
 
 type StatusPayload = {
     processing_status: string;
+    workflow_phase: string | null;
     processing_error: string | null;
     provider_responses: ProviderResponse[];
 };
@@ -115,43 +116,113 @@ const hasMinorityReport = computed(() => Boolean(verdictMetadata.value?.has_mino
 
 const replayProcessing = ref(false);
 const liveStatus = ref(props.verification.processing_status);
-const liveProviderResponses = ref<ProviderResponse[]>([...props.providerResponses]);
+const liveWorkflowPhase = ref<string | null>(
+    typeof props.verification.metadata?.workflow_phase === 'string'
+        ? props.verification.metadata.workflow_phase
+        : null,
+);
+const liveProviderResponses = ref<ProviderResponse[]>(dedupeProviderResponses(props.providerResponses));
 
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 
-function mergeLiveResponses(incoming: ProviderResponse[]): void {
-    const byProvider = new Map(liveProviderResponses.value.map((response) => [response.provider, response]));
+function dedupeProviderResponses(responses: ProviderResponse[]): ProviderResponse[] {
+    const byProvider = new Map<string, ProviderResponse>();
 
-    for (const response of incoming) {
-        byProvider.set(response.provider, response);
+    for (const response of responses) {
+        const existing = byProvider.get(response.provider);
+
+        if (existing === undefined || response.id > existing.id) {
+            byProvider.set(response.provider, response);
+        }
     }
 
-    liveProviderResponses.value = CONSENSUS_SLOTS
+    return CONSENSUS_SLOTS
         .map((slot) => byProvider.get(slot))
         .filter((response): response is ProviderResponse => response !== undefined);
+}
+
+function mergeLiveResponses(incoming: ProviderResponse[]): void {
+    liveProviderResponses.value = dedupeProviderResponses([...liveProviderResponses.value, ...incoming]);
 }
 
 function responseForSlot(slot: (typeof CONSENSUS_SLOTS)[number]): ProviderResponse | null {
     return liveProviderResponses.value.find((response) => response.provider === slot) ?? null;
 }
 
+function isAnalyzable(response: ProviderResponse): boolean {
+    return response.provider_status === 'success' && response.extraction_status === 'success';
+}
+
 function slotState(slot: (typeof CONSENSUS_SLOTS)[number]): SlotState {
     const response = responseForSlot(slot);
+    const phase = liveWorkflowPhase.value;
 
     if (response) {
-        return response.provider_status === 'success' ? 'done' : 'failed';
-    }
+        if (isAnalyzable(response)) {
+            return 'done';
+        }
 
-    if (liveStatus.value === 'running') {
-        const completedCount = liveProviderResponses.value.length;
+        if (response.provider_status !== 'success') {
+            return 'failed';
+        }
 
-        if (CONSENSUS_SLOTS[completedCount] === slot) {
+        if (phase === 'dispatching' || phase === 'extracting' || phase === 'synthesizing' || response.extraction_status === 'not_started') {
             return 'running';
         }
+
+        return response.extraction_status === 'success' ? 'done' : 'failed';
+    }
+
+    if (liveStatus.value === 'running' && (phase === 'dispatching' || phase === null)) {
+        return 'running';
     }
 
     return 'waiting';
 }
+
+const processingPhaseMessage = computed((): string => {
+    const phase = liveWorkflowPhase.value;
+
+    if (phase === 'dispatching') {
+        return '三個共識席同時呼叫模型，任一完成就會在下方顯示。';
+    }
+
+    if (phase === 'extracting') {
+        return '正在抽取各席結構化 claims…';
+    }
+
+    if (phase === 'analyzing') {
+        return '三席回應已完成，正在對齊 claims 與產生判定…';
+    }
+
+    if (phase === 'synthesizing') {
+        return '系統判定已完成，指定整理席正在撰寫最終報告…';
+    }
+
+    return '三個共識席並行處理中，完成一個就會在下方顯示。';
+});
+
+const processingPhaseLabel = computed((): string => {
+    const phase = liveWorkflowPhase.value;
+
+    if (phase === 'dispatching') {
+        return '呼叫模型中…';
+    }
+
+    if (phase === 'extracting') {
+        return '抽取 claims 中…';
+    }
+
+    if (phase === 'analyzing') {
+        return '裁決分析中…';
+    }
+
+    if (phase === 'synthesizing') {
+        return '整理報告中…';
+    }
+
+    return isPending.value ? '等待處理…' : '分析中…';
+});
 
 function startPolling(): void {
     if (pollTimer) { return; }
@@ -165,6 +236,7 @@ function startPolling(): void {
 
             const data = await res.json() as StatusPayload;
             liveStatus.value = data.processing_status;
+            liveWorkflowPhase.value = data.workflow_phase ?? null;
 
             if (Array.isArray(data.provider_responses)) {
                 mergeLiveResponses(data.provider_responses);
@@ -290,10 +362,10 @@ function statusLabel(status: string): string {
                         <div class="size-9 shrink-0 animate-spin rounded-full border-4 border-white/20 border-t-teal-400" />
                         <div>
                             <p class="text-lg font-medium text-white">
-                                {{ isPending ? '等待處理…' : '分析中…' }}
+                                {{ processingPhaseLabel }}
                             </p>
                             <p class="mt-1 text-sm text-neutral-400">
-                                三個模型依序回應，完成一個就會在下方逐字顯示。
+                                {{ processingPhaseMessage }}
                             </p>
                         </div>
                     </div>
@@ -427,8 +499,8 @@ function statusLabel(status: string): string {
 
                 <section class="grid gap-4 lg:grid-cols-3">
                     <article
-                        v-for="response in providerResponses"
-                        :key="response.id"
+                        v-for="response in liveProviderResponses"
+                        :key="response.provider"
                         class="flex min-h-96 flex-col rounded border border-white/10 bg-white/5"
                     >
                         <header class="space-y-3 border-b border-white/10 p-4">

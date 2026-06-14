@@ -14,6 +14,8 @@ test('M6-A renders the question input page with demo fixtures', function () {
             ->component('Demo/Index')
             ->where('defaultFixtureId', 'M6-F02')
             ->has('fixtures', 6)
+            ->where('fixtures.1.id', 'M6-F02')
+            ->where('fixtures.1.label', '少數意見報告')
             ->where('fixtures.1.expected_consensus', 'Majority')
             ->where('fixtures.1.expected_trust', 'Medium')
         );
@@ -37,7 +39,7 @@ test('M6-A submits a question through the fake workflow and renders results', fu
         ->and($verification->consensusResult->consensus['status'])->toBe('Majority')
         ->and($verification->consensusResult->consensus['minority_provider'])->toBe('gemini')
         ->and($verification->final_trust)->toBe('Medium')
-        ->and($verification->final_verdict)->toContain('Minority Opinion');
+        ->and($verification->final_verdict)->toContain('少數意見');
 
     $this->get(route('demo.verifications.show', $verification))
         ->assertOk()

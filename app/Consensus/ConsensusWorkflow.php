@@ -17,7 +17,12 @@ use App\Consensus\DTO\Question;
 use App\Consensus\DTO\TrustLevelResult;
 use App\Consensus\DTO\VerdictInput;
 use App\Consensus\DTO\VerdictReport;
+use App\AI\Providers\ConfiguredLlmProviderFactory;
 use App\Consensus\Prompt\ProviderPromptBuilder;
+use App\Consensus\ProviderResponseCatalog;
+use App\Consensus\Synthesis\ConsensusSynthesisSettings;
+use App\Consensus\Synthesis\SynthesisRequest;
+use App\Models\User;
 use App\Models\ConsensusResult as ConsensusResultModel;
 use App\Models\ProviderResponse as ProviderResponseModel;
 use App\Models\VerificationRequest;
@@ -33,13 +38,21 @@ class ConsensusWorkflow
         private readonly TrustLevelScorer $trustLevelScorer,
         private readonly VerdictReporter $verdictReporter,
         private readonly ProviderPromptBuilder $providerPromptBuilder,
+        private readonly VerificationWorkflowProgress $workflowProgress,
+        private readonly ConfiguredLlmProviderFactory $providerFactory,
     ) {}
 
     /**
      * @param  LlmProvider[]  $providers
+     * @param  array<string, mixed>|null  $consensusSlots
      */
-    public function run(Question $question, array $providers, ?string $providerPrompt = null, ?VerificationRequest $existingRequest = null): VerificationRequest
-    {
+    public function run(
+        Question $question,
+        array $providers,
+        ?string $providerPrompt = null,
+        ?VerificationRequest $existingRequest = null,
+        ?array $consensusSlots = null,
+    ): VerificationRequest {
         $classification = $this->classifier->classify($question);
         $groundingAvailable = (bool) ($question->metadata['grounding_available'] ?? false);
         $groundingStatus = (string) ($question->metadata['grounding']['status'] ?? '');
@@ -54,6 +67,7 @@ class ConsensusWorkflow
                 'metadata' => $question->metadata,
             ]);
             $verificationRequest = $existingRequest;
+            $this->resetProviderResponses($verificationRequest->id);
         } else {
             $verificationRequest = VerificationRequest::create([
                 'question' => $question->text,
@@ -74,26 +88,55 @@ class ConsensusWorkflow
             $classification,
         );
 
-        return $this->completeFromResponses($verificationRequest, $classification, $providerResponses, $groundingAvailable, $groundingStatus);
+        $this->workflowProgress->setPhase($verificationRequest->id, VerificationWorkflowProgress::PHASE_ANALYZING);
+
+        $completed = $this->completeFromResponses(
+            verificationRequest: $verificationRequest,
+            classification: $classification,
+            providerResponses: $providerResponses,
+            groundingAvailable: $groundingAvailable,
+            groundingStatus: $groundingStatus,
+            providers: $providers,
+            questionText: $question->text,
+            consensusSlots: $consensusSlots,
+        );
+
+        $this->workflowProgress->clearPhase($verificationRequest->id);
+
+        return $completed;
     }
 
     public function replayFromPersisted(VerificationRequest $verificationRequest): VerificationRequest
     {
-        $verificationRequest->loadMissing(['providerResponses' => fn ($query) => $query->oldest('id')]);
+        $latestResponses = ProviderResponseCatalog::latestForVerification($verificationRequest->id);
+
+        $providers = [];
+        $user = null;
+        if ($verificationRequest->user_id !== null) {
+            $user = User::query()->find($verificationRequest->user_id);
+            if ($user !== null) {
+                $providers = $this->providerFactory->forUser($user);
+            }
+        }
 
         return $this->completeFromResponses(
             verificationRequest: $verificationRequest,
             classification: $this->classificationFromRequest($verificationRequest),
-            providerResponses: $verificationRequest->providerResponses
+            providerResponses: $latestResponses
                 ->map(fn (ProviderResponseModel $response): ProviderResponse => $this->providerResponseFromModel($response))
                 ->all(),
             groundingAvailable: $verificationRequest->grounding_available,
             groundingStatus: (string) ($verificationRequest->metadata['grounding']['status'] ?? ''),
+            providers: $providers,
+            questionText: $verificationRequest->question,
+            consensusSlots: $user?->consensus_slots,
         );
     }
 
     /**
      * @param  ProviderResponse[]  $providerResponses
+     * @param  LlmProvider[]  $providers
+     * @param  array<string, mixed>|null  $consensusSlots
      */
     private function completeFromResponses(
         VerificationRequest $verificationRequest,
@@ -101,12 +144,21 @@ class ConsensusWorkflow
         array $providerResponses,
         bool $groundingAvailable,
         string $groundingStatus = '',
+        array $providers = [],
+        string $questionText = '',
+        ?array $consensusSlots = null,
     ): VerificationRequest {
         $analyzableResponses = $this->analyzableResponses($providerResponses);
         $alignment = $this->aligner->align($analyzableResponses);
         $consensus = $this->analyzer->analyze($classification, $analyzableResponses, $alignment);
         $context = $this->analysisContext($classification, $providerResponses, $analyzableResponses, $groundingAvailable, $groundingStatus);
         $trustLevel = $this->trustLevelScorer->score($classification, $consensus, $context);
+        $synthesis = $this->resolveSynthesisRequest($consensusSlots, $providers);
+
+        if ($synthesis !== null) {
+            $this->workflowProgress->setPhase($verificationRequest->id, VerificationWorkflowProgress::PHASE_SYNTHESIZING);
+        }
+
         $verdictReport = $this->verdictReporter->report(new VerdictInput(
             classification: $classification,
             providerResponses: $providerResponses,
@@ -114,6 +166,8 @@ class ConsensusWorkflow
             consensus: $consensus,
             trustLevel: $trustLevel,
             context: $context,
+            questionText: $questionText !== '' ? $questionText : $verificationRequest->question,
+            synthesis: $synthesis,
         ));
 
         $this->persistConsensusResult(
@@ -127,7 +181,50 @@ class ConsensusWorkflow
             verdictReport: $verdictReport,
         );
 
-        return $verificationRequest->refresh()->load(['providerResponses', 'consensusResult']);
+        return $verificationRequest->refresh()->load(['consensusResult']);
+    }
+
+    private function resetProviderResponses(int $verificationRequestId): void
+    {
+        ProviderResponseModel::query()
+            ->where('verification_request_id', $verificationRequestId)
+            ->delete();
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $consensusSlots
+     * @param  LlmProvider[]  $providers
+     */
+    private function resolveSynthesisRequest(?array $consensusSlots, array $providers): ?SynthesisRequest
+    {
+        $settings = ConsensusSynthesisSettings::resolve($consensusSlots);
+
+        if (! $settings->enabled) {
+            return null;
+        }
+
+        $provider = $this->findProvider($providers, $settings->synthesizerSlot)
+            ?? $this->providerFactory->disabledSlot($settings->synthesizerSlot);
+
+        return new SynthesisRequest(
+            enabled: true,
+            synthesizerSlot: $settings->synthesizerSlot,
+            synthesizerProvider: $provider,
+        );
+    }
+
+    /**
+     * @param  LlmProvider[]  $providers
+     */
+    private function findProvider(array $providers, string $slot): ?LlmProvider
+    {
+        foreach ($providers as $provider) {
+            if ($provider->name() === $slot) {
+                return $provider;
+            }
+        }
+
+        return null;
     }
 
     private function classificationFromRequest(VerificationRequest $verificationRequest): ClassificationResult

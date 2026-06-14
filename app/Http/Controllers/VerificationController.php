@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Consensus\ProviderResponseCatalog;
 use App\Consensus\ConsensusWorkflow;
 use App\Consensus\Demo\ConsensusDemoFixtureCatalog;
 use App\Consensus\DTO\Question;
@@ -99,14 +100,11 @@ class VerificationController extends Controller
 
     public function show(VerificationRequest $verification): Response
     {
-        $verification->load([
-            'providerResponses' => fn ($query) => $query->oldest('id'),
-            'consensusResult',
-        ]);
+        $verification->load(['consensusResult']);
 
         return Inertia::render('Verification/Show', [
             'verification' => $this->verificationPayload($verification),
-            'providerResponses' => $verification->providerResponses
+            'providerResponses' => ProviderResponseCatalog::latestForVerification($verification->id)
                 ->map(fn (ProviderResponse $response): array => $this->providerPayload($response))
                 ->values()
                 ->all(),

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AI\Providers\ConsensusSlotReadiness;
 use App\AI\Providers\ProviderGenerationOptions;
+use App\Consensus\Synthesis\ConsensusSynthesisSettings;
 use App\Models\UserCustomProvider;
 use App\Rules\ProviderOptionsJson;
 use Illuminate\Http\RedirectResponse;
@@ -61,6 +62,7 @@ class ProviderSettingsController extends Controller
             'presets' => $presets,
             'customProviders' => $customProviders,
             'consensusSlots' => $user->consensus_slots ?? [],
+            'synthesisSettings' => ConsensusSynthesisSettings::resolve($user->consensus_slots)->toArray(),
         ]);
     }
 
@@ -155,17 +157,29 @@ class ProviderSettingsController extends Controller
 
     public function updateSlots(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $request->validate([
             'consensus_slots' => ['required', 'array'],
-            'consensus_slots.openai' => ['nullable', 'array'],
-            'consensus_slots.anthropic' => ['nullable', 'array'],
-            'consensus_slots.gemini' => ['nullable', 'array'],
-            'consensus_slots.*.type' => ['required', Rule::in(['preset', 'custom'])],
-            'consensus_slots.*.provider_key' => ['sometimes', 'nullable', 'string'],
-            'consensus_slots.*.custom_provider_id' => ['sometimes', 'nullable', 'integer'],
+            'consensus_slots.synthesis_enabled' => ['sometimes', 'boolean'],
+            'consensus_slots.synthesizer_slot' => ['sometimes', 'string', Rule::in(['openai', 'anthropic', 'gemini'])],
         ]);
 
-        $request->user()->update(['consensus_slots' => $validated['consensus_slots']]);
+        $consensusSlots = $request->input('consensus_slots', []);
+
+        foreach (['openai', 'anthropic', 'gemini'] as $slot) {
+            $slotDef = $consensusSlots[$slot] ?? null;
+
+            if ($slotDef === null) {
+                continue;
+            }
+
+            validator($slotDef, [
+                'type' => ['required', Rule::in(['preset', 'custom'])],
+                'provider_key' => ['sometimes', 'nullable', 'string'],
+                'custom_provider_id' => ['sometimes', 'nullable', 'integer'],
+            ])->validate();
+        }
+
+        $request->user()->update(['consensus_slots' => $consensusSlots]);
 
         return back()->with('status', '共識槽設定已儲存。');
     }

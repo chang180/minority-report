@@ -75,8 +75,9 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | M8-B Grounding v1 | ✅ 完成（2026-06-14） |
 | M8-A UX + Email verification | ✅ 完成（2026-06-14） |
 | M8-C Semantic alignment | ✅ 完成（2026-06-14） |
+| M8-D 產品文案繁中 + partial verdict | ✅ 完成（2026-06-14） |
 
-**Milestone 8 已完成**（M8-A + M8-B + M8-C · 2026-06-14）。M1–M8 全數交付，產品具備 BYOK、Grounding、非同步 verification、語意對齊等 Post-MVP 能力。
+**Milestone 8 已完成**（M8-A + M8-B + M8-C + M8-D · 2026-06-14）。M1–M8 全數交付，產品具備 BYOK、Grounding、非同步 verification、語意對齊、繁中 verdict 等 Post-MVP 能力。
 
 ### Web 路由（摘要）
 
@@ -104,7 +105,7 @@ Question → [Grounding] → Classification → Multi-Provider Answers → Indep
 | `PUT /admin/aligner` | admin | 更新 aligner 設定 |
 | `GET /health` | public | JSON health check |
 
-測試現況：`php artisan test` → **180 passed**，1 skipped。
+測試現況：`php artisan test` → **212 passed**，1 skipped。
 
 ---
 

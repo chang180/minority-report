@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Link, useForm } from '@inertiajs/vue3';
 import { ArrowLeft } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 
 type FixtureOption = {
     id: string;
     label: string;
     description: string;
+    sample_question: string;
     expected_consensus: string;
     expected_trust: string;
 };
@@ -16,12 +17,26 @@ const props = defineProps<{
     defaultFixtureId: string;
 }>();
 
+const defaultFixture = props.fixtures.find((fixture) => fixture.id === props.defaultFixtureId)
+    ?? props.fixtures[0];
+
 const form = useForm({
-    question: '產品發布日期是否通過共識驗證？',
+    question: defaultFixture?.sample_question ?? '產品發布日期是否通過共識驗證？',
     fixture_id: props.defaultFixtureId,
 });
 
 const selectedFixture = computed(() => props.fixtures.find((fixture) => fixture.id === form.fixture_id));
+
+watch(
+    () => form.fixture_id,
+    (fixtureId) => {
+        const fixture = props.fixtures.find((item) => item.id === fixtureId);
+
+        if (fixture?.sample_question) {
+            form.question = fixture.sample_question;
+        }
+    },
+);
 
 function submit(): void {
     form.post('/demo/verifications');

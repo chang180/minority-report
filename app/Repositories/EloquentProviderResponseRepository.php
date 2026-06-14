@@ -10,19 +10,25 @@ class EloquentProviderResponseRepository implements ProviderResponseRepository
 {
     public function save(int $verificationRequestId, ProviderResponse $response, ?string $providerPrompt = null): void
     {
-        ProviderResponseModel::create([
-            'verification_request_id' => $verificationRequestId,
-            'provider' => $response->provider,
-            'model' => $response->model ?: null,
-            'provider_prompt' => $providerPrompt,
-            'provider_status' => $response->providerStatus,
-            'extraction_status' => $response->extractionStatus,
-            'raw_answer' => $response->rawAnswer ?: null,
-            'normalized' => $response->normalized,
-            'usage' => $response->usage ?: null,
-            'error' => $response->error,
-            'metadata' => $response->metadata ?: null,
-        ]);
+        ProviderResponseModel::updateOrCreate(
+            [
+                'verification_request_id' => $verificationRequestId,
+                'provider' => $response->provider,
+            ],
+            [
+                'model' => $response->model ?: null,
+                'provider_prompt' => $providerPrompt,
+                'provider_status' => $response->providerStatus,
+                'extraction_prompt' => null,
+                'extractor_model' => null,
+                'extraction_status' => $response->extractionStatus,
+                'raw_answer' => $response->rawAnswer ?: null,
+                'normalized' => $response->normalized,
+                'usage' => $response->usage ?: null,
+                'error' => $response->error,
+                'metadata' => $response->metadata ?: null,
+            ],
+        );
     }
 
     public function updateExtraction(int $verificationRequestId, ProviderResponse $response): void
@@ -30,7 +36,6 @@ class EloquentProviderResponseRepository implements ProviderResponseRepository
         ProviderResponseModel::query()
             ->where('verification_request_id', $verificationRequestId)
             ->where('provider', $response->provider)
-            ->latest('id')
             ->firstOrFail()
             ->update([
                 'extraction_prompt' => $response->extractionPrompt ?: null,

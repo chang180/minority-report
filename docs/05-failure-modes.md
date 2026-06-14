@@ -177,6 +177,31 @@ else:
 
 ---
 
+## 10. Partial participation 與 verdict（M8-D）
+
+當部分 provider 因技術原因無法分析（`provider_status != success` 或 `extraction_status != success`），但仍有 ≥1 可分析 provider 產出 verdict 時：
+
+| 情境 | Consensus 範例 | Minority Report | final_verdict |
+|------|----------------|-----------------|---------------|
+| 2 可分析且一致 | `Full (2-only)` | **否** | **MUST** 含兩席結論 + 缺席席與原因 |
+| 2 可分析且分歧 | `None` | **否** | **SHOULD** 含缺席註記 |
+| 1 可分析 | `Insufficient` | **否** | **SHOULD** 含缺席註記 |
+| 0 可分析 | `Failure` | **否** | **MAY** 僅列缺席席清單 |
+
+缺席原因繁中標籤（`StructuredVerdictReporter`）：
+
+| 狀態 | 標籤 |
+|------|------|
+| `failed_timeout` | 呼叫逾時 |
+| `provider_unavailable` | 提供者不可用 |
+| `provider_error` | 提供者錯誤 |
+| `extraction_status = invalid_json` | JSON 解析失敗 |
+| `extraction_status = extraction_failed` | 抽取失敗 |
+
+**MUST NOT** 將 `direct_answer = unknown`（棄權）與技術缺席混為一談。
+
+---
+
 ## Traceability
 
 | 本文件章節 | description.md |

@@ -161,3 +161,55 @@ test('provider failures keep extraction not started', function () {
         ->and($extracted->extractionStatus)->toBe('not_started')
         ->and($extracted->normalized)->toBeNull();
 });
+
+test('string claims from local llms are coerced into numeric claims', function () {
+    $extractor = new JsonResponseExtractor;
+    $response = new ProviderResponse(
+        provider: 'gemini',
+        providerStatus: 'success',
+        rawAnswer: <<<'JSON'
+```json
+{
+  "direct_answer": "not_applicable",
+  "summary": "水銀的標準熔點約為攝氏零下38.83度。",
+  "claims": [
+    "水銀的標準熔點約為攝氏零下38.83度。"
+  ],
+  "citations": []
+}
+```
+JSON,
+    );
+
+    $extracted = $extractor->extract($response, new ClassificationResult(
+        type: 'B',
+        answerShape: 'open',
+        requiresGrounding: false,
+        classifierConfidence: 'high',
+    ));
+
+    expect($extracted->extractionStatus)->toBe('success')
+        ->and($extracted->normalized['claims'])->toHaveCount(1)
+        ->and($extracted->normalized['claims'][0]['type'])->toBe('number')
+        ->and($extracted->normalized['claims'][0]['value'])->toBe('-38.83')
+        ->and($extracted->normalized['claims'][0]['unit'])->toBe('°C');
+});
+
+test('numeric summary is promoted to a number claim when claims are empty', function () {
+    $extractor = new JsonResponseExtractor;
+    $response = new ProviderResponse(
+        provider: 'openai',
+        providerStatus: 'success',
+        rawAnswer: '{"direct_answer":"not_applicable","summary":"水銀的標準熔點約為攝氏零下38.83度。","claims":[],"citations":[]}',
+    );
+
+    $extracted = $extractor->extract($response, new ClassificationResult(
+        type: 'B',
+        answerShape: 'open',
+        requiresGrounding: false,
+        classifierConfidence: 'high',
+    ));
+
+    expect($extracted->normalized['claims'][0]['type'])->toBe('number')
+        ->and($extracted->normalized['claims'][0]['value'])->toBe('-38.83');
+});

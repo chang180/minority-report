@@ -3,24 +3,21 @@
 namespace App\Consensus;
 
 use App\Consensus\Contracts\LlmProvider;
-use App\Consensus\Contracts\ProviderResponseRepository;
 use App\Consensus\DTO\ProviderResponse;
 use App\Consensus\DTO\Question;
-use App\Consensus\Exceptions\ProviderException;
-use App\Consensus\Exceptions\ProviderTimeoutException;
 
 class ProviderOrchestrator
 {
     public function __construct(
-        private readonly ProviderResponseRepository $repository,
-        private readonly int $maxRetries = 1,
+        private readonly ProviderSlotExecutor $slotExecutor,
+        private readonly ProviderQueryService $queryService,
+        private readonly ConsensusParallelRunner $parallelRunner,
+        private readonly VerificationWorkflowProgress $workflowProgress,
     ) {}
 
     /**
-     * Query all providers and persist each result. A single-provider failure does not interrupt others.
-     *
-     * Note: currently runs sequentially. M3-B will introduce true concurrency via Fibers or async adapters
-     * when bridging to real LLM APIs.
+     * Query all providers in parallel and persist each result as it completes.
+     * A single-provider failure does not interrupt others.
      *
      * @param  LlmProvider[]  $providers
      * @return ProviderResponse[]
@@ -31,63 +28,102 @@ class ProviderOrchestrator
         string $prompt,
         array $providers,
     ): array {
-        return array_values(array_map(
-            fn (LlmProvider $provider) => $this->queryAndPersist(
-                $verificationRequestId, $provider, $question, $prompt
-            ),
-            $providers,
-        ));
+        $this->workflowProgress->setPhase($verificationRequestId, VerificationWorkflowProgress::PHASE_DISPATCHING);
+
+        $slots = $this->queryService->serializableSlots($providers);
+        $useParallelSlots = $this->canRunParallel($providers, $slots);
+
+        if ($useParallelSlots) {
+            return $this->dispatchParallel(
+                verificationRequestId: $verificationRequestId,
+                question: $question,
+                prompt: $prompt,
+                slots: $slots,
+            );
+        }
+
+        return $this->dispatchSequential(
+            verificationRequestId: $verificationRequestId,
+            question: $question,
+            prompt: $prompt,
+            providers: $providers,
+        );
     }
 
-    private function queryAndPersist(
+    /**
+     * @param  array<int, array{logical_name: string, connection: \App\AI\Providers\LlmConnectionConfig}>  $slots
+     * @return ProviderResponse[]
+     */
+    private function dispatchParallel(
         int $verificationRequestId,
-        LlmProvider $provider,
         Question $question,
         string $prompt,
-    ): ProviderResponse {
-        $response = $this->queryWithRetry($provider, $question, $prompt);
-        $this->repository->save($verificationRequestId, $response, $prompt);
+        array $slots,
+    ): array {
+        $tasks = [];
 
-        return $response;
+        foreach ($slots as $index => $slot) {
+            $connectionData = $slot['connection']->toArray();
+            $questionText = $question->text;
+            $questionMetadata = $question->metadata;
+            $logicalName = $slot['logical_name'];
+
+            $tasks[$index] = static fn () => app(ProviderSlotExecutor::class)->queryConfiguredSlotAndPersist(
+                verificationRequestId: $verificationRequestId,
+                logicalName: $logicalName,
+                connectionData: $connectionData,
+                questionText: $questionText,
+                questionMetadata: $questionMetadata,
+                prompt: $prompt,
+            );
+        }
+
+        $results = $this->parallelRunner->run($tasks);
+        ksort($results);
+
+        return array_values($results);
     }
 
-    private function queryWithRetry(
-        LlmProvider $provider,
+    /**
+     * @param  LlmProvider[]  $providers
+     * @return ProviderResponse[]
+     */
+    private function dispatchSequential(
+        int $verificationRequestId,
         Question $question,
         string $prompt,
-    ): ProviderResponse {
-        $attempts = 0;
+        array $providers,
+    ): array {
+        $results = [];
 
-        while (true) {
-            $attempts++;
+        foreach ($providers as $provider) {
+            $results[] = $this->slotExecutor->queryAndPersist(
+                verificationRequestId: $verificationRequestId,
+                provider: $provider,
+                question: $question,
+                prompt: $prompt,
+            );
+        }
 
-            try {
-                return $provider->ask($question, $prompt);
-            } catch (ProviderTimeoutException $e) {
-                if ($attempts > $this->maxRetries) {
-                    return new ProviderResponse(
-                        provider: $provider->name(),
-                        providerStatus: 'failed_timeout',
-                        extractionStatus: 'not_started',
-                        error: ['message' => $e->getMessage()],
-                    );
-                }
-                // Retry once on timeout
-            } catch (ProviderException $e) {
-                return new ProviderResponse(
-                    provider: $provider->name(),
-                    providerStatus: 'provider_error',
-                    extractionStatus: 'not_started',
-                    error: ['message' => $e->getMessage()],
-                );
-            } catch (\Throwable $e) {
-                return new ProviderResponse(
-                    provider: $provider->name(),
-                    providerStatus: 'provider_error',
-                    extractionStatus: 'not_started',
-                    error: ['message' => $e->getMessage(), 'class' => $e::class],
-                );
+        return $results;
+    }
+
+    /**
+     * @param  LlmProvider[]  $providers
+     * @param  array<int, array{logical_name: string, connection: \App\AI\Providers\LlmConnectionConfig}|null>  $slots
+     */
+    private function canRunParallel(array $providers, array $slots): bool
+    {
+        if (count($providers) <= 1) {
+            return false;
+        }
+
+        foreach ($slots as $slot) {
+            if ($slot === null) {
+                return false;
             }
         }
+
+        return true;
     }
 }

@@ -101,7 +101,7 @@ test('M5-A restores a complete audit trail from the database', function () {
     $anthropic = collect($audit['providers'])->firstWhere('provider', 'anthropic');
     $gemini = collect($audit['providers'])->firstWhere('provider', 'gemini');
 
-    expect($openai['provider_prompt'])->toContain('Expected answer shape: discrete')
+    expect($openai['provider_prompt'])->toContain('預期答案型態：discrete')
         ->and($openai['raw_answer'])->not->toBeNull()
         ->and($openai['provider_status'])->toBe('success')
         ->and($openai['extraction_prompt'])->toContain('Do not use any other provider answer.')
@@ -126,7 +126,7 @@ test('M5-A restores a complete audit trail from the database', function () {
             'cap' => 'Unknown',
         ])
         ->and($audit['consensus_result']['trust_level'])->toBe('Unknown')
-        ->and($audit['consensus_result']['verdict_report']['summary'])->toBe('Single Provider Answer - Unverified.')
+        ->and($audit['consensus_result']['verdict_report']['summary'])->toBe('僅單一 provider 可分析，答案未經交叉驗證。')
         ->and($audit['consensus_result']['errors'])->toHaveCount(2)
         ->and($audit['consensus_result']['created_at'])->not->toBeNull();
 });

@@ -288,6 +288,25 @@
 
 **Milestone 8 全 Gate RELEASED**（2026-06-14）
 
+### M8-D 產品文案與 partial verdict（2026-06-14）
+
+**進入條件**：M8-C **RELEASED**
+
+**交付物**：
+
+- `ConfiguredRawAnswerAgent` / `ProviderPromptBuilder` — prompt 強制 `summary` 繁中；`direct_answer` enum 仍英文
+- `StructuredVerdictReporter` — `final_verdict` 繁中章節；partial participation 缺席註記
+- `Show.vue` — `slotState` 以雙軸 `success` 判斷完成態
+- `ConsensusDemoFixtureCatalog` — 訪客 demo 範例 label／description／sample_question／summary 繁中
+- `Demo/Index.vue` — 切換範例時載入 `sample_question`
+- 測試：`StructuredVerdictReporterTest`、F05/F06/F09/F11/F14 regression 更新
+
+**驗收**：
+
+- `php artisan test` 全綠
+- F05 `final_verdict` 含「缺席 provider」「呼叫逾時」
+- [08 §3.4](08-ui-auth-providers.md)、[03 §10](03-consensus-algorithm.md)、[05 §10](05-failure-modes.md)
+
 ---
 
 ## Phase 3 延後項目（Non-MVP · M1–M7）

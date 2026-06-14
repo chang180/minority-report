@@ -168,6 +168,7 @@ M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結
 | **驗證刪除** | 列表單筆／全部刪除；`RunAuthenticatedVerificationJob` 略過已刪除列 |
 | **Job 逾時** | `set_time_limit` 於 job 結束 `finally` 還原，避免 worker 空等 crash |
 | **本機驗證基線** | 簡短是非題（如「1加1等於2嗎？」「水的沸點…100度嗎？」）→ 抽取 3/3、Full、Trust High（#20–#21） |
+| **M8-D 產品文案** | `ConfiguredRawAnswerAgent` / `ProviderPromptBuilder` 強制 summary 繁中；`StructuredVerdictReporter` 繁中 `final_verdict` + partial 缺席註記；`ConsensusDemoFixtureCatalog` 訪客 demo 繁中；`Show.vue` slotState 雙軸判斷 |
 
 ### 已知缺口（待 spec）
 

@@ -82,7 +82,7 @@ test('F01 replay: three providers all succeed and responses are persisted', func
     $registry->register('F01_gemini', $successBehavior('gemini'));
 
     $verificationRequest = VerificationRequest::create(['question' => $question->text]);
-    $orchestrator = new ProviderOrchestrator(new EloquentProviderResponseRepository);
+    $orchestrator = app(ProviderOrchestrator::class);
 
     $responses = $orchestrator->dispatch(
         $verificationRequest->id,

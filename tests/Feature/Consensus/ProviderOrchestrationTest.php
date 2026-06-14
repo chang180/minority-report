@@ -1,11 +1,13 @@
 <?php
 
+use App\Consensus\ConsensusParallelRunner;
 use App\Consensus\DTO\ProviderResponse;
 use App\Consensus\DTO\Question;
 use App\Consensus\Exceptions\ProviderException;
 use App\Consensus\Exceptions\ProviderTimeoutException;
 use App\Consensus\Fake\InMemoryFakeProviderRegistry;
 use App\Consensus\ProviderOrchestrator;
+use App\Consensus\VerificationWorkflowProgress;
 use App\Models\VerificationRequest;
 use App\Repositories\EloquentProviderResponseRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,7 +16,7 @@ uses(RefreshDatabase::class);
 
 function makeOrchestrator(): ProviderOrchestrator
 {
-    return new ProviderOrchestrator(new EloquentProviderResponseRepository);
+    return app(ProviderOrchestrator::class);
 }
 
 function makeRequest(): VerificationRequest
@@ -63,7 +65,6 @@ test('single provider failure does not interrupt other providers', function () {
         ->and($responses[1]->providerStatus)->toBe('provider_error')
         ->and($responses[2]->providerStatus)->toBe('success');
 
-    // All three outcomes persisted
     expect(App\Models\ProviderResponse::where('verification_request_id', $request->id)->count())->toBe(3);
 });
 
@@ -141,9 +142,8 @@ test('provider is marked failed_timeout after exhausting retries', function () {
 
     expect($responses[0]->providerStatus)->toBe('failed_timeout')
         ->and($responses[0]->extractionStatus)->toBe('not_started')
-        ->and($attempts)->toBe(2); // 1 initial + 1 retry
+        ->and($attempts)->toBe(2);
 
-    // Failure is persisted
     $record = App\Models\ProviderResponse::where('verification_request_id', $request->id)->first();
     expect($record->provider_status)->toBe('failed_timeout');
 });
@@ -178,4 +178,55 @@ test('raw answer and prompt are persisted for each provider', function () {
         ->and($record->extraction_status)->toBe('not_started')
         ->and($record->raw_answer)->toBe('Persisted raw answer')
         ->and($record->provider_prompt)->toBe('The exact prompt text');
+});
+
+test('dispatch sets workflow phase to dispatching', function () {
+    $registry = new InMemoryFakeProviderRegistry;
+    $registry->register('phase_check', fn (Question $q, string $p): ProviderResponse => new ProviderResponse(
+        provider: 'openai',
+        providerStatus: 'success',
+        extractionStatus: 'not_started',
+        rawAnswer: 'ok',
+    ));
+
+    $request = makeRequest();
+
+    makeOrchestrator()->dispatch(
+        $request->id,
+        makeQuestion(),
+        'prompt',
+        [$registry->create('phase_check')],
+    );
+
+    $request->refresh();
+
+    expect($request->metadata['workflow_phase'] ?? null)->toBe(VerificationWorkflowProgress::PHASE_DISPATCHING);
+});
+
+test('parallel runner executes all provider tasks', function () {
+    config()->set('consensus.parallel.enabled', true);
+
+    $seen = [];
+    $runner = app(ConsensusParallelRunner::class);
+
+    $results = $runner->run([
+        0 => function () use (&$seen) {
+            $seen[] = 'a';
+
+            return 'A';
+        },
+        1 => function () use (&$seen) {
+            $seen[] = 'b';
+
+            return 'B';
+        },
+        2 => function () use (&$seen) {
+            $seen[] = 'c';
+
+            return 'C';
+        },
+    ]);
+
+    expect($results)->toBe(['A', 'B', 'C'])
+        ->and($seen)->toHaveCount(3);
 });

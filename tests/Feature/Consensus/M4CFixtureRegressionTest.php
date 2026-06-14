@@ -6,7 +6,7 @@ use App\Consensus\DTO\ProviderResponse;
 use App\Consensus\DTO\Question;
 use App\Consensus\Exceptions\ProviderTimeoutException;
 use App\Consensus\Fake\InMemoryFakeProviderRegistry;
-use App\Consensus\Verdict\StructuredVerdictReporter;
+use App\Consensus\Verdict\SynthesizingVerdictReporter;
 use App\Models\ConsensusResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -63,18 +63,25 @@ test('M4-C fixture :dataset passes through classifier providers extractor aligne
         }
     }
 
+    if (($fixture['id'] ?? '') === 'F05') {
+        expect($verificationRequest->final_verdict)->toContain('缺席 provider')
+            ->and($verificationRequest->final_verdict)->toContain('openai')
+            ->and($verificationRequest->final_verdict)->toContain('呼叫逾時')
+            ->and($verificationRequest->final_verdict)->toContain('參與 provider');
+    }
+
     if (($fixture['id'] ?? '') === 'F09') {
-        expect($verificationRequest->final_verdict)->toContain('mechanically comparable');
+        expect($verificationRequest->final_verdict)->toContain('機械比對');
     }
 
     if (($fixture['id'] ?? '') === 'F11') {
-        expect($verificationRequest->final_verdict)->toBeNull()
+        expect($verificationRequest->final_verdict)->toContain('缺席 provider')
             ->and($verificationRequest->consensusResult->verdict_report['summary'])
-            ->toContain('No final answer');
+            ->toContain('未產出最終答案');
     }
 
     if (($fixture['id'] ?? '') === 'F14') {
-        expect($verificationRequest->final_verdict)->toContain('direct_answer split')
+        expect($verificationRequest->final_verdict)->toContain('直接回答分歧')
             ->and($verificationRequest->final_verdict)->toContain('launch date');
     }
 
@@ -82,7 +89,7 @@ test('M4-C fixture :dataset passes through classifier providers extractor aligne
 })->with(fn (): array => m4cFixtures());
 
 test('consensus service provider wires the M4-C verdict reporter implementation', function () {
-    expect(app(VerdictReporter::class))->toBeInstanceOf(StructuredVerdictReporter::class);
+    expect(app(VerdictReporter::class))->toBeInstanceOf(SynthesizingVerdictReporter::class);
 });
 
 /**

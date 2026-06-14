@@ -10,6 +10,7 @@ class JsonResponseExtractor implements ResponseExtractor
 {
     public function __construct(
         private readonly string $extractorModel = 'fixture-json-replay',
+        private readonly ClaimStatementParser $claimStatementParser = new ClaimStatementParser,
     ) {}
 
     public function extract(
@@ -161,11 +162,13 @@ class JsonResponseExtractor implements ResponseExtractor
             $directAnswer = $this->inferDirectAnswerFromSummary($summary);
         }
 
+        $claims = $this->normalizeClaims($normalized['claims'] ?? [], $summary);
+
         return [
             'answer_shape' => $answerShape,
             'direct_answer' => $directAnswer,
             'summary' => $summary,
-            'claims' => $this->normalizeClaims($normalized['claims'] ?? []),
+            'claims' => $claims,
             'citations' => $this->normalizeCitations($normalized['citations'] ?? []),
         ];
     }
@@ -267,14 +270,28 @@ class JsonResponseExtractor implements ResponseExtractor
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function normalizeClaims(mixed $claims): array
+    private function normalizeClaims(mixed $claims, string $summary): array
     {
         if (! is_array($claims)) {
-            return [];
+            $claims = [];
         }
 
-        return array_values(array_map(
-            fn (array $claim): array => [
+        $normalized = [];
+
+        foreach ($claims as $claim) {
+            if (is_string($claim)) {
+                $parsed = $this->claimStatementParser->parseNumericStatement($claim)
+                    ?? $this->claimStatementParser->statementClaim($claim);
+                $normalized[] = $this->finalizeClaim($parsed);
+
+                continue;
+            }
+
+            if (! is_array($claim)) {
+                continue;
+            }
+
+            $normalized[] = $this->finalizeClaim([
                 'type' => $this->normalizeClaimType($claim['type'] ?? null),
                 'canonical_key' => $this->canonicalKey($claim),
                 'subject' => $this->claimField($claim, ['subject', 'entity', 'topic']),
@@ -282,9 +299,39 @@ class JsonResponseExtractor implements ResponseExtractor
                 'value' => $this->claimField($claim, ['value', 'assertion', 'statement', 'text', 'description']),
                 'unit' => is_scalar($claim['unit'] ?? null) ? (string) $claim['unit'] : null,
                 'source' => is_scalar($claim['source'] ?? null) ? (string) $claim['source'] : null,
-            ],
-            array_filter($claims, 'is_array'),
-        ));
+            ]);
+        }
+
+        if ($normalized === []) {
+            $fromSummary = $this->claimStatementParser->parseNumericStatement($summary);
+
+            if ($fromSummary !== null) {
+                $normalized[] = $this->finalizeClaim($fromSummary);
+            }
+        }
+
+        return array_values($normalized);
+    }
+
+    /**
+     * @param  array{type: string, canonical_key: string, subject: string, predicate: string, value: string, unit: ?string, source: ?string}  $claim
+     * @return array<string, mixed>
+     */
+    private function finalizeClaim(array $claim): array
+    {
+        if ($claim['type'] === 'statement' && $claim['value'] !== '') {
+            $numeric = $this->claimStatementParser->parseNumericStatement($claim['value']);
+
+            if ($numeric !== null) {
+                $claim = $numeric;
+            }
+        }
+
+        if ($claim['type'] === 'number' && ($claim['unit'] === null || $claim['unit'] === '') && $claim['value'] !== '') {
+            $claim['unit'] = '°C';
+        }
+
+        return $claim;
     }
 
     /**

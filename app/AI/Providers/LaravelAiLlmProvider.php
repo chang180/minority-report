@@ -2,32 +2,36 @@
 
 namespace App\AI\Providers;
 
-use App\Consensus\Contracts\LlmProvider;
+use App\AI\Providers\Contracts\ConnectionConfiguredLlmProvider;
 use App\Consensus\DTO\ProviderResponse;
 use App\Consensus\DTO\Question;
 use App\Consensus\Exceptions\ProviderException;
 use App\Consensus\Exceptions\ProviderTimeoutException;
 use Illuminate\Http\Client\ConnectionException;
+use Laravel\Ai\Ai;
 use Laravel\Ai\Contracts\Agent;
+use Laravel\Ai\Contracts\HasStructuredOutput;
+use Laravel\Ai\Contracts\Providers\TextProvider;
 use Laravel\Ai\Enums\Lab;
+use Laravel\Ai\Prompts\AgentPrompt;
 use Laravel\Ai\Responses\AgentResponse;
 use Laravel\Ai\Responses\StructuredAgentResponse;
 use Throwable;
 
-abstract class LaravelAiLlmProvider implements LlmProvider
+abstract class LaravelAiLlmProvider implements ConnectionConfiguredLlmProvider
 {
     private readonly Agent $agent;
 
     public function __construct(
         private readonly string $providerName,
         private readonly Lab $lab,
-        private readonly bool $enabled,
-        private readonly ?string $model = null,
-        private readonly int $timeout = 60,
+        private readonly LlmConnectionConfig $connection,
         array $providerOptions = [],
         ?Agent $agent = null,
+        private readonly ?AiTextProviderFactory $textProviderFactory = null,
     ) {
-        $this->agent = $agent ?? new ConfiguredRawAnswerAgent($providerOptions);
+        $options = $providerOptions !== [] ? $providerOptions : $connection->providerOptions;
+        $this->agent = $agent ?? new ConfiguredRawAnswerAgent($options);
     }
 
     public function name(): string
@@ -35,12 +39,17 @@ abstract class LaravelAiLlmProvider implements LlmProvider
         return $this->providerName;
     }
 
+    public function connectionConfig(): LlmConnectionConfig
+    {
+        return $this->connection;
+    }
+
     public function ask(Question $question, string $prompt): ProviderResponse
     {
-        if (! $this->enabled) {
+        if (! $this->connection->enabled) {
             return new ProviderResponse(
                 provider: $this->providerName,
-                model: $this->model ?: '',
+                model: $this->connection->model ?: '',
                 providerStatus: 'provider_unavailable',
                 extractionStatus: 'not_started',
                 error: ['message' => 'Provider is disabled or missing credentials.'],
@@ -48,12 +57,7 @@ abstract class LaravelAiLlmProvider implements LlmProvider
         }
 
         try {
-            $response = $this->agent->prompt(
-                $prompt !== '' ? $prompt : $question->text,
-                provider: $this->lab,
-                model: $this->model,
-                timeout: $this->timeout,
-            );
+            $response = $this->invokeAgent($question, $prompt);
         } catch (Throwable $exception) {
             if ($this->isTimeoutException($exception)) {
                 throw new ProviderTimeoutException($exception->getMessage(), previous: $exception);
@@ -64,7 +68,7 @@ abstract class LaravelAiLlmProvider implements LlmProvider
 
         return new ProviderResponse(
             provider: $this->providerName,
-            model: $response->meta->model ?: ($this->model ?: ''),
+            model: $response->meta->model ?: ($this->connection->model ?: ''),
             providerStatus: 'success',
             extractionStatus: 'not_started',
             rawAnswer: $this->resolveRawAnswer($response),
@@ -83,6 +87,40 @@ abstract class LaravelAiLlmProvider implements LlmProvider
                 'structured_output' => $response instanceof StructuredAgentResponse,
             ],
         );
+    }
+
+    private function invokeAgent(Question $question, string $prompt): AgentResponse
+    {
+        $message = $prompt !== '' ? $prompt : $question->text;
+        $timeout = $this->connection->timeout;
+        $model = $this->connection->model;
+
+        $textProvider = $this->resolveTextProvider();
+        $resolvedModel = $model ?: $textProvider->defaultTextModel();
+
+        return $textProvider->prompt(new AgentPrompt(
+            agent: $this->agent,
+            prompt: $message,
+            attachments: [],
+            provider: $textProvider,
+            model: $resolvedModel,
+            timeout: $timeout,
+        ));
+    }
+
+    private function resolveTextProvider(): TextProvider
+    {
+        if ($this->textProviderFactory === null) {
+            throw new ProviderException('AiTextProviderFactory is required for instance-scoped providers.');
+        }
+
+        $textProvider = $this->textProviderFactory->make($this->connection);
+
+        if ($this->agent::isFaked()) {
+            $textProvider = (clone $textProvider)->useTextGateway(Ai::fakeGatewayFor($this->agent));
+        }
+
+        return $textProvider;
     }
 
     private function resolveRawAnswer(AgentResponse $response): string

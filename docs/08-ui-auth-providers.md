@@ -160,6 +160,8 @@ Middleware `admin` **MUST** 保護 `/admin/*`。
 |------|------|------|
 | 按鈕、標題、nav、表單 label、說明、Dashboard | **繁體中文** | 「登入」「註冊」「設定」「儀表板」 |
 | Validation / 錯誤 / flash（使用者可見） | **繁體中文** | Form Request、`lang/zh_TW` |
+| `final_verdict`、`verdict_report.summary` | **繁體中文** | 「最終判定：」「多數意見：」 |
+| Provider `summary` 與 claims 內自然語言 | **繁體中文** | `ConfiguredRawAnswerAgent` / `ProviderPromptBuilder` **MUST** 在 prompt 強制 |
 | API / domain / audit 參數 | **英文** | `openai`、`Full`、`provider_unavailable`、fixture id |
 | Model 名、JSON key、路由 path | **英文** | `gemma-4-…`、`consensus_status` |
 | 程式識別符、HTML `autocomplete` | 不強制中文化 | — |
@@ -169,6 +171,7 @@ Middleware `admin` **MUST** 保護 `/admin/*`。
 - M7 **MUST NOT** 引入 vue-i18n 等多語系框架；硬編碼繁中即可。
 - M7-A **MUST** 將 kit 移植頁（auth、settings、layout、Dashboard）及 M6 Verification 頁改為繁中。
 - M7-B **MUST** 延續同一語言政策。
+- M8-D **MUST** 將 `StructuredVerdictReporter` 輸出與 provider prompt 納入 §3.4（`direct_answer` enum 仍英文，見 [02-contracts.md §5](02-contracts.md)）。
 - `APP_LOCALE` **SHOULD** 為 `zh_TW`（Orchestrator 整合 `.env.example` / README）。
 
 ### 3.5 M6 路由遷移
@@ -203,6 +206,19 @@ Singleton（一行或 key-value）。欄位：
 訪客 verification 的 `verification_requests.user_id` **MUST** 為 `null`。
 
 僅 `admin` **MAY** 更新 demo settings。
+
+### 4.3 Demo fixture 文案（M8-D）
+
+`ConsensusDemoFixtureCatalog` 為訪客 `/demo` 的**單一文案來源**：
+
+| 欄位 | 語言 | 說明 |
+|------|------|------|
+| `label`、`description`、`sample_question` | **繁體中文** | 經 `options()` 送至 `Demo/Index.vue`；切換範例時 **SHOULD** 同步更新問題文字 |
+| Provider `summary`（fake 回應） | **繁體中文** | 寫入 `raw_answer` → 出現在 Show 與 `final_verdict` |
+| `expected_consensus`、`expected_trust` | **英文** | domain 值（與 audit 一致） |
+| `canonical_key`、fixture `id` | **英文** | 機器比對／識別 |
+
+逾時等錯誤訊息 **SHOULD** 為繁中（出現在缺席 provider 行）。
 
 ---
 

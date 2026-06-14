@@ -24,8 +24,11 @@ class ConfiguredRawAnswerAgent implements Agent, HasProviderOptions, HasStructur
             'You are a consensus verification provider.',
             'Return JSON matching the schema exactly.',
             'Use only these top-level keys: direct_answer, summary, claims, citations.',
-            'For yes/no questions, direct_answer must be yes, no, or unknown (lowercase strings).',
-            'summary must be one complete sentence.',
+            'For yes/no questions, direct_answer must be yes, no, or unknown (lowercase English strings).',
+            'summary must be one complete sentence in Traditional Chinese (繁體中文), even when the question is in English.',
+            'claims and citations text intended for human readers must use Traditional Chinese.',
+            'claims must be an array of objects with type, canonical_key, subject, predicate, value, and optional unit — never plain strings.',
+            'For numeric factual answers, include at least one claim with type number and the numeric value in value.',
             'claims and citations may be empty arrays.',
             'Preserve uncertainty and avoid fabricating sources.',
         ]);

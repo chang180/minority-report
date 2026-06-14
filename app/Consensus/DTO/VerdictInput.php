@@ -2,6 +2,8 @@
 
 namespace App\Consensus\DTO;
 
+use App\Consensus\Synthesis\SynthesisRequest;
+
 final readonly class VerdictInput
 {
     /**
@@ -14,5 +16,7 @@ final readonly class VerdictInput
         public ConsensusResult $consensus,
         public TrustLevelResult $trustLevel,
         public AnalysisContext $context,
+        public string $questionText = '',
+        public ?SynthesisRequest $synthesis = null,
     ) {}
 }
