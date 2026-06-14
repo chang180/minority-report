@@ -1,7 +1,7 @@
 # 關鍵報告（Minority Report）— Agent Handoff
 
-> **當前階段**：**M7 進行中** — M7-A **RELEASED**；下一 Gate **M7-B**（待 brief）。  
-> **UI 入口**：`/` Welcome · `/demo` fake fixture · `/dashboard`（auth）。Health：`GET /health`。
+> **當前階段**：**M7 進行中** — M7-A **REOPEN**（M7-A-R1 繁中 UI 修正）。  
+> **可開工**：[M7-A/brief.md](briefs/M7-A/brief.md) · **M7-B 暫停**。
 
 「關鍵報告」是一套 Multi-LLM Consensus Engine：降低單一模型幻覺風險，揭露多模型間的共識、分歧與不確定性。
 
@@ -114,12 +114,12 @@ M6-A **RELEASED**（2026-06-14）：`/` 問題輸入 + `/verifications/{id}` 結
 
 | Gate | 派工文件 | 狀態 |
 |------|----------|------|
-| **M7-A** | [briefs/M7-A/](briefs/M7-A/) | **RELEASED** |
-| **M7-B** | （M7-A RELEASED 後發布） | 未開 |
+| **M7-A** | [briefs/M7-A/](briefs/M7-A/) | **REOPEN**（M7-A-R1） |
+| **M7-B** | （M7-A 重新 RELEASED 後發布） | **暫停** |
 
 **M7 目標**（產品基本 UI，非 M6 minimal）：
 
-- **Spec**：[docs/08-ui-auth-providers.md](../../docs/08-ui-auth-providers.md)（M7 canonical；Worker 必讀）
+- **Spec**：[docs/08-ui-auth-providers.md](../../docs/08-ui-auth-providers.md)（含 **§3.4 繁體中文**）
 - **Auth**：Laravel 13 官方 **Fortify** + vue-starter-kit **選擇性移植**（非整包安裝）— **不用 Breeze**
 - **角色**：admin / user；開放註冊
 - **頁面**：Welcome `/`、訪客 Demo `/demo`（admin 可管理，M7-B）、登入後 Dashboard、Provider 設定（M7-B）

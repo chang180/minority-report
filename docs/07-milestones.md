@@ -14,7 +14,7 @@
 | M4 | Consensus Engine | **完成**（2026-06-13） |
 | M5 | Audit Trail | **完成**（2026-06-14） |
 | M6 | Minimal UI | **完成**（2026-06-14） |
-| M7 | Product UI + Auth | **進行中**（M7-A RELEASED · M7-B 未開） |
+| M7 | Product UI + Auth | **進行中**（M7-A REOPEN · M7-B 暫停） |
 
 **M1 完成前 MUST NOT 撰寫 Laravel application code。** M2 起可開始實作。  
 **M7 開工前 MUST** 先完成 [08-ui-auth-providers.md](08-ui-auth-providers.md) 與本文件 §M7（spec-driven）。
@@ -180,7 +180,7 @@
 
 | Gate | 名稱 | 狀態 |
 |------|------|------|
-| M7-A | Fortify + Vue kit 基礎 + Welcome + Demo 路由 | **RELEASED** |
+| M7-A | Fortify + Vue kit 基礎 + Welcome + Demo 路由 | **REOPEN**（M7-A-R1 繁中 UI） |
 | M7-B | Provider 設定 + Admin demo + Dashboard + 真 verification | 未開 |
 
 詳細規格 **MUST** 以 [08-ui-auth-providers.md](08-ui-auth-providers.md) 為準。
@@ -197,6 +197,7 @@
 
 - 開放註冊 + login/logout + password reset
 - `/` Welcome；`/demo` 保留 M6 fake fixture 行為
+- **使用者可見 UI 為繁體中文**（[08 §3.4](08-ui-auth-providers.md)）
 - `npm run typecheck`；全 suite 綠
 
 ### M7-B 交付物

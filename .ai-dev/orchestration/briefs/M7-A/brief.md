@@ -2,90 +2,88 @@
 
 **Milestone 7 · Auth 基礎 + Vue Starter Kit 移植 + Welcome + Demo 路由**  
 **前置**：M6 **RELEASED**  
-**狀態**：**RELEASED**（2026-06-14）
+**狀態**：**REOPEN**（2026-06-14 · 繁體中文 UI 修正）
 
-> Post-MVP 第一 Gate。Auth 採 **Laravel Fortify**（L13 官方 starter kit 同款），**不用 Breeze**。前端 **選擇性移植** [laravel/vue-starter-kit](https://github.com/laravel/vue-starter-kit)（**MUST NOT** 整包安裝或 `laravel new --vue`），見 [docs/08 §1.4](../../../../docs/08-ui-auth-providers.md)。
+> 原 M7-A 已實作並 RELEASED，Orchestrator 審閱 UI 後 **退回修正**。修正完成後再交 Orchestrator 複審；**M7-B brief 待 M7-A 重新 RELEASED 後發布**。
+
+Post-MVP 第一 Gate。Auth 採 **Laravel Fortify**（L13 官方 starter kit 同款），**不用 Breeze**。前端 **選擇性移植** [laravel/vue-starter-kit](https://github.com/laravel/vue-starter-kit)（**MUST NOT** 整包安裝），見 [docs/08 §1.4](../../../../docs/08-ui-auth-providers.md)。
 
 ---
 
 ## 角色
 
-Worker Agent。**只做 M7-A**：Fortify、Inertia auth 頁、layout 基礎、角色、Welcome、Demo 路由 prefix。**M7-B** 才做 provider 設定與產品 Dashboard 完整內容。
+Worker Agent。**本輪只做 M7-A-R1：繁體中文 UI 修正**（在既有 Fortify / 路由 / layout 實作上改文案，不重做架構）。
 
 ---
 
 ## 必讀
 
-1. **[docs/08-ui-auth-providers.md](../../../../docs/08-ui-auth-providers.md)**（M7 canonical spec）
-2. [docs/07-milestones.md](../../../../docs/07-milestones.md) §M7
-3. [docs/00-product-vision.md](../../../../docs/00-product-vision.md) §7
-4. [Laravel 13 Starter Kits — Authentication](https://laravel.com/docs/13.x/starter-kits#authentication)
-5. [laravel/vue-starter-kit](https://github.com/laravel/vue-starter-kit)
-6. 本 brief · [progress.md](progress.md)
+1. **[docs/08-ui-auth-providers.md §3.4](../../../../docs/08-ui-auth-providers.md)**（顯示語言規格 · **新增**）
+2. [docs/08-ui-auth-providers.md](../../../../docs/08-ui-auth-providers.md) 全文
+3. [docs/07-milestones.md](../../../../docs/07-milestones.md) §M7
+4. 本 brief · [progress.md](progress.md)
 
 ---
 
 ## 背景
 
-- M6 僅 2 個有效 Vue 頁 + minimal inline Tailwind；**不是**完整產品前端
-- 專案已有 Tailwind v4、TS、Inertia Vue 3 — 與官方 kit 技術基底一致
-- **MUST 維持** [`config/inertia.php`](../../../../config/inertia.php) 的 `js/Pages`（大寫 P），避免 CI case-sensitive 回歸
-- **MUST NOT** 整包安裝 starter kit：只移植 Fortify + layouts + auth/settings + 必要 ui 元件；勿保留 kit 預設 Dashboard/範例 CRUD（見 [08 §1.4](../../../../docs/08-ui-auth-providers.md)）
+- M7-A 功能面（Fortify、路由、role、測試）已交付；**Blocking 修正**：使用者可見文案仍大量為英文（kit 預設）
+- 產品決策：**唯一顯示語言為繁體中文**（見 08 §3.4）
+- **MUST NOT** 引入 i18n / vue-i18n 框架（M7 階段硬編碼繁中即可）
+- **MUST NOT** 改 `docs/`、根 `README.md`
 
 ---
 
-## 交付物
+## M7-A-R1 交付物（繁體中文 UI）
 
-### 後端
+### 語言規則（摘要）
 
-- [ ] `composer require laravel/fortify` + publish config
-- [ ] 移植 `app/Actions/Fortify/*`、`FortifyServiceProvider`（Inertia 版，參考 vue-starter-kit）
-- [ ] `config/fortify.php`：register、login、password reset；**2FA 可關閉**至 M7-B
-- [ ] `users.role` migration（`user` | `admin`）；`User::isAdmin()`
-- [ ] Middleware `admin`（`EnsureUserIsAdmin`）
-- [ ] Admin seeder（`ADMIN_EMAIL` / `ADMIN_PASSWORD` from env）
-- [ ] `HandleInertiaRequests` 共享 `auth.user`（含 role）
+| 類別 | 語言 |
+|------|------|
+| 按鈕、標題、說明、nav、表單 label、placeholder、空狀態、Dashboard 文案 | **繁體中文** |
+| 使用者可見 validation / 錯誤訊息 | **繁體中文**（必要時調整 `lang/zh_TW` 或 Form Request messages） |
+| API / domain 參數 | **保留英文**：`openai`、`consensus`、`trust`、`provider_status`、fixture id、JSON key、model 名 |
+| 路由 path、HTML `name`/`autocomplete`、程式識別符 | 維持現狀 |
+| 品牌 | 「關鍵報告」；副標可保留 Minority Report 作為英文名 |
 
-### 前端（自 vue-starter-kit 移植）
+### 必須中文化（至少）
 
-- [ ] `resources/js/layouts/`（App、Auth layout）
-- [ ] `resources/js/components/ui/` + 必要 shadcn-vue 依賴與 `@/` alias
-- [ ] `Pages/auth/*`：Login、Register、ForgotPassword、ResetPassword
-- [ ] `Pages/settings/*`：Profile、Password（kit 預設即可）
-- [ ] **刪除** 孤立 `Pages/Welcome.vue`
-- [ ] **新** `Pages/Home/Welcome.vue`（產品 Welcome + CTA → `/demo`、`/register`）
-- [ ] Dashboard 頁：可保留 kit 殼，M7-B 再換產品內容
-
-### 路由
-
-- [ ] `GET /` → Welcome
-- [ ] `GET /demo`、`POST /demo/verifications`、`GET /demo/verifications/{id}` → `DemoVerificationController`（M6 行為）
-- [ ] Fortify auth 路由（login/register/logout…）
-- [ ] `GET /dashboard` → auth + Inertia dashboard（placeholder OK）
-- [ ] `GET /health` 保留
+- [ ] `resources/js/layouts/*`（AppLayout、AuthLayout、GuestLayout）— nav、logout、settings 等
+- [ ] `resources/js/Pages/auth/*`（Login、Register、ForgotPassword、ResetPassword、ConfirmPassword）
+- [ ] `resources/js/Pages/settings/*`（Profile、Password）
+- [ ] `resources/js/Pages/Dashboard.vue`
+- [ ] `resources/js/Pages/Home/Welcome.vue`（若有英文段落）
+- [ ] `resources/js/Pages/Verification/Index.vue`、`Show.vue`（M6 英文標題/label 一併改繁中）
+- [ ] Fortify / Laravel 回傳之**使用者可見** flash、validation（`lang/zh_TW` 或自訂 messages）
+- [ ] `config/app.php` 或 `.env`：`APP_LOCALE=zh_TW`、`APP_FALLBACK_LOCALE=zh_TW`（本機 example 由 Orchestrator 整合；Worker 可於 progress §4 建議）
 
 ### 測試
 
-- [ ] `tests/Feature/M7AAuthTest.php`（register、login、logout、guest redirect）
-- [ ] 更新 `M6MinimalUiTest`、`ExampleTest` → `/demo` prefix
-- [ ] `npm run typecheck` 通過；全 suite 綠
+- [ ] 更新 `M7AAuthTest` / `M6MinimalUiTest`：若 assert 英文 Inertia 文案，改為繁中或改 assert 結構（component/route）避免 brittle
+- [ ] `npm run typecheck`、全 suite 綠
+
+### 本輪 MUST NOT
+
+- M7-B 範圍（provider DB、Admin demo、真 verification）
+- 改動 `app/Consensus/` domain
+- 引入多語系框架或英文 fallback UI
 
 ---
 
-## MUST NOT
+## 原 M7-A 交付物（已存在 · 勿 regress）
 
-- 使用 **laravel/breeze**
-- **`laravel new --vue` 或整包覆蓋 vue-starter-kit**（必須選擇性移植，見 08 §1.4）
-- 保留 kit 預設 placeholder 應用（範例 CRUD、與 Verification/Demo 無關的路由/頁）
-- 修改 `docs/`、根 `README.md`
-- M7-B 範圍：provider DB、Admin demo settings、真 provider verification、`UserProviderFactory`
-- 改動 `app/Consensus/` domain 算法
-- 改 `config/inertia.php` 的 Pages 路徑為小寫 `pages`（除非 Orchestrator 明確批准並同步 CI 策略）
+以下 **MUST** 保持可用，修正文案時不得破壞：
+
+- Fortify + Inertia auth 流程
+- `users.role` + admin middleware
+- `/` Welcome、`/demo/*` demo 路由
+- `M7AAuthTest` 核心 auth 行為
+- 選擇性移植 kit 結構（非整包安裝）
 
 ---
 
 ## 完成後交還
 
-1. 更新 [progress.md](progress.md) §1–4
-2. §4 列「建議 Orchestrator 文件更新」（M7 milestone 草案、README 路由、`.env.example` ADMIN_*）
-3. 使用者轉交 Orchestrator 審核
+1. 更新 [progress.md](progress.md) §1–4（標明 M7-A-R1 繁中修正）
+2. §4 列「建議 Orchestrator 文件更新」（若需 README 語言說明、`APP_LOCALE` example）
+3. 使用者轉交 Orchestrator **重新審核 RELEASED**

@@ -8,7 +8,7 @@
 
 | Gate | Brief | 說明 |
 |------|-------|------|
-| **M7-B** | （待發布） | Provider 設定 + Admin demo + 產品 Dashboard |
+| **M7-A-R1** | [M7-A/brief.md](M7-A/brief.md) | 繁體中文 UI 修正（原 M7-A REOPEN） |
 
 ---
 
@@ -16,22 +16,14 @@
 
 **M1–M6 全 RELEASED**（2026-06-14）。
 
-| Milestone | 最後 Gate |
-|-----------|-----------|
-| M2 Skeleton | M2-E |
-| M3 Providers | M3-B |
-| M4 Consensus | M4-C |
-| M5 Audit | M5-A |
-| M6 Minimal UI | M6-A |
-
 ---
 
 ## Milestone 7（Post-MVP）
 
 | Gate | 狀態 |
 |------|------|
-| M7-A | **RELEASED**（2026-06-14） |
-| M7-B | 待 brief |
+| M7-A | **REOPEN**（M7-A-R1） |
+| M7-B | 暫停（待 M7-A 重新 RELEASED） |
 
 ---
 

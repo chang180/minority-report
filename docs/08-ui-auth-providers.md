@@ -152,7 +152,26 @@ Middleware `admin` **MUST** 保護 `/admin/*`。
 
 `GET /health` **MUST** 保留。
 
-### 3.4 M6 路由遷移
+### 3.4 顯示語言（繁體中文）
+
+本產品 UI **ONLY** 使用**繁體中文**作為使用者可見文案語言。
+
+| 類別 | 語言 | 範例 |
+|------|------|------|
+| 按鈕、標題、nav、表單 label、說明、Dashboard | **繁體中文** | 「登入」「註冊」「設定」「儀表板」 |
+| Validation / 錯誤 / flash（使用者可見） | **繁體中文** | Form Request、`lang/zh_TW` |
+| API / domain / audit 參數 | **英文** | `openai`、`Full`、`provider_unavailable`、fixture id |
+| Model 名、JSON key、路由 path | **英文** | `gemma-4-…`、`consensus_status` |
+| 程式識別符、HTML `autocomplete` | 不強制中文化 | — |
+
+規則：
+
+- M7 **MUST NOT** 引入 vue-i18n 等多語系框架；硬編碼繁中即可。
+- M7-A **MUST** 將 kit 移植頁（auth、settings、layout、Dashboard）及 M6 Verification 頁改為繁中。
+- M7-B **MUST** 延續同一語言政策。
+- `APP_LOCALE` **SHOULD** 為 `zh_TW`（Orchestrator 整合 `.env.example` / README）。
+
+### 3.5 M6 路由遷移
 
 M6 的 `/` demo **MUST** 遷至 `/demo/*`（M7-A）。  
 既有 `M6MinimalUiTest` **MUST** 更新為 `/demo` prefix。
@@ -285,6 +304,7 @@ public function forDemo(SystemDemoSettings $settings): array;
 - [ ] vue-starter-kit layouts + auth 頁移植；`npm run typecheck` 通過
 - [ ] `users.role` + admin middleware + admin seeder
 - [ ] `GET /` Welcome；`/demo/*` 保留 M6 demo 行為
+- [ ] **使用者可見 UI 文案為繁體中文**（§3.4）
 - [ ] `M7AAuthTest` + 更新 `M6MinimalUiTest`
 - [ ] **MUST NOT** 引入 Breeze
 
@@ -308,6 +328,8 @@ public function forDemo(SystemDemoSettings $settings): array;
 | §1.4 移植策略 | 本專案 Orchestrator M7 決策 |
 | §2 Auth | [01-architecture.md §7](01-architecture.md)、Laravel 13 Starter Kits |
 | §3 前端 | [01-architecture.md §1](01-architecture.md)、M6 實作慣例 |
+| §3.4 顯示語言 | 產品決策（繁體中文 only） |
+| §3.5 M6 路由 | M7-A 路由遷移 |
 | §4 Demo | [00-product-vision.md §3.2](00-product-vision.md) fake fixture 策略 |
 | §5 Provider | [02-contracts.md §8](02-contracts.md)、[01-architecture.md §4](01-architecture.md) |
 | §6 Audit | [02-contracts.md §10–§11](02-contracts.md) |

@@ -9,7 +9,7 @@
 | 階段 | Milestone | Spec 狀態 | 實作 |
 |------|-----------|-----------|------|
 | **MVP** | M1–M6 | `docs/00..07` **完成** | **RELEASED**（2026-06-14） |
-| **Post-MVP** | M7+ | `docs/08` + `07` §M7 **已寫** | M7-A **RELEASED** · M7-B 未開 |
+| **Post-MVP** | M7+ | `docs/08` + `07` §M7 | M7-A **REOPEN**（R1 繁中）· M7-B 暫停 |
 
 ### Spec-driven 規則（M2 起）
 
@@ -82,6 +82,7 @@
 | `demo mode` | `fake_fixtures` \| `shared_local_api`；Admin 設定 |
 | `Fortify` | Laravel 13 官方 starter kit 使用的 auth 後端；**本專案 M7 MUST 使用，MUST NOT 使用 Breeze** |
 | starter kit 移植 | **選擇性**自 vue-starter-kit 複製所需檔案；**MUST NOT** 整包 `laravel new --vue`（見 08 §1.4） |
+| UI 顯示語言 | **僅繁體中文**（API/domain 參數除外）；見 [08 §3.4](08-ui-auth-providers.md) |
 
 ---
 
