@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AI\Providers\ConsensusSlotReadiness;
 use App\Models\UserCustomProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,6 +32,7 @@ class ProviderSettingsController extends Controller
                 'label' => $preset['label'],
                 'cloud' => $preset['cloud'],
                 'has_key' => $setting && filled($setting->api_key),
+                'configured' => ConsensusSlotReadiness::isPresetReady($user, $preset['key']),
                 'api_url' => $setting?->api_url,
                 'model' => $setting?->model,
                 'enabled' => $setting?->enabled ?? true,
@@ -45,6 +47,7 @@ class ProviderSettingsController extends Controller
                 'api_url' => $p->api_url,
                 'model' => $p->model,
                 'has_key' => filled($p->api_key),
+                'configured' => ConsensusSlotReadiness::isCustomReady($user, $p->id),
                 'enabled' => $p->enabled,
             ])
             ->values()

@@ -87,6 +87,7 @@ class VerificationController extends Controller
         );
 
         $verification->update([
+            'processing_status' => 'completed',
             'metadata' => array_merge($verification->metadata ?? [], [
                 'source' => 'demo',
                 'demo_mode' => $settings->mode,
@@ -133,6 +134,7 @@ class VerificationController extends Controller
         return [
             'id' => $verification->id,
             'question' => $verification->question,
+            'processing_status' => $this->resolveProcessingStatus($verification),
             'classified_type' => $verification->classified_type,
             'classifier_confidence' => $verification->classifier_confidence,
             'answer_shape' => $verification->answer_shape,
@@ -145,6 +147,20 @@ class VerificationController extends Controller
             'metadata' => $verification->metadata,
             'created_at' => $verification->created_at?->toISOString(),
         ];
+    }
+
+    private function resolveProcessingStatus(VerificationRequest $verification): string
+    {
+        if ($verification->processing_status === 'completed' || $verification->processing_status === 'failed') {
+            return $verification->processing_status;
+        }
+
+        // Demo runs synchronously; legacy rows may still be `pending` after M8-A migration.
+        if (($verification->metadata['source'] ?? null) === 'demo' && $verification->consensusResult !== null) {
+            return 'completed';
+        }
+
+        return $verification->processing_status ?? 'pending';
     }
 
     /**

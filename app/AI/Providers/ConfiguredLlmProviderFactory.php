@@ -134,14 +134,14 @@ class ConfiguredLlmProviderFactory
             ->where('provider_key', $providerKey)
             ->first();
 
-        if ($setting === null || ! $setting->enabled || empty($setting->api_key)) {
+        if ($setting === null || ! ConsensusSlotReadiness::isPresetReady($user, $providerKey)) {
             return $this->disabledProvider($logicalName);
         }
 
         $aiKey = self::PRESET_AI_KEY[$providerKey] ?? $providerKey;
         $inner = $this->buildPresetInner($providerKey, $setting->model, $this->providerTimeout());
 
-        $overrides = ["ai.providers.{$aiKey}.key" => $setting->api_key];
+        $overrides = ['ai.providers.'.$aiKey.'.key' => ConsensusSlotReadiness::localApiKey($setting->api_key)];
         if ($setting->api_url !== null) {
             $overrides["ai.providers.{$aiKey}.url"] = $setting->api_url;
         }
@@ -154,7 +154,7 @@ class ConfiguredLlmProviderFactory
         /** @var UserCustomProvider|null $custom */
         $custom = $user->customProviders()->find($customProviderId);
 
-        if ($custom === null || ! $custom->enabled || empty($custom->api_key)) {
+        if ($custom === null || ! ConsensusSlotReadiness::isCustomReady($user, $customProviderId)) {
             return $this->disabledProvider($logicalName);
         }
 
@@ -166,7 +166,7 @@ class ConfiguredLlmProviderFactory
         );
 
         return new ScopedConfigLlmProvider($logicalName, $inner, [
-            'ai.providers.openai.key' => $custom->api_key,
+            'ai.providers.openai.key' => ConsensusSlotReadiness::localApiKey($custom->api_key),
             'ai.providers.openai.url' => $custom->api_url,
         ], $this->config);
     }

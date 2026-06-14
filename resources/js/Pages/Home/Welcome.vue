@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GuestLayout from '@/layouts/GuestLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import { ArrowRight, Gauge, Split, TestTubeDiagonal } from '@lucide/vue';
+import { ArrowRight, Gauge, LogIn, Split, TestTubeDiagonal } from '@lucide/vue';
 </script>
 
 <template>
@@ -24,6 +24,10 @@ import { ArrowRight, Gauge, Split, TestTubeDiagonal } from '@lucide/vue';
                     <Link href="/demo" class="inline-flex min-h-11 items-center gap-2 rounded-md bg-teal-600 px-5 text-sm font-semibold text-white transition hover:bg-teal-700">
                         <TestTubeDiagonal class="size-4" />
                         開啟示範
+                    </Link>
+                    <Link href="/login" class="inline-flex min-h-11 items-center gap-2 rounded-md border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white dark:hover:bg-neutral-900">
+                        <LogIn class="size-4" />
+                        登入
                     </Link>
                     <Link href="/register" class="inline-flex min-h-11 items-center gap-2 rounded-md border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white dark:hover:bg-neutral-900">
                         建立帳號

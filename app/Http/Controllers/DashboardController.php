@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\AI\Providers\ConsensusSlotReadiness;
 use App\Models\UserCustomProvider;
-use App\Models\UserProviderSettings;
 use App\Models\VerificationRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -33,28 +33,24 @@ class DashboardController extends Controller
 
             if ($slot['type'] === 'preset') {
                 $key = $slot['provider_key'];
-                /** @var UserProviderSettings|null $setting */
-                $setting = $user->providerSettings()->where('provider_key', $key)->first();
-                $ready = $setting && $setting->enabled && filled($setting->api_key);
 
                 return [
                     'slot' => $logicalName,
                     'type' => 'preset',
                     'provider_label' => self::PRESET_LABELS[$key] ?? $key,
-                    'ready' => $ready,
+                    'ready' => ConsensusSlotReadiness::isPresetReady($user, $key),
                 ];
             }
 
             if ($slot['type'] === 'custom') {
                 /** @var UserCustomProvider|null $custom */
                 $custom = $user->customProviders()->find((int) $slot['custom_provider_id']);
-                $ready = $custom && $custom->enabled && filled($custom->api_key);
 
                 return [
                     'slot' => $logicalName,
                     'type' => 'custom',
                     'provider_label' => $custom ? $custom->label : '已刪除的自訂供應端',
-                    'ready' => (bool) $ready,
+                    'ready' => ConsensusSlotReadiness::isCustomReady($user, (int) $slot['custom_provider_id']),
                 ];
             }
 

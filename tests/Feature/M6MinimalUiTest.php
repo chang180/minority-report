@@ -30,6 +30,7 @@ test('M6-A submits a question through the fake workflow and renders results', fu
     $response->assertRedirect(route('demo.verifications.show', $verification));
 
     expect($verification->question)->toBe('Did the product launch date pass consensus verification?')
+        ->and($verification->processing_status)->toBe('completed')
         ->and($verification->metadata['fixture_id'])->toBe('M6-F02')
         ->and($verification->providerResponses()->count())->toBe(3)
         ->and($verification->consensusResult)->not->toBeNull()
@@ -43,6 +44,7 @@ test('M6-A submits a question through the fake workflow and renders results', fu
         ->assertInertia(fn (Assert $page) => $page
             ->component('Verification/Show')
             ->where('verification.id', $verification->id)
+            ->where('verification.processing_status', 'completed')
             ->where('verification.final_trust', 'Medium')
             ->where('verification.consensus_summary.status', 'Majority')
             ->where('consensusResult.consensus.status', 'Majority')
@@ -83,6 +85,24 @@ test('M6-A result page exposes provider failure and extracted summary comparison
             ->has('providerResponses', 3)
             ->where('providerResponses.1.extraction_status', 'invalid_json')
             ->where('providerResponses.2.provider_status', 'failed_timeout')
+        );
+});
+
+test('M6-A legacy demo pending status still renders as completed on show', function () {
+    $this->post('/demo/verifications', [
+        'question' => 'Legacy pending row should still show consensus results',
+        'fixture_id' => 'M6-F02',
+    ])->assertRedirect();
+
+    $verification = VerificationRequest::query()->latest('id')->firstOrFail();
+    $verification->update(['processing_status' => 'pending']);
+
+    $this->get(route('demo.verifications.show', $verification))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Verification/Show')
+            ->where('verification.processing_status', 'completed')
+            ->where('consensusResult.consensus.status', 'Majority')
         );
 });
 

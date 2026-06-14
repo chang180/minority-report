@@ -6,6 +6,8 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
+        <link rel="icon" href="data:,">
+
         @vite(['resources/css/app.css', 'resources/js/app.ts'])
         @inertiaHead
     </head>

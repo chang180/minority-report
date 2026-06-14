@@ -6,7 +6,9 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Http\Middleware\AutoVerifyEmailLocally;
 use App\Models\User;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -73,17 +75,25 @@ class FortifyServiceProvider extends ServiceProvider
 
     private function registerAutoVerify(): void
     {
-        $autoVerify = config('app.env') === 'local'
-            || config('app.env') === 'testing'
-            || (bool) config('auth.auto_verify_email', false);
-
-        if (! $autoVerify) {
+        if (! AutoVerifyEmailLocally::shouldAutoVerifyOnAuthEvents()) {
             return;
         }
 
-        Event::listen(Registered::class, function (Registered $event): void {
-            if ($event->user instanceof User && ! $event->user->hasVerifiedEmail()) {
-                $event->user->markEmailAsVerified();
+        $verify = function (User $user): void {
+            if (! $user->hasVerifiedEmail()) {
+                $user->markEmailAsVerified();
+            }
+        };
+
+        Event::listen(Registered::class, function (Registered $event) use ($verify): void {
+            if ($event->user instanceof User) {
+                $verify($event->user);
+            }
+        });
+
+        Event::listen(Login::class, function (Login $event) use ($verify): void {
+            if ($event->user instanceof User) {
+                $verify($event->user);
             }
         });
     }

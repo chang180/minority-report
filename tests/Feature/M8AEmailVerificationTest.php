@@ -53,6 +53,20 @@ test('verified user (factory default) can post verifications', function () {
     expect(VerificationRequest::where('user_id', $user->id)->count())->toBeGreaterThanOrEqual(1);
 });
 
+test('auto verify on login marks previously unverified user as verified in testing', function () {
+    $user = User::factory()->unverified()->create([
+        'email' => 'login-auto@example.com',
+        'password' => bcrypt('password123'),
+    ]);
+
+    $this->post('/login', [
+        'email' => 'login-auto@example.com',
+        'password' => 'password123',
+    ])->assertRedirect();
+
+    expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
+});
+
 test('demo routes are not protected by verified middleware', function () {
     $this->get('/demo')->assertOk();
 });

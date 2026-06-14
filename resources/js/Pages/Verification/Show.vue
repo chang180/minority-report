@@ -70,12 +70,19 @@ const isDemo = computed(() => {
     return meta && meta['source'] === 'demo';
 });
 
-const processingStatus = computed(() => props.verification.processing_status);
+const processingStatus = computed(() => props.verification.processing_status ?? 'pending');
 const isPending = computed(() => processingStatus.value === 'pending');
 const isRunning = computed(() => processingStatus.value === 'running');
-const isCompleted = computed(() => processingStatus.value === 'completed');
 const isFailed = computed(() => processingStatus.value === 'failed');
-const isProcessing = computed(() => isPending.value || isRunning.value);
+const isCompleted = computed(() => {
+    if (processingStatus.value === 'completed') {
+        return true;
+    }
+
+    // Demo is synchronous; treat finished consensus as completed even if DB still says pending.
+    return isDemo.value && props.consensusResult !== null && ! isFailed.value;
+});
+const isProcessing = computed(() => ! isDemo.value && (isPending.value || isRunning.value));
 
 const processingError = computed(() => props.verification.metadata?.['processing_error'] as string | null ?? null);
 

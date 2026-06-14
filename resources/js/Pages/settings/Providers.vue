@@ -13,6 +13,7 @@ type PresetProvider = {
     label: string;
     cloud: boolean;
     has_key: boolean;
+    configured: boolean;
     api_url: string | null;
     model: string | null;
     enabled: boolean;
@@ -24,6 +25,7 @@ type CustomProvider = {
     api_url: string;
     model: string | null;
     has_key: boolean;
+    configured: boolean;
     enabled: boolean;
 };
 
@@ -117,10 +119,10 @@ function saveSlots() {
                             <div class="flex items-center gap-3">
                                 <span class="font-medium">{{ preset.label }}</span>
                                 <span
-                                    :class="preset.has_key ? 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'"
+                                    :class="preset.configured ? 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'"
                                     class="rounded-full px-2 py-0.5 text-xs font-medium"
                                 >
-                                    {{ preset.has_key ? '已設定' : '未設定' }}
+                                    {{ preset.configured ? '已設定' : '未設定' }}
                                 </span>
                             </div>
                             <Button variant="outline" size="sm" @click="editingPreset = editingPreset === preset.provider_key ? null : preset.provider_key">
@@ -167,7 +169,7 @@ function saveSlots() {
                             <p v-if="custom.model" class="text-xs text-neutral-400">模型：{{ custom.model }}</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span :class="custom.has_key ? 'text-teal-600' : 'text-neutral-400'" class="text-xs">{{ custom.has_key ? '已設定金鑰' : '無金鑰' }}</span>
+                            <span :class="custom.configured ? 'text-teal-600' : 'text-neutral-400'" class="text-xs">{{ custom.configured ? '已設定' : '未設定' }}</span>
                             <Button variant="danger" size="sm" @click="deleteCustom(custom.id)">刪除</Button>
                         </div>
                     </div>
@@ -231,7 +233,7 @@ function saveSlots() {
                                         class="accent-teal-500"
                                     />
                                     <span>{{ p.label }}</span>
-                                    <span v-if="!p.has_key" class="text-xs text-rose-500">未設定金鑰</span>
+                                    <span v-if="!p.configured" class="text-xs text-rose-500">未設定</span>
                                 </label>
                                 <label
                                     v-for="c in customProviders"
@@ -245,6 +247,7 @@ function saveSlots() {
                                         class="accent-teal-500"
                                     />
                                     <span>{{ c.label }}（自訂）</span>
+                                    <span v-if="!c.configured" class="text-xs text-rose-500">未設定</span>
                                 </label>
                             </div>
                         </div>
