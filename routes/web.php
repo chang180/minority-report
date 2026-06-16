@@ -24,6 +24,7 @@ Route::get('/demo/verifications/{verification}', [VerificationController::class,
 
 Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/about', fn () => Inertia::render('About/Index'))->name('about');
 
     // Settings
     Route::get('/settings/profile', fn () => Inertia::render('settings/Profile'))->name('profile.edit');

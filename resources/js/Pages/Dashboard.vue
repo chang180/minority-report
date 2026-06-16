@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { consensusSlotLabel } from '@/lib/consensusSlots';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { CheckCircle, Circle, PlusCircle, Settings, TestTubeDiagonal } from '@lucide/vue';
+import { CheckCircle, Circle, Info, PlusCircle, Settings, TestTubeDiagonal } from '@lucide/vue';
 
 type SlotStatus = {
     slot: string;
@@ -89,7 +89,7 @@ function trustBadgeClass(trust: string | null) {
             </section>
 
             <!-- Summary Cards -->
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div class="rounded-lg border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
                     <p class="text-sm text-neutral-500">已完成驗證</p>
                     <p class="mt-1 text-3xl font-bold">{{ totalVerifications }}</p>
@@ -98,6 +98,16 @@ function trustBadgeClass(trust: string | null) {
                     <p class="text-sm text-neutral-500">就緒供應端</p>
                     <p class="mt-1 text-3xl font-bold">{{ readyCount }} / 3</p>
                 </div>
+                <Link
+                    href="/about"
+                    class="rounded-lg border border-neutral-200 bg-white p-5 transition hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+                >
+                    <div class="flex items-center gap-2">
+                        <Info class="size-4 text-teal-500" />
+                        <p class="text-sm font-medium">了解關鍵報告</p>
+                    </div>
+                    <p class="mt-2 text-xs text-neutral-500">共識引擎願景、流程與限制說明</p>
+                </Link>
                 <Link
                     href="/demo"
                     class="rounded-lg border border-neutral-200 bg-white p-5 transition hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800"
