@@ -35,9 +35,6 @@ jobs:
       - name: Prepare environment
         run: |
           cp .env.example .env
-          # CI 用 PHPUnit(APP_ENV=testing)跑「未驗證必須 redirect」的測試；
-          # .env.example 內預設 AUTH_AUTO_VERIFY_EMAIL=true（本機 auto-verify），會導致測試失敗。
-          echo "AUTH_AUTO_VERIFY_EMAIL=false" >> .env
           php artisan key:generate
           touch database/database.sqlite
           php artisan migrate --force
