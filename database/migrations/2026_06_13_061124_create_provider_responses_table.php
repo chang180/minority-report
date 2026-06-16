@@ -30,7 +30,7 @@ return new class extends Migration
 
             $table->index(['verification_request_id', 'provider']);
             $table->index(['verification_request_id', 'provider_status']);
-            $table->index(['verification_request_id', 'extraction_status']);
+            $table->index(['verification_request_id', 'extraction_status'], 'provider_responses_request_extraction_status_index');
         });
     }
 
