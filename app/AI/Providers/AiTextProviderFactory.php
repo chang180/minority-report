@@ -23,6 +23,11 @@ class AiTextProviderFactory
             'key' => $connection->apiKey ?? ($base['key'] ?? null),
         ]);
 
+        // Strip empty string URL from base config to prevent invalid-scheme errors
+        if (isset($providerConfig['url']) && $providerConfig['url'] === '') {
+            unset($providerConfig['url']);
+        }
+
         if ($connection->apiUrl !== null && $connection->apiUrl !== '') {
             $providerConfig['url'] = $connection->apiUrl;
         }
@@ -30,6 +35,7 @@ class AiTextProviderFactory
         return match ($driver) {
             'anthropic' => $this->aiManager->createAnthropicDriver($providerConfig),
             'gemini' => $this->aiManager->createGeminiDriver($providerConfig),
+            'deepseek' => $this->aiManager->createDeepseekDriver($providerConfig),
             default => $this->aiManager->createOpenaiDriver($providerConfig),
         };
     }

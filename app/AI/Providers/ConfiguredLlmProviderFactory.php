@@ -170,9 +170,11 @@ class ConfiguredLlmProviderFactory
         }
 
         $options = ProviderGenerationOptions::sanitize($custom->provider_options);
+        $aiProviderKey = (string) ($options['ai_provider_key'] ?? 'openai');
+        unset($options['ai_provider_key']);
 
         return $this->buildProvider($logicalName, new LlmConnectionConfig(
-            aiProviderKey: 'openai',
+            aiProviderKey: $aiProviderKey,
             enabled: true,
             model: $custom->model,
             apiKey: ConsensusSlotReadiness::localApiKey($custom->api_key),
